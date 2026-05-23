@@ -23,9 +23,9 @@ void print_char(char toBePrintedCharacter, enum Color charColor, int charLocatio
     video_memory[charLocation * 2 + 1] = charColor;
 }
 
-void printf(char* text, enum Color textColor, int textLocation) {
-    for (int i = 0; text[0] != 0; i++) {
-        print_char(text[i], textColor, textLocation + i);
+void printf(char* text, enum Color textColor, int lineNo, int charPadding) {
+    for (int i = 0; text[i] != 0; i++) {
+        print_char(text[i], textColor, 80 * lineNo + i + charPadding);
     }
 }
 
@@ -36,9 +36,18 @@ void clear() {
     }
 }
 
+void printHeader() {
+    printf("--------------------- ", DarkGray, 0, 0);
+    printf("[INFO]: ", Yellow, 1, 0);
+    printf("Kernel Loaded", White, 1, 8);
+    printf("ESZ-OS", White, 2, 0);
+    printf("by Jonas Paprotka", White, 3, 0);
+    printf("--------------------- ", DarkGray, 4, 0);
+}
+
 void kmain() {
     clear();
-    printf("ESZ-OS", Red, 0);
+    printHeader();
 
     while(1); // loop to keep alive
 }
