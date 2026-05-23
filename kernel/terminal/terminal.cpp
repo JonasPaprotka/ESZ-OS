@@ -19,8 +19,8 @@ void printHeader() {
     printf("--------------------- ", DarkGray, 4, 0);
 }
 
-extern int cursorAtChar = 0;
-extern int cursorAtLine = 0;
+int cursorAtChar = 0;
+int cursorAtLine = 0;
 
 void terminal_on_key(unsigned char scancode) {
     print_char(scancode_to_ascii[scancode], White, 80 * cursorAtLine + cursorAtChar);
@@ -28,7 +28,7 @@ void terminal_on_key(unsigned char scancode) {
 }
 
 void newTerminalLine() {
-    printf(">> ", White);
+    //printf(">> ", White,);
 }
 
 void terminal_init() {

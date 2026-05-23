@@ -1,21 +1,21 @@
 # File Updated with AI
 
-CC      = x86_64-elf-gcc
+CC      = x86_64-elf-g++
 LD      = x86_64-elf-ld
 OBJCOPY = x86_64-elf-objcopy
 ASM     = nasm
 
-CFLAGS = -m32 -ffreestanding -Wall -Wextra -Ikernel -Ikernel/io -Ikernel/terminal
+CFLAGS  = -m32 -ffreestanding -fno-exceptions -fno-rtti -Wall -Wextra -Ikernel -Ikernel/io -Ikernel/terminal
 LDFLAGS = -m elf_i386 -T kernel/linker.ld
 
 BOOT    = bootloader/boot.bin
 OS      = os.bin
 
 KERNEL_ASM_SRCS = kernel/kernel_entry.asm
-KERNEL_C_SRCS   = $(wildcard kernel/*.c) $(wildcard kernel/**/*.c)
+KERNEL_C_SRCS   = $(wildcard kernel/*.cpp) $(wildcard kernel/**/*.cpp)
 
 KERNEL_ASM_OBJS = $(KERNEL_ASM_SRCS:.asm=.o)
-KERNEL_C_OBJS   = $(KERNEL_C_SRCS:.c=.o)
+KERNEL_C_OBJS   = $(KERNEL_C_SRCS:.cpp=.o)
 KERNEL_OBJS     = $(KERNEL_ASM_OBJS) $(KERNEL_C_OBJS)
 
 KERNEL_ELF = kernel/kernel.elf
@@ -31,7 +31,7 @@ $(BOOT): bootloader/boot.asm
 %.o: %.asm
 	$(ASM) -f elf32 $< -o $@
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(KERNEL_ELF): $(KERNEL_OBJS)

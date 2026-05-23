@@ -1,6 +1,7 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-void keyboard_handler();
+extern "C" void keyboard_handler();
+extern bool shift;
 
 #endif

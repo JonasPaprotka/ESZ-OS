@@ -4,9 +4,9 @@
 #include "vga.h"
 #include "terminal.h"
 
-extern void keyboard_isr();
+extern "C" void keyboard_isr();
 
-void kmain() {
+extern "C" void kmain() {
     clear();
     terminal_init();
 
