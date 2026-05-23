@@ -45,7 +45,7 @@ print:
     mov bl, 0x07
     int 0x10
 
-    jmp print ; should decrement cx
+    jmp print
 .done:
     ret ; back to caller
 

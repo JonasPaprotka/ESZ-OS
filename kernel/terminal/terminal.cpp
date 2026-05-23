@@ -33,6 +33,11 @@ void processLineInputBuffer() {
         lineInputBuffer[0] = 0;
         return;
     }
+    if (lineImputLength > 256) {
+        lineImputLength = 0;
+        lineInputBuffer[0] = 0;
+        return;
+    }
 
     const char* args = "";
     for (int i = 0; i < lineImputLength; i++) {
