@@ -1,25 +1,47 @@
-BOOT = bootloader/boot.bin
-KERNEL = kernel/kernel.bin
-OS = os.bin
+# File Updated with AI
+
+CC      = x86_64-elf-gcc
+LD      = x86_64-elf-ld
+OBJCOPY = x86_64-elf-objcopy
+ASM     = nasm
+
+CFLAGS = -m32 -ffreestanding -Wall -Wextra -Ikernel -Ikernel/io -Ikernel/terminal
+LDFLAGS = -m elf_i386 -T kernel/linker.ld
+
+BOOT    = bootloader/boot.bin
+OS      = os.bin
+
+KERNEL_ASM_SRCS = kernel/kernel_entry.asm
+KERNEL_C_SRCS   = $(wildcard kernel/*.c) $(wildcard kernel/**/*.c)
+
+KERNEL_ASM_OBJS = $(KERNEL_ASM_SRCS:.asm=.o)
+KERNEL_C_OBJS   = $(KERNEL_C_SRCS:.c=.o)
+KERNEL_OBJS     = $(KERNEL_ASM_OBJS) $(KERNEL_C_OBJS)
+
+KERNEL_ELF = kernel/kernel.elf
+KERNEL_BIN = kernel/kernel.bin
+
+.PHONY: all run debug clean
 
 all: $(OS)
 
 $(BOOT): bootloader/boot.asm
-	nasm -f bin $< -o $@
+	$(ASM) -f bin $< -o $@
 
-$(KERNEL): kernel/kernel_entry.asm kernel/kernel.c kernel/vga.c kernel/io.c kernel/pic.c kernel/idt.c kernel/keyboard.c
-	nasm -f elf32 kernel/kernel_entry.asm -o kernel/entry.o
-	x86_64-elf-gcc -m32 -ffreestanding -c kernel/kernel.c -o kernel/kernel.o
-	x86_64-elf-gcc -m32 -ffreestanding -c kernel/vga.c -o kernel/vga.o
-	x86_64-elf-gcc -m32 -ffreestanding -c kernel/io.c -o kernel/io.o
-	x86_64-elf-gcc -m32 -ffreestanding -c kernel/pic.c -o kernel/pic.o
-	x86_64-elf-gcc -m32 -ffreestanding -c kernel/idt.c -o kernel/idt.o
-	x86_64-elf-gcc -m32 -ffreestanding -c kernel/keyboard.c -o kernel/keyboard.o
-	x86_64-elf-ld -m elf_i386 -T kernel/linker.ld -o kernel/kernel.elf kernel/entry.o kernel/kernel.o kernel/vga.o kernel/io.o kernel/pic.o kernel/idt.o kernel/keyboard.o
-	x86_64-elf-objcopy -O binary kernel/kernel.elf kernel/kernel.bin
+%.o: %.asm
+	$(ASM) -f elf32 $< -o $@
 
-$(OS): $(BOOT) $(KERNEL)
-	cat $(BOOT) $(KERNEL) > $(OS)
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(KERNEL_ELF): $(KERNEL_OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^
+
+$(KERNEL_BIN): $(KERNEL_ELF)
+	$(OBJCOPY) -O binary $< $@
+
+$(OS): $(BOOT) $(KERNEL_BIN)
+	cat $^ > $@
 
 run: all
 	qemu-system-i386 -drive format=raw,file=$(OS) -display cocoa,zoom-to-fit=on
@@ -28,6 +50,4 @@ debug: all
 	qemu-system-i386 -drive format=raw,file=$(OS) -s -S -display cocoa,zoom-to-fit=on
 
 clean:
-	rm -f bootloader/boot.bin kernel/entry.o kernel/kernel.o kernel/vga.o kernel/io.o kernel/pic.o kernel/idt.o kernel/keyboard.o kernel/kernel.elf $(KERNEL) $(OS)
-
-.PHONY: all run debug clean
+	rm -f $(BOOT) $(KERNEL_OBJS) $(KERNEL_ELF) $(KERNEL_BIN) $(OS)
