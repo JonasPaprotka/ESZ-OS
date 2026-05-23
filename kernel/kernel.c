@@ -2,21 +2,13 @@
 #include "pic.h"
 #include "idt.h"
 #include "vga.h"
-
-void printHeader() {
-    printf("--------------------- ", DarkGray, 0, 0);
-    printf("[INFO]: ", Yellow, 1, 0);
-    printf("Kernel Loaded", White, 1, 8);
-    printf("ESZ-OS", White, 2, 0);
-    printf("by Jonas Paprotka", White, 3, 0);
-    printf("--------------------- ", DarkGray, 4, 0);
-}
+#include "terminal.h"
 
 extern void keyboard_isr();
 
 void kmain() {
     clear();
-    printHeader();
+    terminal_init();
 
     pic_init();
     idt_init();

@@ -1,32 +1,18 @@
 #include "io.h"
 #include "pic.h"
 #include "vga.h"
+#include "terminal.h"
 
-char scancode_to_ascii[] = {
-    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
-    0, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0,
-    0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
-    0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
-    '*', 0, ' '
-};
-
-int cursorAtChar = 0;
-int cursorAtLine = 5;
+extern bool shift = false;
 
 void keyboard_handler() {
     unsigned char scancode = inb(0x60);
 
-    if (scancode < 58 && scancode_to_ascii[scancode]) {
-        print_char(scancode_to_ascii[scancode], White, 80 * cursorAtLine + cursorAtChar);
-        ++cursorAtChar;
-    } else {
-        // Backspace
-        if (scancode == 0x0E) {
-            if (cursorAtChar <= 0) { return; }
-            --cursorAtChar;
-            print_char(' ', White, 80 * cursorAtLine + cursorAtChar);
-        }
-    }
+    if (scancode == 0x2A || scancode == 0x36) { shift = 1; return; } // shift down
+    if (scancode == 0xAA || scancode == 0xB6) { shift = 0; return; } // shift up
+    if (scancode & 0x80) return; // ignore key release
 
+
+    if (scancode) terminal_on_key(scancode);
     outb(0x20, 0x20);
 }

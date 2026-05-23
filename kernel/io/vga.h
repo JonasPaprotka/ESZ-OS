@@ -23,5 +23,6 @@ enum Color {
 void print_char(char c, enum Color color, int pos);
 void printf(char* text, enum Color color, int line, int padding);
 void clear();
+void set_cursor(int pos);
 
 #endif
