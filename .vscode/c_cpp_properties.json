@@ -6,7 +6,8 @@
                 "${workspaceFolder}/kernel",
                 "${workspaceFolder}/kernel/io",
                 "${workspaceFolder}/kernel/terminal",
-                "${workspaceFolder}/kernel/types"
+                "${workspaceFolder}/kernel/types",
+                "${workspaceFolder}/kernel/maps"
             ],
             "compilerPath": "/opt/homebrew/bin/x86_64-elf-g++",
             "cStandard": "c17",

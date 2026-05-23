@@ -3,14 +3,17 @@
 #include "keyboard.h"
 #include "string.h"
 #include "commands.h"
+#include "keymap.h"
 
-char scancode_to_ascii[] = {
-    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
-    0, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0,
-    0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
-    0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
-    '*', 0, ' '
-};
+KeyboardLayout current_layout = LAYOUT_DE;
+char scancode_to_char(unsigned char scancode) {
+    if (scancode > 0x39) return 0;  // outside of table range
+    
+    if (current_layout == LAYOUT_DE) {
+        return shift ? de_shifted[scancode] : de_unshifted[scancode];
+    }
+    return shift ? us_shifted[scancode] : us_unshifted[scancode];
+}
 
 void printHeader() {
     print("---------------------- ", DarkGray);
@@ -59,7 +62,7 @@ void processLineInputBuffer() {
 
     ++cursorAtLine;
     cursorAtChar = 0;
-    print("Unknown command", Red);
+    print("[ERROR]: Unknown command", Red);
     lineImputLength = 0;
     lineInputBuffer[0] = 0; // clear buffer
 }
@@ -87,7 +90,7 @@ void terminal_on_key(unsigned char scancode) {
             clear_char(80 * cursorAtLine + cursorAtChar);
             break;
         default:
-            char c = scancode_to_ascii[scancode];
+            char c = scancode_to_char(scancode);
             if (!c) return;
             print_char(c);
             ++cursorAtChar;
