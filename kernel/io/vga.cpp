@@ -2,24 +2,48 @@
 #include "terminal.h"
 #include "io.h"
 
-void print_char(char toBePrintedCharacter, enum Color charColor, int charLocation) {
+//region Print
+void print_char(char c, enum Color charColor, int charLocation) {
     unsigned char *video_memory = (unsigned char *) 0xB8000;
-    video_memory[charLocation * 2] = toBePrintedCharacter;
+    video_memory[charLocation * 2] = c;
     video_memory[charLocation * 2 + 1] = charColor;
-    set_cursor(charLocation);
+    set_cursor(charLocation + 1);
 }
 
-void printf(const char* text, enum Color textColor, int lineNo, int charPadding) {
+void print_char(char c) {
+    unsigned char *video_memory = (unsigned char *) 0xB8000;
+    video_memory[(80 * cursorAtLine + cursorAtChar) * 2] = c;
+    video_memory[(80 * cursorAtLine + cursorAtChar) * 2 + 1 ] = White;
+    set_cursor(80 * cursorAtLine + cursorAtChar + 1);
+}
+
+void print(const char* text, enum Color textColor, int lineNo, int charPadding) {
     for (int i = 0; text[i] != 0; i++) {
         print_char(text[i], textColor, 80 * lineNo + i + charPadding);
     }
 }
 
+void print(const char* text, enum Color textColor) {
+    print(text, textColor, cursorAtLine, cursorAtChar);
+    ++cursorAtLine;
+    cursorAtChar = 0;
+}
+
+void print(const char* text) {
+    print(text, White, cursorAtLine, cursorAtChar);
+    ++cursorAtLine;
+    cursorAtChar = 0;
+}
+//endregion Print
+
 void clear() {
     int chars = 2000;
     for (int i = 0; i <= chars; i++) {
-        print_char(' ', Black, i);
+        print_char(' ', White, i);
     }
+    cursorAtChar = 0;
+    cursorAtLine = 0;
+    set_cursor(0);
 }
 
 void set_cursor(int pos) {

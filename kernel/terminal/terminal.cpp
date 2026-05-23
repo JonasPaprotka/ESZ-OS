@@ -11,24 +11,27 @@ char scancode_to_ascii[] = {
 };
 
 void printHeader() {
-    printf("--------------------- ", DarkGray, 0, 0);
-    printf("[INFO]: ", Yellow, 1, 0);
-    printf("Kernel Loaded", White, 1, 8);
-    printf("ESZ-OS", White, 2, 0);
-    printf("by Jonas Paprotka", White, 3, 0);
-    printf("--------------------- ", DarkGray, 4, 0);
+    print("--------------------- ", DarkGray);
+    print("[INFO]: Kernel Loaded", Yellow);
+    print("ESZ-OS");
+    print("by Jonas Paprotka");
+    print("--------------------- ", DarkGray);
 }
 
 int cursorAtChar = 0;
 int cursorAtLine = 0;
 
 void terminal_on_key(unsigned char scancode) {
-    print_char(scancode_to_ascii[scancode], White, 80 * cursorAtLine + cursorAtChar);
+    char c = scancode_to_ascii[scancode];
+    if (!c) { return; }
+    print_char(c);
     ++cursorAtChar;
 }
 
 void newTerminalLine() {
-    //printf(">> ", White,);
+    cursorAtChar = 0;
+    print(">> ", White, cursorAtLine, 0);
+    cursorAtChar = 3;
 }
 
 void terminal_init() {
