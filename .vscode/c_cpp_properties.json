@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "ESZ-OS",
+            "includePath": [
+                "${workspaceFolder}/kernel",
+                "${workspaceFolder}/kernel/io",
+                "${workspaceFolder}/kernel/terminal",
+                "${workspaceFolder}/kernel/types"
+            ],
+            "compilerPath": "/opt/homebrew/bin/x86_64-elf-g++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

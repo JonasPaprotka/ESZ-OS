@@ -1,6 +1,8 @@
 #ifndef VGA_H
 #define VGA_H
 
+#include "string.h"
+
 enum Color {
     Black   = 0x00,
     Blue    = 0x01,
@@ -23,11 +25,12 @@ enum Color {
 void print_char(char c, enum Color color, int pos);
 void print_char(char c);
 
-void print(const char* text, enum Color textColor, int line, int padding);
-void print(const char* text, enum Color textColor);
-void print(const char* text);
+void print(const string text, enum Color textColor, int line, int padding);
+void print(const string text, enum Color textColor);
+void print(const string text);
 
 void clear();
 void set_cursor(int pos);
+void clear_char(int pos);
 
 #endif
