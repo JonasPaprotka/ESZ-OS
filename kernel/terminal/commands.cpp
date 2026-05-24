@@ -8,8 +8,6 @@ void cmd_clear(const char* args) {
 }
 
 void cmd_echo(const char* args) {
-    ++cursorAtLine;
-    cursorAtChar = 0;
     print(args);
 }
 

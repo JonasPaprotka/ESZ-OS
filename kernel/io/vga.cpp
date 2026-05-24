@@ -3,18 +3,44 @@
 #include "io.h"
 #include "string.h"
 
+void scrollDown() {
+    // shift lines and clear last one
+    unsigned char *video_memory = (unsigned char *) 0xB8000;
+    for (int i = 1; i <= 3840; i++) {
+        video_memory[i - 1] = video_memory[i + 159];
+    }
+    for (int i = 1920; i <= 1999; i++) {
+        clear_char(i);
+    }
+    cursorAtChar = 0;
+    cursorAtLine = 24;
+    set_cursor(1920);
+}
+
+bool handleScroll() {
+    if (cursorAtLine >= 25) {
+        scrollDown();
+        return true;
+    }
+    return false;
+}
+
+void newline() {
+    cursorAtLine++;
+    cursorAtChar = 0;
+    handleScroll();
+}
+
 //region Print
 void handleCursorUpdateOnPrint(int charAtPos) {
     cursorAtChar++;
     if (cursorAtChar >= 80) {
-        cursorAtChar = 0;
-        cursorAtLine++;
+        newline();
+        return;
     }
-    if (cursorAtLine >= 25) {
-        //TODO implement scrolling somehow
+    if (not handleScroll()) {
+        set_cursor(charAtPos + 1);
     }
-
-    set_cursor(charAtPos + 1);
 }
 
 void print_char(char c, enum Color charColor) {
@@ -33,30 +59,28 @@ void print_char(char c) {
     handleCursorUpdateOnPrint(charAtPos);
 }
 
-void print(const string text, enum Color textColor, int lineNo, int charPadding) {
+void print_text(const string text, enum Color textColor) {
     for (int i = 0; text[i] != 0; i++) {
         print_char(text[i], textColor);
     }
 }
 
 void print(const string text, enum Color textColor) {
-    print(text, textColor, cursorAtLine, cursorAtChar);
-    cursorAtLine++;
-    cursorAtChar = 0;
+    print_text(text, textColor);
+    newline();
 }
 
 void print(const string text) {
-    print(text, White, cursorAtLine, cursorAtChar);
-    cursorAtLine++;
-    cursorAtChar = 0;
+    print_text(text, White);
+    newline();
 }
 
 void print_inline(const string text, enum Color textColor) {
-    print(text, textColor, cursorAtLine, cursorAtChar);
+    print_text(text, textColor);
 }
 
 void print_inline(const string text) {
-    print(text, White, cursorAtLine, cursorAtChar);
+    print_text(text, White);
 }
 //endregion Print
 
@@ -82,4 +106,9 @@ void set_cursor(int pos) {
     outb(0x3D5, pos & 0xFF);
     outb(0x3D4, 0x0E);
     outb(0x3D5, (pos >> 8) & 0xFF);
+}
+
+void cursor_backspace() {
+    --cursorAtChar;
+    clear_char(80 * cursorAtLine + cursorAtChar);
 }

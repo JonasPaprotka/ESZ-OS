@@ -16,11 +16,14 @@ char scancode_to_char(unsigned char scancode) {
 }
 
 void printHeader() {
-    print("---------------------- ", DarkGray);
+    print_inline("---------------------- ", DarkGray);
+    newline();
     print_inline("[INFO]: ", Green);
-    print("Kernel Loaded");
+    print_inline("Kernel Loaded");
+    newline();
     print_inline("[WARN]: ", Yellow);
-    print("Kernel W.I.P.");
+    print_inline("Kernel W.I.P.");
+    newline();
     print("ESZ-OS");
     print("by Jonas Paprotka");
     print("---------------------- ", DarkGray);
@@ -36,7 +39,7 @@ char lineInputBuffer[256];
 
 void processLineInputBuffer() {
     if (lineImputLength == 0) {
-        ++cursorAtLine;
+        newline();
         lineInputBuffer[0] = 0;
         return;
     }
@@ -44,8 +47,7 @@ void processLineInputBuffer() {
     if (lineImputLength > 256) {
         lineImputLength = 0;
         lineInputBuffer[0] = 0;
-        ++cursorAtLine;
-        cursorAtChar = 0;
+        newline();
         print_inline("[ERROR]: ", Red);
         print("Command exceeds 256 chars");
         return;
@@ -62,6 +64,7 @@ void processLineInputBuffer() {
 
     for (int i = 0; commands[i].name != 0; i++) {
         if (strcmp(lineInputBuffer, commands[i].name)) {
+            newline();
             commands[i].execute(args);
             lineImputLength = 0;
             lineInputBuffer[0] = 0;
@@ -69,8 +72,7 @@ void processLineInputBuffer() {
         }
     }
 
-    ++cursorAtLine;
-    cursorAtChar = 0;
+    newline();
     print_inline("[ERROR]: ", Red);
     print("Unknown command");
     lineImputLength = 0;
@@ -78,10 +80,8 @@ void processLineInputBuffer() {
 }
 
 void newTerminalInputLine() {
-    cursorAtChar = 0;
     string linePrefix = "root@esz >> ";
     print_inline(linePrefix);
-
     cursorAtChar = strlen(linePrefix);
     charsProtectedTil = cursorAtChar;
 }
@@ -93,10 +93,8 @@ void terminal_on_key(unsigned char scancode) {
             newTerminalInputLine();
             break;
         case 0x0E: // Backspace
-            if (cursorAtChar == charsProtectedTil) { break; }
-            --cursorAtChar;
-            clear_char(80 * cursorAtLine + cursorAtChar);
-
+            if (cursorAtChar <= charsProtectedTil) { break; }
+            cursor_backspace();
             --lineImputLength;
             lineInputBuffer[lineImputLength] = 0;
             break;
