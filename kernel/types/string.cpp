@@ -10,10 +10,10 @@ bool str_equal(cstr a, cstr b) {
     const int a_len = str_length(a);
     const int b_len = str_length(b);
     
-    if (a_len != b_len) { return false; }
+    if (a_len != b_len) return false;
 
     for (int i = 0; i < a_len; ++i) {
-        if (a[i] != b[i]) { return false; }
+        if (a[i] != b[i]) return false;
     }
     return true;
 }
@@ -43,18 +43,40 @@ bool str_contains(cstr text, cstr searchText) {
 }
 
 int str_count(cstr text, cstr searchText) {
-    //TODO
-    return 0;
+    int counterHits = 0;
+    const int searchText_len = str_length(searchText);
+    const int text_len = str_length(text);
+    if (searchText_len > text_len) return 0;
+
+    for (int i = 0; i < text_len - searchText_len; ++i) {
+        str comparison = "";
+        for (int j = 0; j < searchText_len; ++j) {
+            comparison[j] = text[i + j];
+        }
+        comparison[searchText_len] = 0;
+        if (searchText == comparison) counterHits++;
+    }
+    return counterHits;
 }
 
 bool str_starts_with(cstr text, cstr searchText) {
-    //TODO
-    return false;
+    const int searchText_len = str_length(searchText);
+    if (searchText_len > str_length(text)) return false;
+
+    for (int i = 0; i < searchText_len; ++i) {
+        if (text[i] != searchText[i]) return false;
+    }
+    return true;
 }
 
 bool str_ends_with(cstr text, cstr searchText) {
-    //TODO
-    return false;
+    const int searchText_len = str_length(searchText);
+    if (searchText_len > str_length(text)) return false;
+
+    for (int i = searchText_len; i > 0; --i) {
+        if (text[i] != searchText[i]) return false;
+    }
+    return true;
 }
 
 void str_replace(str text, cstr toBeReplacedText, cstr replacementText) {

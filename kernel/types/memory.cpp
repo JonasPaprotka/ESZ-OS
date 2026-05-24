@@ -7,4 +7,3 @@ void memory_fill(void* target, byte value, int amountOfBytesToFill) {
 void memory_copy(void* copyTo, void* copyFrom, int amountOfBytesToCopy) {
     //TODO
 }
-
