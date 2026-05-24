@@ -17,4 +17,10 @@ make clean && make run
 
 # Known Bugs
 - When command is longer then one line you cant backspace further than the "protected" area due to the check not knowing it is a continued line. Fix later - or rework with new display system in the future.
-- First command after rebooting isnt known for some reason.
+
+# Further TODO
+- Kernel panic system - handle e.g. stuff like division by 0 errors from the CPU
+- Implement system timer and sleep() function or something simmilar - for multitasking for later stuff
+- Hex to string, int to string and further TODO labeld functions in code
+- Ram manager - get info from bios - then make a ram map map usage and stuff (kill me)
+- BIS+32bit -> 64bit mode & UEFI update

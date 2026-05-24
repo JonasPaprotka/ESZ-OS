@@ -56,7 +56,7 @@ halt:
 
 load_kernel_from_disk:
     mov ah, 2  ; read secotrs
-    mov al, 10 ; sector amount (10 = 5KB)
+    mov al, 40 ; sector amount (40 = 20KB)
     mov ch, 0 ; cylinder amount
     mov cl, 2 ; kernel on sector (sector 1 bootloader, 2 kernel)
     mov dh, 0 ; head (which side on plate i would assume)
