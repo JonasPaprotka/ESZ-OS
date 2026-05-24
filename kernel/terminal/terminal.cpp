@@ -80,7 +80,7 @@ void processLineInputBuffer() {
 }
 
 void newTerminalInputLine() {
-    string linePrefix = "root@esz >> ";
+    string linePrefix = "esz >> ";
     print_inline(linePrefix);
     cursorAtChar = strlen(linePrefix);
     charsProtectedTil = cursorAtChar;
