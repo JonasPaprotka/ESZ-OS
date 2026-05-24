@@ -17,8 +17,10 @@ char scancode_to_char(unsigned char scancode) {
 
 void printHeader() {
     print("---------------------- ", DarkGray);
-    print("[INFO]: Kernel Loaded", Green);
-    print("[WARN]: Kernel W.I.P.", Yellow);
+    print_inline("[INFO]: ", Green);
+    print("Kernel Loaded");
+    print_inline("[WARN]: ", Yellow);
+    print("Kernel W.I.P.");
     print("ESZ-OS");
     print("by Jonas Paprotka");
     print("---------------------- ", DarkGray);
@@ -27,18 +29,25 @@ void printHeader() {
 int cursorAtChar = 0;
 int cursorAtLine = 0;
 int charsProtectedTil = 0;
+int lineFullLength = 0;
 
 int lineImputLength = 0;
 char lineInputBuffer[256];
 
 void processLineInputBuffer() {
     if (lineImputLength == 0) {
+        ++cursorAtLine;
         lineInputBuffer[0] = 0;
         return;
     }
+
     if (lineImputLength > 256) {
         lineImputLength = 0;
         lineInputBuffer[0] = 0;
+        ++cursorAtLine;
+        cursorAtChar = 0;
+        print_inline("[ERROR]: ", Red);
+        print("Command exceeds 256 chars");
         return;
     }
 
@@ -62,7 +71,8 @@ void processLineInputBuffer() {
 
     ++cursorAtLine;
     cursorAtChar = 0;
-    print("[ERROR]: Unknown command", Red);
+    print_inline("[ERROR]: ", Red);
+    print("Unknown command");
     lineImputLength = 0;
     lineInputBuffer[0] = 0; // clear buffer
 }
@@ -70,7 +80,8 @@ void processLineInputBuffer() {
 void newTerminalInputLine() {
     cursorAtChar = 0;
     string linePrefix = "root@esz >> ";
-    print(linePrefix, White, cursorAtLine, 0);
+    print_inline(linePrefix);
+
     cursorAtChar = strlen(linePrefix);
     charsProtectedTil = cursorAtChar;
 }
@@ -84,16 +95,15 @@ void terminal_on_key(unsigned char scancode) {
         case 0x0E: // Backspace
             if (cursorAtChar == charsProtectedTil) { break; }
             --cursorAtChar;
+            clear_char(80 * cursorAtLine + cursorAtChar);
 
             --lineImputLength;
             lineInputBuffer[lineImputLength] = 0;
-            clear_char(80 * cursorAtLine + cursorAtChar);
             break;
         default:
             char c = scancode_to_char(scancode);
             if (!c) return;
             print_char(c);
-            ++cursorAtChar;
 
             lineInputBuffer[lineImputLength] = c;
             ++lineImputLength;

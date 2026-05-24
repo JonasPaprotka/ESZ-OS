@@ -4,36 +4,59 @@
 #include "string.h"
 
 //region Print
-void print_char(char c, enum Color charColor, int charLocation) {
+void handleCursorUpdateOnPrint(int charAtPos) {
+    cursorAtChar++;
+    if (cursorAtChar >= 80) {
+        cursorAtChar = 0;
+        cursorAtLine++;
+    }
+    if (cursorAtLine >= 25) {
+        //TODO implement scrolling somehow
+    }
+
+    set_cursor(charAtPos + 1);
+}
+
+void print_char(char c, enum Color charColor) {
     unsigned char *video_memory = (unsigned char *) 0xB8000;
-    video_memory[charLocation * 2] = c;
-    video_memory[charLocation * 2 + 1] = charColor;
-    set_cursor(charLocation + 1);
+    int charAtPos = 80 * cursorAtLine + cursorAtChar;
+    video_memory[charAtPos * 2] = c;
+    video_memory[charAtPos * 2 + 1] = charColor;
+    handleCursorUpdateOnPrint(charAtPos);
 }
 
 void print_char(char c) {
     unsigned char *video_memory = (unsigned char *) 0xB8000;
-    video_memory[(80 * cursorAtLine + cursorAtChar) * 2] = c;
-    video_memory[(80 * cursorAtLine + cursorAtChar) * 2 + 1 ] = White;
-    set_cursor(80 * cursorAtLine + cursorAtChar + 1);
+    int charAtPos = 80 * cursorAtLine + cursorAtChar;
+    video_memory[charAtPos * 2] = c;
+    video_memory[charAtPos * 2 + 1 ] = White;
+    handleCursorUpdateOnPrint(charAtPos);
 }
 
 void print(const string text, enum Color textColor, int lineNo, int charPadding) {
     for (int i = 0; text[i] != 0; i++) {
-        print_char(text[i], textColor, 80 * lineNo + i + charPadding);
+        print_char(text[i], textColor);
     }
 }
 
 void print(const string text, enum Color textColor) {
     print(text, textColor, cursorAtLine, cursorAtChar);
-    ++cursorAtLine;
+    cursorAtLine++;
     cursorAtChar = 0;
 }
 
 void print(const string text) {
     print(text, White, cursorAtLine, cursorAtChar);
-    ++cursorAtLine;
+    cursorAtLine++;
     cursorAtChar = 0;
+}
+
+void print_inline(const string text, enum Color textColor) {
+    print(text, textColor, cursorAtLine, cursorAtChar);
+}
+
+void print_inline(const string text) {
+    print(text, White, cursorAtLine, cursorAtChar);
 }
 //endregion Print
 

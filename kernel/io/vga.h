@@ -29,6 +29,9 @@ void print(const string text, enum Color textColor, int line, int padding);
 void print(const string text, enum Color textColor);
 void print(const string text);
 
+void print_inline(const string text, enum Color textColor);
+void print_inline(const string text);
+
 void clear();
 void set_cursor(int pos);
 void clear_char(int pos);
