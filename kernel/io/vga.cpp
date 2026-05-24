@@ -2,10 +2,11 @@
 #include "terminal.h"
 #include "io.h"
 #include "string.h"
+#include "byte.h"
 
 void scrollDown() {
     // shift lines and clear last one
-    unsigned char *video_memory = (unsigned char *) 0xB8000;
+    byte *video_memory = (byte *) 0xB8000;
     for (int i = 1; i <= 3840; i++) {
         video_memory[i - 1] = video_memory[i + 159];
     }
@@ -44,7 +45,7 @@ void handleCursorUpdateOnPrint(int charAtPos) {
 }
 
 void print_char(char c, enum Color charColor) {
-    unsigned char *video_memory = (unsigned char *) 0xB8000;
+    byte *video_memory = (byte *) 0xB8000;
     int charAtPos = 80 * cursorAtLine + cursorAtChar;
     video_memory[charAtPos * 2] = c;
     video_memory[charAtPos * 2 + 1] = charColor;
@@ -52,34 +53,34 @@ void print_char(char c, enum Color charColor) {
 }
 
 void print_char(char c) {
-    unsigned char *video_memory = (unsigned char *) 0xB8000;
+    byte *video_memory = (byte *) 0xB8000;
     int charAtPos = 80 * cursorAtLine + cursorAtChar;
     video_memory[charAtPos * 2] = c;
     video_memory[charAtPos * 2 + 1 ] = White;
     handleCursorUpdateOnPrint(charAtPos);
 }
 
-void print_text(const string text, enum Color textColor) {
+void print_text(cstr text, enum Color textColor) {
     for (int i = 0; text[i] != 0; i++) {
         print_char(text[i], textColor);
     }
 }
 
-void print(const string text, enum Color textColor) {
+void print(cstr text, enum Color textColor) {
     print_text(text, textColor);
     newline();
 }
 
-void print(const string text) {
+void print(cstr text) {
     print_text(text, White);
     newline();
 }
 
-void print_inline(const string text, enum Color textColor) {
+void print_inline(cstr text, enum Color textColor) {
     print_text(text, textColor);
 }
 
-void print_inline(const string text) {
+void print_inline(cstr text) {
     print_text(text, White);
 }
 //endregion Print
@@ -95,7 +96,7 @@ void clear() {
 }
 
 void clear_char(int pos) {
-    unsigned char *video_memory = (unsigned char *) 0xB8000;
+    byte *video_memory = (byte *) 0xB8000;
     video_memory[pos * 2] = ' ';
     video_memory[pos * 2 + 1] = White;
     set_cursor(pos);

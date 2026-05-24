@@ -25,11 +25,11 @@ enum Color {
 void print_char(char c, enum Color color);
 void print_char(char c);
 
-void print(const string text, enum Color textColor);
-void print(const string text);
+void print(cstr text, enum Color textColor);
+void print(cstr text);
 
-void print_inline(const string text, enum Color textColor);
-void print_inline(const string text);
+void print_inline(cstr text, enum Color textColor);
+void print_inline(cstr text);
 
 void clear();
 void set_cursor(int pos);

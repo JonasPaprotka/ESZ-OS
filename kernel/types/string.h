@@ -1,11 +1,12 @@
 #ifndef STRING_H
 #define STRING_H
 
-typedef const char* string;
+typedef const char* cstr;
+typedef char* str;
 
-int strlen(const string str);
-bool strcmp(const string a, const string b);
-// void strcpy(string dest, const string src);
-// void memset(void* ptr, int value, int size);
+int str_length(cstr str);
+bool str_equal(cstr a, cstr b);
+void str_copy(cstr src, str dest);
+void str_add(str target, cstr value);
 
 #endif

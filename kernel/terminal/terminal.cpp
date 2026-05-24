@@ -4,9 +4,10 @@
 #include "string.h"
 #include "commands.h"
 #include "keymap.h"
+#include "byte.h"
 
 KeyboardLayout current_layout = LAYOUT_DE;
-char scancode_to_char(unsigned char scancode) {
+char scancode_to_char(byte scancode) {
     if (scancode > 0x39) return 0;  // outside of table range
     
     if (current_layout == LAYOUT_DE) {
@@ -63,7 +64,7 @@ void processLineInputBuffer() {
     }
 
     for (int i = 0; commands[i].name != 0; i++) {
-        if (strcmp(lineInputBuffer, commands[i].name)) {
+        if (str_equal(lineInputBuffer, commands[i].name)) {
             newline();
             commands[i].execute(args);
             lineImputLength = 0;
@@ -80,13 +81,13 @@ void processLineInputBuffer() {
 }
 
 void newTerminalInputLine() {
-    string linePrefix = "esz >> ";
+    cstr linePrefix = "esz >> ";
     print_inline(linePrefix);
-    cursorAtChar = strlen(linePrefix);
+    cursorAtChar = str_length(linePrefix);
     charsProtectedTil = cursorAtChar;
 }
 
-void terminal_on_key(unsigned char scancode) {
+void terminal_on_key(byte scancode) {
     switch(scancode) {
         case 0x1C: // Enter
             processLineInputBuffer();

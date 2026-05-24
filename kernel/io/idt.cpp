@@ -1,12 +1,12 @@
 // File Updated with AI
-
 #include "idt.h"
+#include "byte.h"
 
 struct IDTEntry {
     unsigned short base_low;
     unsigned short selector;
-    unsigned char zero;
-    unsigned char flags;
+    byte zero;
+    byte flags;
     unsigned short base_high;
 } __attribute__((packed));
 
