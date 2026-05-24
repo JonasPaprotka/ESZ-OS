@@ -7,6 +7,6 @@ void terminal_on_key(unsigned char scancode);
 extern int cursorAtChar;
 extern int cursorAtLine;
 extern int charsProtectedTil;
-extern int lineImputLength;
+extern int lineInputLength;
 
 #endif

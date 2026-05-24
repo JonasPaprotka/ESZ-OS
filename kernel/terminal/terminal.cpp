@@ -36,18 +36,18 @@ int cursorAtLine = 0;
 int charsProtectedTil = 0;
 int lineFullLength = 0;
 
-int lineImputLength = 0;
+int lineInputLength = 0;
 char lineInputBuffer[256];
 
 void processLineInputBuffer() {
-    if (lineImputLength == 0) {
+    if (lineInputLength == 0) {
         newline();
         lineInputBuffer[0] = 0;
         return;
     }
 
-    if (lineImputLength > 256) {
-        lineImputLength = 0;
+    if (lineInputLength > 256) {
+        lineInputLength = 0;
         lineInputBuffer[0] = 0;
         newline();
         print_inline("[ERROR]: ", Red);
@@ -56,7 +56,7 @@ void processLineInputBuffer() {
     }
 
     const char* args = "";
-    for (int i = 0; i < lineImputLength; i++) {
+    for (int i = 0; i < lineInputLength; i++) {
         if (lineInputBuffer[i] == ' ') {
             lineInputBuffer[i] = 0;
             args = &lineInputBuffer[i+1];
@@ -68,7 +68,7 @@ void processLineInputBuffer() {
         if (str_equal(lineInputBuffer, commands[i].name)) {
             newline();
             commands[i].execute(args);
-            lineImputLength = 0;
+            lineInputLength = 0;
             lineInputBuffer[0] = 0;
             return;
         }
@@ -77,7 +77,7 @@ void processLineInputBuffer() {
     newline();
     print_inline("[ERROR]: ", Red);
     print("Unknown command");
-    lineImputLength = 0;
+    lineInputLength = 0;
     lineInputBuffer[0] = 0; // clear buffer
 }
 
@@ -97,17 +97,17 @@ void terminal_on_key(const byte scancode) {
         case 0x0E: // Backspace
             if (cursorAtChar <= charsProtectedTil) { break; }
             cursor_backspace();
-            --lineImputLength;
-            lineInputBuffer[lineImputLength] = 0;
+            --lineInputLength;
+            lineInputBuffer[lineInputLength] = 0;
             break;
         default:
             char c = scancode_to_char(scancode);
             if (!c) return;
             print_char(c);
 
-            lineInputBuffer[lineImputLength] = c;
-            ++lineImputLength;
-            lineInputBuffer[lineImputLength] = 0; // null-terminate
+            lineInputBuffer[lineInputLength] = c;
+            ++lineInputLength;
+            lineInputBuffer[lineInputLength] = 0; // null-terminate
             break;
     }
 }
