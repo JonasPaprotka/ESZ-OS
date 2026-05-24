@@ -6,8 +6,9 @@
 #include "keymap.h"
 #include "byte.h"
 
-KeyboardLayout current_layout = LAYOUT_DE;
-char scancode_to_char(byte scancode) {
+const KeyboardLayout current_layout = LAYOUT_DE;
+
+char scancode_to_char(const byte scancode) {
     if (scancode > 0x39) return 0;  // outside of table range
     
     if (current_layout == LAYOUT_DE) {
@@ -87,7 +88,7 @@ void newTerminalInputLine() {
     charsProtectedTil = cursorAtChar;
 }
 
-void terminal_on_key(byte scancode) {
+void terminal_on_key(const byte scancode) {
     switch(scancode) {
         case 0x1C: // Enter
             processLineInputBuffer();

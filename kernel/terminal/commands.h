@@ -7,6 +7,6 @@ struct Command {
     void (*execute)(const char* args);
 };
 
-extern Command commands[];
+extern const Command commands[];
 
 #endif

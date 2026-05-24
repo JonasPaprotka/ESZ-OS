@@ -1,6 +1,5 @@
 #ifndef VGA_H
 #define VGA_H
-
 #include "string.h"
 
 enum Color {
@@ -22,18 +21,18 @@ enum Color {
     BrightWhite = 0x0F
 };
 
-void print_char(char c, enum Color color);
-void print_char(char c);
+void print_char(const char c, const enum Color color);
+void print_char(const char c);
 
-void print(cstr text, enum Color textColor);
+void print(cstr text, const enum Color textColor);
 void print(cstr text);
 
-void print_inline(cstr text, enum Color textColor);
+void print_inline(cstr text, const enum Color textColor);
 void print_inline(cstr text);
 
 void clear();
-void set_cursor(int pos);
-void clear_char(int pos);
+void set_cursor(const int pos);
+void clear_char(const int pos);
 
 void cursor_backspace();
 void newline();

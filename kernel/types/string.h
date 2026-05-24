@@ -17,6 +17,6 @@ bool str_starts_with(cstr text, cstr searchText);
 bool str_ends_with(cstr text, cstr searchText);
 void str_replace(str text, cstr toBeReplacedText, cstr replacementText);
 
-str to_string(int inputValue);
+str to_string(const int inputValue);
 
 #endif

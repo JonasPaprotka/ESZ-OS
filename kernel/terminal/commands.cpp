@@ -28,7 +28,7 @@ void cmd_reboot(const char* args) {
     outb(0x64, 0xFE);
 }
 
-Command commands[] = {
+const Command commands[] = {
     { "help", cmd_help },
     { "echo", cmd_echo },
     { "clear", cmd_clear },

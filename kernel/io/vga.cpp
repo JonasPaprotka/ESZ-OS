@@ -33,7 +33,7 @@ void newline() {
 }
 
 //region Print
-void handleCursorUpdateOnPrint(int charAtPos) {
+void handleCursorUpdateOnPrint(const int charAtPos) {
     cursorAtChar++;
     if (cursorAtChar >= 80) {
         newline();
@@ -44,7 +44,7 @@ void handleCursorUpdateOnPrint(int charAtPos) {
     }
 }
 
-void print_char(char c, enum Color charColor) {
+void print_char(const char c, const enum Color charColor) {
     byte *video_memory = (byte *) 0xB8000;
     int charAtPos = 80 * cursorAtLine + cursorAtChar;
     video_memory[charAtPos * 2] = c;
@@ -52,7 +52,7 @@ void print_char(char c, enum Color charColor) {
     handleCursorUpdateOnPrint(charAtPos);
 }
 
-void print_char(char c) {
+void print_char(const char c) {
     byte *video_memory = (byte *) 0xB8000;
     int charAtPos = 80 * cursorAtLine + cursorAtChar;
     video_memory[charAtPos * 2] = c;
@@ -60,13 +60,13 @@ void print_char(char c) {
     handleCursorUpdateOnPrint(charAtPos);
 }
 
-void print_text(cstr text, enum Color textColor) {
+void print_text(cstr text, const enum Color textColor) {
     for (int i = 0; text[i] != 0; i++) {
         print_char(text[i], textColor);
     }
 }
 
-void print(cstr text, enum Color textColor) {
+void print(cstr text, const enum Color textColor) {
     print_text(text, textColor);
     newline();
 }
@@ -76,7 +76,7 @@ void print(cstr text) {
     newline();
 }
 
-void print_inline(cstr text, enum Color textColor) {
+void print_inline(cstr text, const enum Color textColor) {
     print_text(text, textColor);
 }
 
@@ -95,14 +95,14 @@ void clear() {
     set_cursor(0);
 }
 
-void clear_char(int pos) {
+void clear_char(const int pos) {
     byte *video_memory = (byte *) 0xB8000;
     video_memory[pos * 2] = ' ';
     video_memory[pos * 2 + 1] = White;
     set_cursor(pos);
 }
 
-void set_cursor(int pos) {
+void set_cursor(const int pos) {
     outb(0x3D4, 0x0F);
     outb(0x3D5, pos & 0xFF);
     outb(0x3D4, 0x0E);

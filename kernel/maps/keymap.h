@@ -6,6 +6,9 @@ extern char us_shifted[];
 extern char de_unshifted[];
 extern char de_shifted[];
 
-enum KeyboardLayout { LAYOUT_US, LAYOUT_DE };
+enum KeyboardLayout {
+    LAYOUT_US,
+    LAYOUT_DE
+};
 
 #endif

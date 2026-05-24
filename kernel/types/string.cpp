@@ -94,7 +94,7 @@ void str_replace(str text, cstr toBeReplacedText, cstr replacementText) {
     //TODO
 }
 
-str to_string(int inputValue) {
+str to_string(const int inputValue) {
     //TODO
     return "";
 }
