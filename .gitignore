@@ -1,4 +1,4 @@
 *.bin
 *.o
 *.elf
-*.DS-Store
+*.DS_Store

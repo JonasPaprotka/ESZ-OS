@@ -38,7 +38,18 @@ void str_add(str target, cstr value) {
 }
 
 bool str_contains(cstr text, cstr searchText) {
-    //TODO
+    const int searchText_len = str_length(searchText);
+    const int text_len = str_length(text);
+    if (searchText_len > text_len) return 0;
+
+    for (int i = 0; i < text_len - searchText_len; ++i) {
+        str comparison = "";
+        for (int j = 0; j < searchText_len; ++j) {
+            comparison[j] = text[i + j];
+        }
+        comparison[searchText_len] = 0;
+        if (searchText == comparison) return true;
+    }
     return false;
 }
 
