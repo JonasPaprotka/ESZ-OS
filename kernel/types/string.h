@@ -4,7 +4,7 @@
 typedef const char* cstr;
 typedef char* str;
 
-str malloc_str(const unsigned int size);
+str ppm_malloc_str(const unsigned int size);
 int str_length(cstr str);
 bool str_equal(cstr a, cstr b);
 

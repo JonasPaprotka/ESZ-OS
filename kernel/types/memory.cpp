@@ -91,14 +91,14 @@ unsigned int calculateReqPages(const unsigned int byteAmount) {
     return (byteAmount + pageSize - 1) / pageSize;
 }
 
-void malloc_page_range(unsigned int page, const unsigned int pageAmount) {
+void ppm_malloc_page_range(unsigned int page, const unsigned int pageAmount) {
     for (unsigned int i = 0; i < pageAmount; i++) {
         bit_write(pmm_bitmap, page, true);
         page++;
     }
 }
 
-unsigned int malloc(const unsigned int byteAmount) {
+unsigned int ppm_malloc(const unsigned int byteAmount) {
     const unsigned int reqPages = calculateReqPages(byteAmount);
     unsigned int freePageCounter = 0;
     unsigned int firstPageOfSeries = 0;
@@ -110,7 +110,7 @@ unsigned int malloc(const unsigned int byteAmount) {
             }
             freePageCounter++;
             if (freePageCounter == reqPages) {
-                malloc_page_range(firstPageOfSeries, reqPages);
+                ppm_malloc_page_range(firstPageOfSeries, reqPages);
                 return firstPageOfSeries * pageSize;
             }
         } else {
@@ -118,11 +118,11 @@ unsigned int malloc(const unsigned int byteAmount) {
         }
     }
 
-    printInfoLine(Error, "malloc failed");
+    printInfoLine(Error, "ppm_malloc failed");
     return 0;
 }
 
-void free(const unsigned int addr, const unsigned int byteAmount) {
+void ppm_free(const unsigned int addr, const unsigned int byteAmount) {
     const unsigned int reqPages = calculateReqPages(byteAmount);
     unsigned int currPage = addr / pageSize;
 

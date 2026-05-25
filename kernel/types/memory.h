@@ -15,8 +15,8 @@ struct MemoryRegionInfo {
 
 void memory_info_init();
 
-unsigned int malloc(const unsigned int pageAmount);
-void free(const unsigned int addr, const unsigned int byteAmount);
+unsigned int ppm_malloc(const unsigned int pageAmount);
+void ppm_free(const unsigned int addr, const unsigned int byteAmount);
 
 void printMemoryInfo();
 

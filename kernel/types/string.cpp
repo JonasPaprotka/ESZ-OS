@@ -1,8 +1,8 @@
 #include "string.h"
 #include "memory.h"
 
-str malloc_str(const unsigned int size) {
-    unsigned int addr = malloc(size);
+str ppm_malloc_str(const unsigned int size) {
+    unsigned int addr = ppm_malloc(size);
     str string = (str) addr;
     memory_clear(string, size);
     return string;
@@ -105,7 +105,7 @@ void str_replace(str text, cstr toBeReplacedText, cstr replacementText) {
 }
 
 str str_repeat(cstr text, int amount) {
-    str returnString = malloc_str(128);
+    str returnString = ppm_malloc_str(128);
     const int text_len = str_length(text);
 
     for (int i = 0; i < amount; i++) {
@@ -119,7 +119,7 @@ str str_repeat(cstr text, int amount) {
 }
 
 str str_combine(cstr a, cstr b) {
-    str returnString = malloc_str(128);
+    str returnString = ppm_malloc_str(128);
 
     const int len_a = str_length(a);
     const int len_b = str_length(b);
@@ -136,8 +136,8 @@ str str_combine(cstr a, cstr b) {
 }
 
 str to_string(const int inputValue) {
-    str composedString = malloc_str(12);
-    str returnString = malloc_str(12);
+    str composedString = ppm_malloc_str(12);
+    str returnString = ppm_malloc_str(12);
 
     int strLength = 0;
     int calcValue = inputValue;
