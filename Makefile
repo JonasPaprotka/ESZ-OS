@@ -5,7 +5,7 @@ LD      = x86_64-elf-ld
 OBJCOPY = x86_64-elf-objcopy
 ASM     = nasm
 
-CFLAGS = -m32 -ffreestanding -fno-exceptions -fno-rtti -Wall -Wextra -Ikernel -Ikernel/io -Ikernel/terminal -Ikernel/types -Ikernel/maps
+CFLAGS = -m32 -ffreestanding -fno-exceptions -fno-rtti -Wall -Wextra -Ikernel -Ikernel/io -Ikernel/terminal -Ikernel/types -Ikernel/maps -Ikernel/helper
 LDFLAGS = -m elf_i386 -T kernel/linker.ld
 
 BOOT    = bootloader/boot.bin

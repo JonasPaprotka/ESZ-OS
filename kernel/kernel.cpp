@@ -3,11 +3,18 @@
 #include "idt.h"
 #include "vga.h"
 #include "terminal.h"
+#include "memory_info.h"
+#include "info_text.h"
 
 extern "C" void keyboard_isr();
 
 extern "C" void kmain() {
     clear();
+
+    printInfoLine(Loading, "Initializing Memory Info...");
+    memory_info_init();
+    
+    printInfoLine(Loading, "Initializing Terminal...");
     terminal_init();
 
     pic_init();

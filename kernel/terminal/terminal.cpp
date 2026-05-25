@@ -5,6 +5,7 @@
 #include "commands.h"
 #include "keymap.h"
 #include "byte.h"
+#include "info_text.h"
 
 const KeyboardLayout current_layout = LAYOUT_DE;
 
@@ -18,17 +19,12 @@ char scancode_to_char(const byte scancode) {
 }
 
 void printHeader() {
-    print_inline("---------------------- ", DarkGray);
-    newline();
-    print_inline("[INFO]: ", Green);
-    print_inline("Kernel Loaded");
-    newline();
-    print_inline("[WARN]: ", Yellow);
-    print_inline("Kernel W.I.P.");
-    newline();
-    print("ESZ-OS");
+    printSeperator();
+    printInfoLine(Success, "Kernel Loaded");
+    printInfoLine(Warning, "Project W.I.P.");
+    print("ESZ-OS (32bit)");
     print("by Jonas Paprotka");
-    print("---------------------- ", DarkGray);
+    printSeperator();
 }
 
 int cursorAtChar = 0;
@@ -50,8 +46,7 @@ void processLineInputBuffer() {
         lineInputLength = 0;
         lineInputBuffer[0] = 0;
         newline();
-        print_inline("[ERROR]: ", Red);
-        print("Command exceeds 256 chars");
+        printInfoLine(Error, "Command exceeds 256 chars");
         return;
     }
 
@@ -75,8 +70,7 @@ void processLineInputBuffer() {
     }
 
     newline();
-    print_inline("[ERROR]: ", Red);
-    print("Unknown command");
+    printInfoLine(Error, "Unknown Command");
     lineInputLength = 0;
     lineInputBuffer[0] = 0; // clear buffer
 }

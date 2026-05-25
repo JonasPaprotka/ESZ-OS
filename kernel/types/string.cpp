@@ -1,4 +1,5 @@
 #include "string.h"
+#include "memory.h"
 
 int str_length(cstr str) {
     int i = 0;
@@ -94,7 +95,61 @@ void str_replace(str text, cstr toBeReplacedText, cstr replacementText) {
     //TODO
 }
 
+str str_repeat(cstr text, int amount) {
+    static char returnString[128];
+    memory_clear(returnString, 128); 
+
+    const int text_len = str_length(text);
+
+    for (int i = 0; i < amount; i++) {
+        for (int j = 0; j < text_len; j++) {
+            returnString[i * text_len + j] = text[j];
+        }
+    }
+
+    returnString[text_len * amount] = 0;
+    return returnString;
+}
+
+str str_combine(cstr a, cstr b) {
+    static char returnString[128];
+    memory_clear(returnString, 128);
+
+    const int len_a = str_length(a);
+    const int len_b = str_length(b);
+
+    for (int i = 0; i < len_a; i++) {
+        returnString[i] = a[i];
+    }
+    for (int i = 0; i < len_b; i++) {
+        returnString[i + len_a] = b[i];
+    }
+    
+    returnString[len_a + len_b] = 0;
+    return returnString;
+}
+
 str to_string(const int inputValue) {
-    //TODO
-    return "";
+    static char composedString[12];
+    memory_clear(composedString, 12);
+    static char returnString[12];
+    memory_clear(returnString, 12);
+
+    int strLength = 0;
+    int calcValue = inputValue;
+
+    while (calcValue != 0) {
+        composedString[strLength] = calcValue % 10 + '0'; // + '0' is to make ascii
+        calcValue /= 10;
+        strLength++;
+    }
+
+    int counter = 0;
+    for (int i = strLength - 1; i >= 0; --i) {
+        returnString[counter] = composedString[i];
+        ++counter;
+    }
+
+    returnString[strLength] = 0;
+    return returnString;
 }

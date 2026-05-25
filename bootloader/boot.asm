@@ -21,19 +21,23 @@ start:
     call print
     call configure_GDT
 
+    mov si, getting_memory_map_msg
+    call print
+    call get_memory_map
+
     mov si, activate_protected_mode_msg
     call print
-    call activate_protected_mode
+    call activate_protected_mode ; activates kernel in process
 
-    jmp halt
+    ; jmp halt
 
 
 boot_msg: db "Booting ESZ-OS", 0x0d, 0x0a, 0
-loading_kernel_msg: db "[INFO]: Loading kernel from disk", 0x0d, 0x0a, 0
-kernel_stop_msg: db "[INFO]: Kernel exited. Halting CPU", 0x0d, 0x0a, 0
-configuring_GDT_msg: db "[INFO]: Configuring GDT", 0x0d, 0x0a, 0
-activate_protected_mode_msg: db "[INFO]: Activating protected mode", 0x0d, 0x0a, 0
-starting_kernel_msg: db "[INFO]: Starting kernel", 0x0d, 0x0a, 0
+loading_kernel_msg: db "Loading kernel from disk", 0x0d, 0x0a, 0
+configuring_GDT_msg: db "Configuring GDT", 0x0d, 0x0a, 0
+activate_protected_mode_msg: db "Activating protected mode", 0x0d, 0x0a, 0
+getting_memory_map_msg: db "Getting memory map", 0x0d, 0x0a, 0
+
 
 print:
     lodsb
@@ -97,6 +101,36 @@ gdt_descriptor:
     dd gdt_start
 
 
+get_memory_map:
+    xor ax, ax
+    mov es, ax
+    mov ebx, 0
+    mov di, 0x8004 ; entry region
+    mov bp, 0 ; counter
+    call get_memory_map_loop
+    ret
+
+get_memory_map_loop:
+    mov eax, 0xe820
+    mov edx, 0x534D4150 ; "SMAP"
+    mov ecx, 24
+
+    int 0x15
+    
+    jc .done
+
+    inc bp ; counter ++
+    add di, 24
+
+    cmp ebx, 0
+    je .done
+
+    jmp get_memory_map_loop
+.done:
+    mov [0x8000], bp ; 4 byte before entry array (0x8004)
+    ret
+
+
 [bits 32]
 protected_mode_entry:
     mov ax, 0x10 ; data segment selector
@@ -104,7 +138,7 @@ protected_mode_entry:
     mov es, ax
     mov ss, ax
     mov esp, 0x90000 ; new stack for 32-bit
-    jmp 0x1000
+    jmp 0x1000 ; goto kernel
 
 ; padding -> 512 bytes
 times 510 - ($ - $$) db 0x00
