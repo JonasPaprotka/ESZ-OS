@@ -4,8 +4,8 @@
 typedef const char* cstr;
 typedef char* str;
 
+str malloc_str(const unsigned int size);
 int str_length(cstr str);
-
 bool str_equal(cstr a, cstr b);
 
 void str_copy(cstr src, str dest);

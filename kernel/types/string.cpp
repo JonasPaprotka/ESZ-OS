@@ -1,6 +1,13 @@
 #include "string.h"
 #include "memory.h"
 
+str malloc_str(const unsigned int size) {
+    unsigned int addr = malloc(128);
+    str string = (str) addr;
+    memory_clear(string, 128);
+    return string;
+}
+
 int str_length(cstr str) {
     int i = 0;
     while (str[i] != 0) i++;
@@ -96,11 +103,7 @@ void str_replace(str text, cstr toBeReplacedText, cstr replacementText) {
 }
 
 str str_repeat(cstr text, int amount) {
-    //TODO rework when Malloc is finished
-
-    static char returnString[128];
-    memory_clear(returnString, 128); 
-
+    str returnString = malloc_str(128);
     const int text_len = str_length(text);
 
     for (int i = 0; i < amount; i++) {
@@ -114,10 +117,7 @@ str str_repeat(cstr text, int amount) {
 }
 
 str str_combine(cstr a, cstr b) {
-    //TODO rework when Malloc is finished
-
-    static char returnString[128];
-    memory_clear(returnString, 128);
+    str returnString = malloc_str(128);
 
     const int len_a = str_length(a);
     const int len_b = str_length(b);
@@ -134,12 +134,8 @@ str str_combine(cstr a, cstr b) {
 }
 
 str to_string(const int inputValue) {
-    //TODO rework when Malloc is finished
-
-    static char composedString[12];
-    memory_clear(composedString, 12);
-    static char returnString[12];
-    memory_clear(returnString, 12);
+    str composedString = malloc_str(12);
+    str returnString = malloc_str(12);
 
     int strLength = 0;
     int calcValue = inputValue;

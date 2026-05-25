@@ -3,6 +3,7 @@
 #include "commands.h"
 #include "terminal.h"
 #include "io.h"
+#include "memory.h"
 
 void cmd_help(const char* args) {
     for (int i = 0; commands[i].name != 0; i++) {
@@ -28,11 +29,16 @@ void cmd_reboot(const char* args) {
     outb(0x64, 0xFE);
 }
 
+void cmd_memory_info(const char* args) {
+    printMemoryInfo();
+}
+
 const Command commands[] = {
     { "help", cmd_help },
     { "echo", cmd_echo },
     { "clear", cmd_clear },
     { "os-info", cmd_os_info },
     { "reboot", cmd_reboot },
+    { "memory-info", cmd_memory_info },
     { 0, 0 }
 };

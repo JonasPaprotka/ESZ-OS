@@ -15,9 +15,9 @@ struct MemoryRegionInfo {
 
 void memory_info_init();
 
-void malloc();
-void malloc(const unsigned int pageAmount);
-void free(const unsigned long long page);
-void free(const unsigned long long startPage, const unsigned int pageAmount);
+unsigned int malloc(const unsigned int pageAmount);
+void free(const unsigned int addr, const unsigned int byteAmount);
+
+void printMemoryInfo();
 
 #endif
