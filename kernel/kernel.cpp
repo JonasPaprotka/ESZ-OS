@@ -3,7 +3,7 @@
 #include "idt.h"
 #include "vga.h"
 #include "terminal.h"
-#include "memory_info.h"
+#include "memory.h"
 #include "info_text.h"
 
 extern "C" void keyboard_isr();

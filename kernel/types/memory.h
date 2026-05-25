@@ -6,4 +6,18 @@ void memory_fill(void* target, byte value, const int amountOfBytesToFill);
 void memory_clear(void* target, const int amoutOfBytesToClear);
 void memory_copy(void* copyTo, const void* copyFrom, const int amountOfBytesToCopy);
 
+struct MemoryRegionInfo {
+    unsigned long long ramRegionStartAddress;
+    unsigned long long ramRegionLength;
+    unsigned int ramRegionType;
+    unsigned int ACPIExtension;
+} __attribute__((packed));
+
+void memory_info_init();
+
+void malloc();
+void malloc(const unsigned int pageAmount);
+void free(const unsigned long long page);
+void free(const unsigned long long startPage, const unsigned int pageAmount);
+
 #endif
