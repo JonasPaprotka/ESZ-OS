@@ -3,8 +3,8 @@
 #include "string.h"
 
 void printInfoLine(const enum InfoTextType textType, cstr infoText) {
-    enum Color textTagColor;
-    str textTagText;
+    Color textTagColor = White;
+    cstr textTagText = "";
 
     switch (textType) {
         case Info:

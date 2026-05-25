@@ -5,7 +5,7 @@
 #include "io.h"
 #include "memory.h"
 
-void cmd_help(const char* args) {
+void cmd_help(const char*) {
     for (int i = 0; commands[i].name != 0; i++) {
         print_inline(commands[i].name);
         print_inline("; ");
@@ -13,7 +13,7 @@ void cmd_help(const char* args) {
     newline();
 }
 
-void cmd_clear(const char* args) {
+void cmd_clear(const char*) {
     clear();
 }
 
@@ -21,15 +21,15 @@ void cmd_echo(const char* args) {
     print(args);
 }
 
-void cmd_os_info(const char* args) {
+void cmd_os_info(const char*) {
     print("ESZ-OS (W.I.P.) by Jonas Paprotka");
 }
 
-void cmd_reboot(const char* args) {
+void cmd_reboot(const char*) {
     outb(0x64, 0xFE);
 }
 
-void cmd_memory_info(const char* args) {
+void cmd_memory_info(const char*) {
     printMemoryInfo();
 }
 

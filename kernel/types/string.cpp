@@ -2,9 +2,9 @@
 #include "memory.h"
 
 str malloc_str(const unsigned int size) {
-    unsigned int addr = malloc(128);
+    unsigned int addr = malloc(size);
     str string = (str) addr;
-    memory_clear(string, 128);
+    memory_clear(string, size);
     return string;
 }
 
@@ -46,6 +46,7 @@ void str_add(str target, cstr value) {
 }
 
 bool str_contains(cstr text, cstr searchText) {
+    //TODO fix/rewrite
     const int searchText_len = str_length(searchText);
     const int text_len = str_length(text);
     if (searchText_len > text_len) return 0;
@@ -62,6 +63,7 @@ bool str_contains(cstr text, cstr searchText) {
 }
 
 int str_count(cstr text, cstr searchText) {
+    //TODO fix/rewrite
     int counterHits = 0;
     const int searchText_len = str_length(searchText);
     const int text_len = str_length(text);

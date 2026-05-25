@@ -27,7 +27,7 @@ void reserve_special_addresses() {
     // -> Page0 til end of Bitmap
 
     const unsigned int bitmapEndPage = ((unsigned int) &_bss_end + pageCount / 8) / pageSize;
-    for (int i = 0; i < bitmapEndPage; i++) {
+    for (unsigned i = 0; i < bitmapEndPage; i++) {
         bit_write(pmm_bitmap, i, true);
     }
 
@@ -46,7 +46,7 @@ void get_memory_regions() {
     
     MemoryRegionInfo *memoryRegionInfoPtr = (MemoryRegionInfo *) 0x8004;
     
-    for (int i = 0; i < memoryRegionCount; i++) {
+    for (unsigned int i = 0; i < memoryRegionCount; i++) {
         unsigned long long ramRegionByteAmount = memoryRegionInfoPtr[i].ramRegionLength;
 
         while (ramRegionByteAmount >= pageSize) {
@@ -64,8 +64,8 @@ void get_memory_regions() {
 }
 
 int get_free_ram_in_kb() {
-    int freePages = 0;
-    for (int i = 0; i < pageCount; i++) {
+    unsigned int freePages = 0;
+    for (unsigned int i = 0; i < pageCount; i++) {
         if (!bit_read(pmm_bitmap, i)) freePages++;
     }
     return freePages * 4;
@@ -81,7 +81,7 @@ void printMemoryInfo() {
 void memory_info_init() {
     get_memory_region_count();
     get_memory_regions();
-    
+
     printMemoryInfo();
 }
 // ------------
@@ -92,7 +92,7 @@ unsigned int calculateReqPages(const unsigned int byteAmount) {
 }
 
 void malloc_page_range(unsigned int page, const unsigned int pageAmount) {
-    for (int i = 0; i < pageAmount; i++) {
+    for (unsigned int i = 0; i < pageAmount; i++) {
         bit_write(pmm_bitmap, page, true);
         page++;
     }
@@ -103,7 +103,7 @@ unsigned int malloc(const unsigned int byteAmount) {
     unsigned int freePageCounter = 0;
     unsigned int firstPageOfSeries = 0;
 
-    for (int i = 0; i < pageCount; i++) {
+    for (unsigned int i = 0; i < pageCount; i++) {
         if (!bit_read(pmm_bitmap, i)) {
             if (freePageCounter == 0) {
                 firstPageOfSeries = i;
@@ -126,7 +126,7 @@ void free(const unsigned int addr, const unsigned int byteAmount) {
     const unsigned int reqPages = calculateReqPages(byteAmount);
     unsigned int currPage = addr / pageSize;
 
-    for (int i = 0; i < reqPages; i++) {
+    for (unsigned int i = 0; i < reqPages; i++) {
         bit_write(pmm_bitmap, currPage, false);
         currPage++;
     }
