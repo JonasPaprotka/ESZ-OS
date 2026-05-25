@@ -96,6 +96,8 @@ void str_replace(str text, cstr toBeReplacedText, cstr replacementText) {
 }
 
 str str_repeat(cstr text, int amount) {
+    //TODO rework when Malloc is finished
+
     static char returnString[128];
     memory_clear(returnString, 128); 
 
@@ -112,6 +114,8 @@ str str_repeat(cstr text, int amount) {
 }
 
 str str_combine(cstr a, cstr b) {
+    //TODO rework when Malloc is finished
+
     static char returnString[128];
     memory_clear(returnString, 128);
 
@@ -130,6 +134,8 @@ str str_combine(cstr a, cstr b) {
 }
 
 str to_string(const int inputValue) {
+    //TODO rework when Malloc is finished
+
     static char composedString[12];
     memory_clear(composedString, 12);
     static char returnString[12];
