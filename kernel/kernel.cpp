@@ -14,6 +14,8 @@ extern "C" void keyboard_isr();
 extern "C" void kernel_main() {
     clearScreen();
 
+    init_print();
+
     printInfoLine(InfoTextType::Loading, "Initializing Memory Info...");
     memory_info_init();
     

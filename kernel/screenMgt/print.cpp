@@ -15,6 +15,8 @@ static constexpr int FONT_SIZE = 4;
 static constexpr int FONT_W = 8 * FONT_SIZE;
 static constexpr int FONT_H = 16 * FONT_SIZE;
 
+unsigned int MAX_CHARS;
+
 bool cursor_visible = true;
 const char cursor_view = '_';
 
@@ -25,8 +27,7 @@ void newline() {
 }
 
 void handle_automatic_newline() {
-    const int max_chars = boot_info.width / FONT_W; // TODO put in init function for performance
-    if (cursorAt_X >= max_chars) newline();
+    if (cursorAt_X >= MAX_CHARS) newline();
 }
 
 void draw_char(char c, const int printAt_X, const int printAt_Y, Color color) {
@@ -78,3 +79,31 @@ void print(const char* text) {
     print_chars(text, Color::White);
     newline();
 }
+
+
+void init_print() {
+    MAX_CHARS = boot_info.width / FONT_W;
+}
+
+
+// LEGACY
+/* void scrollDown() {
+    // shift lines and clear last one
+    byte *video_memory = (byte *) 0xB8000;
+    for (int i = 1; i <= 3840; i++) {
+        video_memory[i - 1] = video_memory[i + 159];
+    }
+    for (int i = 1920; i <= 1999; i++) {
+        clear_char(i);
+    }
+    cursorAtChar = 0;
+    cursorAtLine = 24;
+    set_cursor(1920);
+}
+ */
+
+/*  void cursor_backspace() {
+    --cursorAtChar;
+    clear_char(80 * cursorAtLine + cursorAtChar);
+}
+ */

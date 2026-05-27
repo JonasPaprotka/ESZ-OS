@@ -19,4 +19,6 @@ void print_char(const char c);
 
 void newline();
 
+void init_print();
+
 #endif
