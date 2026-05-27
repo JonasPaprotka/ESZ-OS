@@ -1,15 +1,15 @@
 #include "terminal.h"
-#include "vga.h"
-#include "keyboard.h"
+#include "io/keyboard.h"
 #include "string.h"
+#include "print.h"
 #include "commands.h"
-#include "keymap.h"
-#include "byte.h"
-#include "info_text.h"
+#include "maps/keymap.h"
+#include "helper/info_text.h"
+#include "shell/commands.h"
 
 const KeyboardLayout current_layout = LAYOUT_DE;
 
-char scancode_to_char(const byte scancode) {
+char scancode_to_char(const unsigned char scancode) {
     if (scancode > 0x39) return 0;  // outside of table range
     
     if (current_layout == LAYOUT_DE) {
@@ -18,19 +18,15 @@ char scancode_to_char(const byte scancode) {
     return shift ? us_shifted[scancode] : us_unshifted[scancode];
 }
 
+
 void printHeader() {
     printSeperator();
-    printInfoLine(Success, "Kernel Loaded");
-    printInfoLine(Warning, "Project W.I.P.");
-    print("ESZ-OS (32bit)");
+    printInfoLine(InfoTextType::Success, "Kernel Loaded");
+    printInfoLine(InfoTextType::Warning, "Project W.I.P.");
+    print("ESZ-OS (64bit)");
     print("by Jonas Paprotka");
     printSeperator();
 }
-
-int cursorAtChar = 0;
-int cursorAtLine = 0;
-int charsProtectedTil = 0;
-int lineFullLength = 0;
 
 int lineInputLength = 0;
 char lineInputBuffer[256];
@@ -46,7 +42,7 @@ void processLineInputBuffer() {
         lineInputLength = 0;
         lineInputBuffer[0] = 0;
         newline();
-        printInfoLine(Error, "Command exceeds 256 chars");
+        printInfoLine(InfoTextType::Error, "Command exceeds 256 chars");
         return;
     }
 
@@ -60,37 +56,35 @@ void processLineInputBuffer() {
     }
 
     for (int i = 0; commands[i].name != 0; i++) {
-        if (str_equal(lineInputBuffer, commands[i].name)) {
+/*         if (str_equal(lineInputBuffer, commands[i].name)) {
             newline();
             commands[i].execute(args);
             lineInputLength = 0;
             lineInputBuffer[0] = 0;
             return;
-        }
+        } */
     }
 
     newline();
-    printInfoLine(Error, "Unknown Command");
+    printInfoLine(InfoTextType::Error, "Unknown Command");
     lineInputLength = 0;
     lineInputBuffer[0] = 0; // clear buffer
 }
 
 void newTerminalInputLine() {
-    cstr linePrefix = "esz >> ";
+    const char* linePrefix = "esz >> ";
     print_inline(linePrefix);
-    cursorAtChar = str_length(linePrefix);
-    charsProtectedTil = cursorAtChar;
 }
 
-void terminal_on_key(const byte scancode) {
+void terminal_on_key(const unsigned char scancode) {
     switch(scancode) {
         case 0x1C: // Enter
             processLineInputBuffer();
             newTerminalInputLine();
             break;
         case 0x0E: // Backspace
-            if (cursorAtChar <= charsProtectedTil) { break; }
-            cursor_backspace();
+            // if (cursorAt_X <= charsProtectedTil) { break; }
+            // cursor_backspace();
             --lineInputLength;
             lineInputBuffer[lineInputLength] = 0;
             break;

@@ -1,8 +1,9 @@
 #ifndef INFO_HELPER_H
 #define INFO_HELPER_H
+
 #include "string.h"
 
-enum InfoTextType {
+enum class InfoTextType {
     Info,
     Warning,
     Error,
@@ -10,7 +11,7 @@ enum InfoTextType {
     Loading
 };
 
-void printInfoLine(enum InfoTextType textType, cstr infoText);
+void printInfoLine(enum InfoTextType textType, const char* infoText);
 void printSeperator();
 
 #endif

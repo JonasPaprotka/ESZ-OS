@@ -1,39 +1,43 @@
 // File Updated with AI
 #include "idt.h"
-#include "byte.h"
+#include <stdint.h>
 
 struct IDTEntry {
-    unsigned short base_low;
-    unsigned short selector;
-    byte zero;
-    byte flags;
-    unsigned short base_high;
+    uint16_t base_low;
+    uint16_t selector;
+    uint8_t  ist;
+    uint8_t  flags;
+    uint16_t base_mid; // middle 16 bits of handler address
+    uint32_t base_high; // higher 32 bits of handler address
+    uint32_t reserved;
 } __attribute__((packed));
 
 struct IDTDescriptor {
-    unsigned short limit;
-    unsigned int base;
+    uint16_t limit;
+    uint64_t base;
 } __attribute__((packed));
 
 struct IDTEntry idt[256];
 struct IDTDescriptor idt_desc;
 
-void idt_set_entry(int n, unsigned int handler) {
+void idt_set_entry(int n, uint64_t handler) {
     idt[n].base_low  = handler & 0xFFFF;
-    idt[n].base_high = (handler >> 16) & 0xFFFF;
-    idt[n].selector  = 0x08;
-    idt[n].zero      = 0;
-    idt[n].flags     = 0x8E;
+    idt[n].base_mid  = (handler >> 16) & 0xFFFF;
+    idt[n].base_high = (handler >> 32) & 0xFFFFFFFF;
+    idt[n].selector = 0x28; // Limine default for 64 bit
+    idt[n].ist = 0;
+    idt[n].flags = 0x8E;
+    idt[n].reserved = 0;
 }
 
 void idt_init() {
     idt_desc.limit = sizeof(idt) - 1;
-    idt_desc.base  = (unsigned int) &idt;
+    idt_desc.base  = (uint64_t)&idt;
 
-    // null table
     for (int i = 0; i < 256; i++) {
-        idt_set_entry(i, 0);
+        idt[i].flags = 0;
     }
 
-    __asm__("lidt %0" : : "m"(idt_desc));
+    // load the IDT into the CPU register
+    __asm__ volatile("lidt %0" : : "m"(idt_desc));
 }

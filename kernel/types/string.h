@@ -1,24 +1,22 @@
 #ifndef STRING_H
 #define STRING_H
 
-typedef const char* cstr;
-typedef char* str;
+/* char* ppm_malloc_str(const unsigned int size); */
+int str_length(const char* str);
+/* char* str_repeat(const char* text, int amount);
+ *//* 
+bool str_equal(const char* a, const char* b);
 
-str ppm_malloc_str(const unsigned int size);
-int str_length(cstr str);
-bool str_equal(cstr a, cstr b);
+void str_copy(const char* src, const char* dest);
+void str_add(char* target, const char* value);
+char* str_combine(const char* a, const char* b);
 
-void str_copy(cstr src, str dest);
-void str_add(str target, cstr value);
-str str_combine(cstr a, cstr b);
-str str_repeat(cstr text, int amount);
+bool str_contains(const char* text, const char* searchText);
+int str_count(const char* text, const char* searchText);
+bool str_starts_with(const char* text, const char* searchText);
+bool str_ends_with(const char* text, const char* searchText);
+void str_replace(char* text, const char* toBeReplacedText, const char* replacementText);
 
-bool str_contains(cstr text, cstr searchText);
-int str_count(cstr text, cstr searchText);
-bool str_starts_with(cstr text, cstr searchText);
-bool str_ends_with(cstr text, cstr searchText);
-void str_replace(str text, cstr toBeReplacedText, cstr replacementText);
-
-str to_string(const int inputValue);
-
+char* to_string(const int inputValue);
+ */
 #endif

@@ -4,16 +4,25 @@
             "name": "ESZ-OS",
             "includePath": [
                 "${workspaceFolder}/kernel",
-                "${workspaceFolder}/kernel/io",
-                "${workspaceFolder}/kernel/terminal",
-                "${workspaceFolder}/kernel/types",
-                "${workspaceFolder}/kernel/maps",
-                "${workspaceFolder}/kernel/helper"
+                "${workspaceFolder}/kernel/**"
             ],
             "compilerPath": "/opt/homebrew/bin/x86_64-elf-g++",
+            "compilerArgs": [
+                "-m64",
+                "-march=x86-64",
+                "-mcmodel=kernel",
+                "-mno-red-zone",
+                "-ffreestanding",
+                "-fno-exceptions",
+                "-fno-rtti"
+            ],
+            "defines": [
+                "__x86_64__",
+                "__KERNEL__"
+            ],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ],
     "version": 4

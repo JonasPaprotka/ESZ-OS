@@ -1,26 +1,33 @@
-#include "io.h"
-#include "pic.h"
-#include "idt.h"
-#include "vga.h"
-#include "terminal.h"
-#include "memory.h"
-#include "info_text.h"
+#include "print.h"
+#include "clear.h"
+#include "terminal/terminal.h"
+#include "helper/info_text.h"
+#include "memory/memory.h"
+#include "io/pic.h"
+#include "io/idt.h"
+#include "io/keyboard.h"
+#include <stdint.h>
+
 
 extern "C" void keyboard_isr();
 
-extern "C" void kmain() {
-    clear();
+extern "C" void kernel_main() {
+    clearScreen();
 
-    printInfoLine(Loading, "Initializing Memory Info...");
+    printInfoLine(InfoTextType::Loading, "Initializing Memory Info...");
     memory_info_init();
     
-    printInfoLine(Loading, "Initializing Terminal...");
+    printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
     terminal_init();
-
+    
     pic_init();
-    idt_init();
-    idt_set_entry(33, (unsigned int) keyboard_isr);
-    __asm__("sti");
 
-    while(1); // loop to keep alive
+    idt_init();
+    idt_set_entry(33, (uint64_t) keyboard_isr); 
+    
+    __asm__ volatile("sti"); 
+
+    while(1) {
+        __asm__ volatile("hlt");
+    }
 }

@@ -1,53 +1,78 @@
-# File Updated with AI
+# File updated with AI
 
-CC      = x86_64-elf-g++
-LD      = x86_64-elf-ld
-OBJCOPY = x86_64-elf-objcopy
-ASM     = nasm
+KERNEL := bin/kernel.elf
+ISO := bin/eszos.iso
+ISO_ROOT := bin/iso_root
+LIMINE := limine
 
-CFLAGS = -m32 -ffreestanding -fno-exceptions -fno-rtti -Wall -Wextra -Ikernel -Ikernel/io -Ikernel/terminal -Ikernel/types -Ikernel/maps -Ikernel/helper
-LDFLAGS = -m elf_i386 -T kernel/linker.ld --no-warn-rwx-segments
+CXX := x86_64-elf-g++
+LD := x86_64-elf-ld
+ASM := nasm
 
-BOOT    = bootloader/boot.bin
-OS      = os.bin
+KERNEL_INC_DIRS := $(shell find kernel -type d)
+INC_FLAGS := $(addprefix -I , $(KERNEL_INC_DIRS))
 
-KERNEL_ASM_SRCS = kernel/kernel_entry.asm
-KERNEL_C_SRCS   = $(wildcard kernel/*.cpp) $(wildcard kernel/**/*.cpp)
+CXXFLAGS := \
+    -m64 -march=x86-64 \
+    -mcmodel=kernel \
+    -mno-red-zone \
+    -mno-mmx -mno-sse -mno-sse2 \
+    -ffreestanding \
+    -fno-stack-protector -fno-stack-check \
+    -fno-pie -fno-pic \
+    -fno-exceptions -fno-rtti \
+    -Wall -Wextra \
+    $(INC_FLAGS)
 
-KERNEL_ASM_OBJS = $(KERNEL_ASM_SRCS:.asm=.o)
-KERNEL_C_OBJS   = $(KERNEL_C_SRCS:.cpp=.o)
-KERNEL_OBJS     = $(KERNEL_ASM_OBJS) $(KERNEL_C_OBJS)
+ASMFLAGS := -f elf64
 
-KERNEL_ELF = kernel/kernel.elf
-KERNEL_BIN = kernel/kernel.bin
+LDFLAGS := \
+    -m elf_x86_64 -nostdlib -static \
+    -z max-page-size=0x1000 \
+    -T kernel/linker.ld
 
-.PHONY: all run debug clean
+CPP_SRC := $(shell find kernel -name '*.cpp')
+ASM_SRC := $(shell find kernel -name '*.asm')
+CPP_OBJ := $(CPP_SRC:%.cpp=bin/obj/%.cpp.o)
+ASM_OBJ := $(ASM_SRC:%.asm=bin/obj/%.asm.o)
+OBJ := $(CPP_OBJ) $(ASM_OBJ)
 
-all: $(OS)
+.PHONY: all run clean
 
-$(BOOT): bootloader/boot.asm
-	$(ASM) -f bin $< -o $@
+all: $(ISO)
 
-%.o: %.asm
-	$(ASM) -f elf32 $< -o $@
+bin/obj/%.cpp.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-%.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+bin/obj/%.asm.o: %.asm
+	@mkdir -p $(dir $@)
+	$(ASM) $(ASMFLAGS) $< -o $@
 
-$(KERNEL_ELF): $(KERNEL_OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+$(KERNEL): $(OBJ) kernel/linker.ld
+	@mkdir -p $(dir $@)
+	$(LD) $(LDFLAGS) $(OBJ) -o $@
 
-$(KERNEL_BIN): $(KERNEL_ELF)
-	$(OBJCOPY) -O binary $< $@
+$(ISO): $(KERNEL) limine.conf
+	@rm -rf $(ISO_ROOT)
+	@mkdir -p $(ISO_ROOT)/boot/limine
+	@mkdir -p $(ISO_ROOT)/EFI/BOOT
+	@cp $(KERNEL) $(ISO_ROOT)/boot/
+	@cp limine.conf $(ISO_ROOT)/boot/limine/
+	@cp $(LIMINE)/limine-bios.sys $(ISO_ROOT)/boot/limine/
+	@cp $(LIMINE)/limine-bios-cd.bin $(ISO_ROOT)/boot/limine/
+	@cp $(LIMINE)/limine-uefi-cd.bin $(ISO_ROOT)/boot/limine/
+	@cp $(LIMINE)/BOOTX64.EFI $(ISO_ROOT)/EFI/BOOT/
+	xorriso -as mkisofs \
+	    -b boot/limine/limine-bios-cd.bin \
+	    -no-emul-boot -boot-load-size 4 -boot-info-table \
+	    --efi-boot boot/limine/limine-uefi-cd.bin \
+	    -efi-boot-part --efi-boot-image --protective-msdos-label \
+	    $(ISO_ROOT) -o $(ISO)
+	$(LIMINE)/limine bios-install $(ISO)
 
-$(OS): $(BOOT) $(KERNEL_BIN)
-	cat $^ > $@
-
-run: all
-	qemu-system-i386 -drive format=raw,file=$(OS) -display cocoa,zoom-to-fit=on
-
-debug: all
-	qemu-system-i386 -drive format=raw,file=$(OS) -s -S -display cocoa,zoom-to-fit=on
+run: $(ISO)
+	qemu-system-x86_64 -M q35 -m 512M -cdrom $(ISO) -boot d
 
 clean:
-	rm -f $(BOOT) $(KERNEL_OBJS) $(KERNEL_ELF) $(KERNEL_BIN) $(OS)
+	rm -rf bin

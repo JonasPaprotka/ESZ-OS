@@ -1,8 +1,6 @@
-#include "memory.h"
-#include "byte.h"
-#include "vga.h"
+/* #include "memory.h"
 #include "string.h"
-#include "info_text.h"
+#include "helper/info_text.h"
 #include "bit.h"
 
 extern char _bss_end; // linker symbol. end of the kernel in memory
@@ -11,7 +9,7 @@ unsigned int memoryRegionCount;
 unsigned int pageCount;
 const unsigned int pageSize = 4096; // 4KB Pages
 
-byte* pmm_bitmap = (byte*) &_bss_end; // bitmap lives right after kernel
+unsigned char* pmm_bitmap = (unsigned char*) &_bss_end; // bitmap lives right after kernel
 
 
 void get_memory_region_count() {
@@ -72,19 +70,10 @@ int get_free_ram_in_kb() {
 }
 
 void printMemoryInfo() {
-    printInfoLine(Info, str_combine("Memory regions detected: ", to_string(memoryRegionCount)));
-    printInfoLine(Info, str_combine("Available RAM (KB): ", to_string(get_free_ram_in_kb())));
-    printInfoLine(Info, str_combine("Available RAM (MB): ", to_string(get_free_ram_in_kb() / 1024)));
+    //printInfoLine(Info, str_combine("Memory regions detected: ", to_string(memoryRegionCount)));
+    //printInfoLine(Info, str_combine("Available RAM (KB): ", to_string(get_free_ram_in_kb())));
+    //printInfoLine(Info, str_combine("Available RAM (MB): ", to_string(get_free_ram_in_kb() / 1024)));
 }
-
-// --- INIT ---
-void memory_info_init() {
-    get_memory_region_count();
-    get_memory_regions();
-
-    printMemoryInfo();
-}
-// ------------
 
 unsigned int calculateReqPages(const unsigned int byteAmount) {
     // round up to next page if needed
@@ -118,7 +107,7 @@ unsigned int ppm_malloc(const unsigned int byteAmount) {
         }
     }
 
-    printInfoLine(Error, "ppm_malloc failed");
+    printInfoLine(InfoTextType::Error, "ppm_malloc failed");
     return 0;
 }
 
@@ -132,9 +121,9 @@ void ppm_free(const unsigned int addr, const unsigned int byteAmount) {
     }
 }
 
-void memory_fill(void* target, const byte value, const int amountOfBytesToFill) {
+void memory_fill(void* target, const unsigned char value, const int amountOfBytesToFill) {
     for (int i = 0; i < amountOfBytesToFill; ++i) {
-        ((byte*)target)[i] = value;
+        ((unsigned char*)target)[i] = value;
     }
 }
 
@@ -144,6 +133,16 @@ void memory_clear(void* target, const int amoutOfBytesToClear) {
 
 void memory_copy(void* copyTo, const void* copyFrom, const int amountOfBytesToCopy) {
     for (int i = 0; i < amountOfBytesToCopy; ++i) {
-        ((byte*)copyTo)[i] = ((byte*)copyFrom)[i];
+        ((unsigned char*)copyTo)[i] = ((unsigned char*)copyFrom)[i];
     }
 }
+ */
+
+// --- INIT ---
+void memory_info_init() {
+/*     get_memory_region_count();
+    get_memory_regions();
+
+    printMemoryInfo(); */
+}
+// ------------
