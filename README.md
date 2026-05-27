@@ -17,7 +17,7 @@ I have an idea how to convert this rambling into value.
 -> See this fellow humanoids? The feeling you get when reading this; THIS is what I aimed for in code quality. So dont expect much.
 
 W.I.P.
-by Jonas Paprotka (ASM and C++ Noobie)
+by Jonas Paprotka (ASM and C++ Noobie) - Some Files are marked as "Updated/Assisted by AI/LLM" - when AI was used to help. Files will probably be rewritten with worse but human quality. - No, honestly - ... maybe...
 
 # Install
 bios 32 bit edition (outdated)

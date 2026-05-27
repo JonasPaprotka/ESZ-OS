@@ -11,7 +11,7 @@
 int cursorAt_X;
 int cursorAt_Y;
 
-static constexpr int FONT_SIZE = 4;
+static constexpr int FONT_SIZE = 2;
 static constexpr int FONT_W = 8 * FONT_SIZE;
 static constexpr int FONT_H = 16 * FONT_SIZE;
 
@@ -20,14 +20,33 @@ unsigned int MAX_CHARS;
 bool cursor_visible = true;
 const char cursor_view = '_';
 
+void scroll() {
+    //TODO
+}
+
+void handleScroll() {
+    //TODO
+}
 
 void newline() {
     cursorAt_X = 0;
     cursorAt_Y++;
+    handleScroll();
 }
 
 void handle_automatic_newline() {
     if (cursorAt_X >= MAX_CHARS) newline();
+    // TODO cover other direction
+}
+
+void remove_prev_char() {
+    //TODO
+}
+
+void cursor_backspace() {
+    cursorAt_X--;
+    handle_automatic_newline();
+    remove_prev_char();
 }
 
 void draw_char(char c, const int printAt_X, const int printAt_Y, Color color) {
@@ -80,30 +99,7 @@ void print(const char* text) {
     newline();
 }
 
-
+// INIT
 void init_print() {
     MAX_CHARS = boot_info.width / FONT_W;
 }
-
-
-// LEGACY
-/* void scrollDown() {
-    // shift lines and clear last one
-    byte *video_memory = (byte *) 0xB8000;
-    for (int i = 1; i <= 3840; i++) {
-        video_memory[i - 1] = video_memory[i + 159];
-    }
-    for (int i = 1920; i <= 1999; i++) {
-        clear_char(i);
-    }
-    cursorAtChar = 0;
-    cursorAtLine = 24;
-    set_cursor(1920);
-}
- */
-
-/*  void cursor_backspace() {
-    --cursorAtChar;
-    clear_char(80 * cursorAtLine + cursorAtChar);
-}
- */

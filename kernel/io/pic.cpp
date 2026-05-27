@@ -1,4 +1,5 @@
-// File Updated with AI
+// File Updated with AI / Assisted by AI
+
 #include "io.h"
 
 void pic_init() {

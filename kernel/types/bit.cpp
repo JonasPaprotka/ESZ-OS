@@ -1,4 +1,4 @@
-// File updated by AI
+// File Updated with AI / Assisted by AI
 
 void bit_set(unsigned char* bitmap, int page) {
     bitmap[page / 8] |= (1 << (page % 8));

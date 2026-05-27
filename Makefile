@@ -1,4 +1,4 @@
-# File updated with AI
+# File updated with AI / AI Assited
 
 KERNEL := bin/kernel.elf
 ISO := bin/eszos.iso
