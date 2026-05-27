@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "color.h"
 
+extern int FONT_SIZE;
+
 extern int cursorAt_X;
 extern int cursorAt_Y;
 

@@ -8,12 +8,14 @@
 #include "color.h"
 #include <stdint.h>
 
+
+int FONT_SIZE;
+
 int cursorAt_X;
 int cursorAt_Y;
 
-static constexpr int FONT_SIZE = 2;
-static constexpr int FONT_W = 8 * FONT_SIZE;
-static constexpr int FONT_H = 16 * FONT_SIZE;
+int FONT_W;
+int FONT_H;
 
 unsigned int MAX_CHARS;
 
@@ -101,5 +103,9 @@ void print(const char* text) {
 
 // INIT
 void init_print() {
+    FONT_SIZE = 2;
+    FONT_W = 8 * FONT_SIZE;
+    FONT_H = 16 * FONT_SIZE;
+
     MAX_CHARS = boot_info.width / FONT_W;
 }

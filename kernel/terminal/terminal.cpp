@@ -9,13 +9,15 @@
 
 const KeyboardLayout current_layout = LAYOUT_DE;
 
-char scancode_to_char(const unsigned char scancode) {
-    if (scancode > 0x39) return 0;  // outside of table range
-    
+uint16_t scancode_to_keycode(const unsigned char scancode) {
+    if (scancode >= 0x3A) return KEY_UNKNOWN;
+    int shift_idx = shift ? 1 : 0;
+
     if (current_layout == LAYOUT_DE) {
-        return shift ? de_shifted[scancode] : de_unshifted[scancode];
+        return de_keymap[shift_idx][scancode];
     }
-    return shift ? us_shifted[scancode] : us_unshifted[scancode];
+
+    return us_keymap[shift_idx][scancode];
 }
 
 
@@ -77,19 +79,26 @@ void newTerminalInputLine() {
 }
 
 void terminal_on_key(const unsigned char scancode) {
-    switch(scancode) {
-        case 0x1C: // Enter
+    uint16_t key = scancode_to_keycode(scancode);
+
+    switch(key) {
+        case KeyCode::KEY_ENTER: // Enter
             processLineInputBuffer();
             newTerminalInputLine();
             break;
-        case 0x0E: // Backspace
+        case KeyCode::KEY_BACKSPACE: // Backspace
             // if (cursorAt_X <= charsProtectedTil) { break; }
             // cursor_backspace();
             --lineInputLength;
             lineInputBuffer[lineInputLength] = 0;
             break;
+        //TODO:
+        // - cmd + "+" / "-" to change font size (needs storing of lines first!)
+        // - Arrow key cursor movement right/left; up/down for prev/next command (also needs storage)
+        // - TAB to complete command/paths etc
+
         default:
-            char c = scancode_to_char(scancode);
+            char c = scancode_to_keycode(scancode);
             if (!c) return;
             print_char(c);
 

@@ -1,34 +1,44 @@
 // File Updated with AI / Assisted by AI
-//TODO consider Open source maps (if existing - have to... right?)
 
-char us_unshifted[] = {
-    0,   0,    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,    // 0x00-0x0E
-    0,   'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0,          // 0x0F-0x1C
-    0,   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'','`',             // 0x1D-0x29
-    0,   '\\','z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,               // 0x2A-0x36
-    '*', 0,   ' '                                                                // 0x37-0x39
+#include <stdint.h>
+#include "maps/keymap.h"
+
+// en-US
+uint16_t us_keymap[2][0x3A] = {
+    // Unshifted
+    {
+        0, KEY_ESCAPE, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', KEY_BACKSPACE,
+        KEY_TAB, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', KEY_ENTER,
+        KEY_LCTRL, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
+        KEY_LSHIFT, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', KEY_RSHIFT,
+        '*', KEY_LALT, ' '
+    },
+    // Shifted
+    {
+        0, KEY_ESCAPE, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', KEY_BACKSPACE,
+        KEY_TAB, 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', KEY_ENTER,
+        KEY_LCTRL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~',
+        KEY_LSHIFT, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', KEY_RSHIFT,
+        '*', KEY_LALT, ' '
+    }
 };
 
-char us_shifted[] = {
-    0,   0,    '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 0,    // 0x00-0x0E
-    0,   'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', 0,          // 0x0F-0x1C
-    0,   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~',             // 0x1D-0x29
-    0,   '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0,               // 0x2A-0x36
-    '*', 0,   ' '                                                                // 0x37-0x39
-};
-
-char de_unshifted[] = {
-    0,   0,    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', (char)0xE1, '\'', 0,    // 0x00-0x0E  (ß, ´≈')
-    0,   'q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', (char)0x81, '+', 0,           // 0x0F-0x1C  (y, ü)
-    0,   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', (char)0x94, (char)0x84, '^',       // 0x1D-0x29  (ö, ä, ^)
-    0,   '#', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-', 0,                       // 0x2A-0x36  (z)
-    '*', 0,   ' '                                                                        // 0x37-0x39
-};
-
-char de_shifted[] = {
-    0,   0,    '!', '"', (char)0x15, '$', '%', '&', '/', '(', ')', '=', '?', '`', 0,     // 0x00-0x0E  (§=0x15, ?, `)
-    0,   'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', (char)0x9A, '*', 0,           // 0x0F-0x1C  (Z, Ü, *)
-    0,   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', (char)0x99, (char)0x8E, (char)0xF8,// 0x1D-0x29  (Ö, Ä, °)
-    0,   '\'','Y', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', '_', 0,                       // 0x2A-0x36  (', Y, _)
-    '*', 0,   ' '                                                                        // 0x37-0x39
+// de-DE
+uint16_t de_keymap[2][0x3A] = {
+    // Unshifted
+    {
+        0, KEY_ESCAPE, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', KEY_DE_SS, '\'', KEY_BACKSPACE,
+        KEY_TAB, 'q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', KEY_DE_UE, '+', KEY_ENTER,
+        KEY_LCTRL, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', KEY_DE_OE, KEY_DE_AE, '^',
+        KEY_LSHIFT, '#', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-', KEY_RSHIFT,
+        '*', KEY_LALT, ' '
+    },
+    // Shifted
+    {
+        0, KEY_ESCAPE, '!', '"', '3', '$', '%', '&', '/', '(', ')', '=', '?', '`', KEY_BACKSPACE,
+        KEY_TAB, 'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', KEY_DE_UE_CAPS, '*', KEY_ENTER,
+        KEY_LCTRL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', KEY_DE_OE_CAPS, KEY_DE_AE_CAPS, '2', // '2' repräsentiert hier Grad °
+        KEY_LSHIFT, '\'', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', '_', KEY_RSHIFT,
+        '*', KEY_LALT, ' '
+    }
 };
