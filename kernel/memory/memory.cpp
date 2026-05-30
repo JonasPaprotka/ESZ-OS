@@ -70,9 +70,19 @@ void get_free_location_for_bitmap() {
 }
 
 void print_memory_info() {
-    //printInfoLine(InfoTextType::Info, str_combine("Memory regions detected: ", to_string(memoryRegionCount)));
-    //printInfoLine(InfoTextType::Info, str_combine("Available RAM (KB): ", to_string(get_free_ram_in_kb())));
-    //printInfoLine(InfoTextType::Info, str_combine("Available RAM (MB): ", to_string(get_free_ram_in_kb() / 1024)));
+    uint64_t KiB = freeBytes / 1024;
+    uint64_t MiB = KiB / 1024;
+    uint64_t GiB = MiB / 1024;
+
+    printInfoLine(InfoTextType::Info, str_combine("Memory regions: ", to_string(memoryRegionCount)));
+    
+    if (GiB > 0) {
+        printInfoLine(InfoTextType::Info, str_combine(str_combine("Available RAM: ", to_string(GiB)), " GiB"));
+    } else if (MiB > 0) {
+        printInfoLine(InfoTextType::Info, str_combine(str_combine("Available RAM: ", to_string(MiB)), " MiB"));
+    } else {
+        printInfoLine(InfoTextType::Info, str_combine(str_combine("Available RAM: ", to_string(KiB)), " KiB"));
+    }
 }
 
 void ppm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
@@ -104,6 +114,12 @@ uint64_t ppm_malloc(const uint64_t byteAmount) {
 
     printInfoLine(InfoTextType::Error, "ppm_malloc failed");
     return 0;
+}
+
+void* ppm_malloc_addr(const uint64_t byteAmount) {
+    uint64_t phys_addr = ppm_malloc(byteAmount);
+    if (phys_addr == 0) return nullptr;
+    return (void*)(phys_addr + hhdm_offset); 
 }
 
 void ppm_free(const uint64_t addr, const uint64_t byteAmount) {

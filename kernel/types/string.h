@@ -1,10 +1,12 @@
 #ifndef STRING_H
 #define STRING_H
 
-/* char* ppm_malloc_str(const unsigned int size); */
+#include <stdint.h>
+
+char* ppm_malloc_str(const uint64_t size);
 int str_length(const char* str);
-/* char* str_repeat(const char* text, int amount);
- *//* 
+char* str_repeat(const char* text, int amount);
+ 
 bool str_equal(const char* a, const char* b);
 
 void str_copy(const char* src, const char* dest);
@@ -18,5 +20,5 @@ bool str_ends_with(const char* text, const char* searchText);
 void str_replace(char* text, const char* toBeReplacedText, const char* replacementText);
 
 char* to_string(const int inputValue);
- */
+
 #endif

@@ -31,7 +31,7 @@ void cmd_reboot(const char*) {
 }
 
 void cmd_memory_info(const char*) {
-    //printMemoryInfo();
+    print_memory_info();
 }
 
 const Command commands[] = {

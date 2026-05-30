@@ -1,11 +1,12 @@
 #include "string.h"
+#include "memory.h"
+#include <stdint.h>
 
-/* str ppm_malloc_str(const unsigned int size) {
-    unsigned int addr = ppm_malloc(size);
-    str string = (str) addr;
+char* ppm_malloc_str(const uint64_t size) {
+    char* string = (char*) ppm_malloc_addr(size);
     memory_clear(string, size);
     return string;
-} */
+}
 
 int str_length(const char* str) {
     int i = 0;
@@ -13,7 +14,7 @@ int str_length(const char* str) {
     return i;
 }
 
-/* bool str_equal(const char* a, const char* b) {
+bool str_equal(const char* a, const char* b) {
     const int a_len = str_length(a);
     const int b_len = str_length(b);
     
@@ -97,14 +98,14 @@ bool str_ends_with(const char* text, const char* searchText) {
         if (text[i] != searchText[i]) return false;
     }
     return true;
-} */
+}
 
-/* void str_replace(str text, const char* toBeReplacedText, const char* replacementText) {
+void str_replace(char* text, const char* toBeReplacedText, const char* replacementText) {
     //TODO
-} */
+}
 
-/* char* str_repeat(const char* text, int amount) {
-    char*[128] returnString = "";
+char* str_repeat(const char* text, int amount) {
+    char* returnString = ppm_malloc_str(128);
     const int text_len = str_length(text);
 
     for (int i = 0; i < amount; i++) {
@@ -115,10 +116,10 @@ bool str_ends_with(const char* text, const char* searchText) {
 
     returnString[text_len * amount] = 0;
     return returnString;
-} */
+}
 
-/* str str_combine(const char* a, const char* b) {
-    str returnString = ppm_malloc_str(128);
+char* str_combine(const char* a, const char* b) {
+    char* returnString = ppm_malloc_str(128);
 
     const int len_a = str_length(a);
     const int len_b = str_length(b);
@@ -134,9 +135,9 @@ bool str_ends_with(const char* text, const char* searchText) {
     return returnString;
 }
 
-str to_string(const int inputValue) {
-    str composedString = ppm_malloc_str(12);
-    str returnString = ppm_malloc_str(12);
+char* to_string(const int inputValue) {
+    char* composedString = ppm_malloc_str(12);
+    char* returnString = ppm_malloc_str(12);
 
     int strLength = 0;
     int calcValue = inputValue;
@@ -156,4 +157,3 @@ str to_string(const int inputValue) {
     returnString[strLength] = 0;
     return returnString;
 }
- */

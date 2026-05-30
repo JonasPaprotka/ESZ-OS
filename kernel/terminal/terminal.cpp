@@ -58,14 +58,14 @@ void processLineInputBuffer() {
     }
 
     for (int i = 0; commands[i].name != 0; i++) {
-/*         if (str_equal(lineInputBuffer, commands[i].name)) {
+        if (str_equal(lineInputBuffer, commands[i].name)) {
             newline();
             commands[i].execute(args);
             lineInputLength = 0;
             lineInputBuffer[0] = 0;
             return;
-        } */
-    }
+        }
+    } 
 
     newline();
     printInfoLine(InfoTextType::Error, "Unknown Command");
