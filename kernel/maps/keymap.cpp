@@ -37,7 +37,7 @@ uint16_t de_keymap[2][0x3A] = {
     {
         0, KEY_ESCAPE, '!', '"', '3', '$', '%', '&', '/', '(', ')', '=', '?', '`', KEY_BACKSPACE,
         KEY_TAB, 'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', KEY_DE_UE_CAPS, '*', KEY_ENTER,
-        KEY_LCTRL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', KEY_DE_OE_CAPS, KEY_DE_AE_CAPS, '2', // '2' repräsentiert hier Grad °
+        KEY_LCTRL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', KEY_DE_OE_CAPS, KEY_DE_AE_CAPS, '2',
         KEY_LSHIFT, '\'', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', '_', KEY_RSHIFT,
         '*', KEY_LALT, ' '
     }

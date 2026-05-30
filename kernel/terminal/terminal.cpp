@@ -80,17 +80,35 @@ void newTerminalInputLine() {
 
 void terminal_on_key(const unsigned char scancode) {
     uint16_t key = scancode_to_keycode(scancode);
+    
+    if (isExtendedScancode) {
+        switch(scancode) {
+            case 0x48: // ARROW UP
+                break;
+            case 0x50: // ARROW DOWN
+                break;
+            case 0x4B: // ARROW LEFT
+                break;
+            case 0x4D: // ARROW RIGHT
+                break;
+        }
+
+        isExtendedScancode = false;
+        return;
+    }
 
     switch(key) {
-        case KeyCode::KEY_ENTER: // Enter
+        case KeyCode::KEY_ENTER:
             processLineInputBuffer();
             newTerminalInputLine();
             break;
-        case KeyCode::KEY_BACKSPACE: // Backspace
+        case KeyCode::KEY_BACKSPACE:
             // if (cursorAt_X <= charsProtectedTil) { break; }
             cursor_backspace();
             --lineInputLength;
             lineInputBuffer[lineInputLength] = 0;
+            break;
+        case KeyCode::KEY_TAB:
             break;
         //TODO:
         // - cmd + "+" / "-" to change font size (needs storing of lines first!)
