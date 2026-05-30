@@ -20,9 +20,13 @@ make -C limine
 make clean && make run
 ```
 
+# Known Bugs
+- `str_copy` & `str_contains` & `str_count` broken
+- `to_string` leaks memory if caller doesn't `free()`
+
 # TODO
-- Implement Heap Allocator - no more Page Allocation for everything (kmalloc, kfree)
-- Rewrite line rendering - actually store all line
+- memory free defrag
+- Rewrite line rendering - actually store all lines
   - Allow scroll up/down
 - UX
     - arrow key cursor movement
@@ -30,7 +34,7 @@ make clean && make run
     - Padding for text rendering
 - Implement system timer and sleep()
 - Shutdown, Reboot, etc via APIC
-- Hex to string (and fix TODOs in string.cpp)
+- Fix TODOs in string.cpp
 
 # Future TODOs
 - Filesystem FAT16, later FAT32

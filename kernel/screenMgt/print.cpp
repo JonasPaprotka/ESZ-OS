@@ -38,7 +38,7 @@ void newline() {
 
 void prevline() {
     cursorAt_Y--;
-    handleScroll;
+    handleScroll();
 }
 
 void handle_automatic_newline() {
