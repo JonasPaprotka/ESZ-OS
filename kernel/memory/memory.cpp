@@ -12,6 +12,8 @@ const uint64_t pageSize = 4096; // 4KiB Pages
 uint64_t freeBytes = 0;
 uint64_t highestAddress = 0;
 
+uint64_t hhdm_offset;
+
 unsigned char* pmm_bitmap;
 
 
@@ -53,7 +55,7 @@ void get_free_location_for_bitmap() {
 
         if (entry->type == LIMINE_MEMMAP_USABLE) {
             if (entry->length >= reqSize) {
-                pmm_bitmap = (unsigned char*) entry->base;
+                pmm_bitmap = (unsigned char*) entry->base + hhdm_offset;
                 break;
             }
         }
@@ -133,6 +135,8 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
 
 // --- INIT ---
 void memory_info_init() {
+    hhdm_offset = hhdm_request.response->offset;
+
     get_memory_region_count();
     get_memory_regions();
     get_free_location_for_bitmap();
