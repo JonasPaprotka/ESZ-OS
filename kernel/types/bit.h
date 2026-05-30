@@ -1,12 +1,10 @@
 #ifndef BIT_H
 #define BIT_H
-#include "byte.h"
 
-void bit_set(byte* bitmap, int page);
-void bit_clear(byte* bitmap, int page);
-void bit_write(byte* bitmap, int page, bool value);
+void bit_set(unsigned char* bitmap, int page);
+void bit_clear(unsigned char* bitmap, int page);
+void bit_write(unsigned char* bitmap, int page, bool value);
 
-bool bit_read(byte* bitmap, int page);
-
+bool bit_read(unsigned char* bitmap, int page);
 
 #endif

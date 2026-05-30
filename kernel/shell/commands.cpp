@@ -1,9 +1,10 @@
 #include "string.h"
-#include "vga.h"
+#include "print.h"
 #include "commands.h"
-#include "terminal.h"
-#include "io.h"
+#include "terminal/terminal.h"
+#include "io/io.h"
 #include "memory.h"
+#include "clear.h"
 
 void cmd_help(const char*) {
     for (int i = 0; commands[i].name != 0; i++) {
@@ -14,7 +15,9 @@ void cmd_help(const char*) {
 }
 
 void cmd_clear(const char*) {
-    clear();
+    clearScreen();
+    cursorAt_X = 0;
+    cursorAt_Y = 0;
 }
 
 void cmd_echo(const char* args) {
@@ -30,7 +33,7 @@ void cmd_reboot(const char*) {
 }
 
 void cmd_memory_info(const char*) {
-    printMemoryInfo();
+    print_memory_info();
 }
 
 const Command commands[] = {

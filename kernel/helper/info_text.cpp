@@ -1,31 +1,36 @@
-#include "vga.h"
 #include "info_text.h"
 #include "string.h"
+#include "color.h"
+#include "print.h"
 
-void printInfoLine(const enum InfoTextType textType, cstr infoText) {
-    Color textTagColor = White;
-    cstr textTagText = "";
+void printInfoLine(const enum InfoTextType textType, const char* infoText) {
+    Color textTagColor = Color::White;
+    const char* textTagText = "";
 
     switch (textType) {
-        case Info:
-            textTagColor = LightCyan;
+        case InfoTextType::Info:
+            textTagColor = Color::LightCyan;
             textTagText = "[INFO]: ";
             break;
-        case Warning:
-            textTagColor = Yellow;
+        case InfoTextType::Warning:
+            textTagColor = Color::Yellow;
             textTagText = "[WARNING]: ";
             break;
-        case Error:
-            textTagColor = Red;
+        case InfoTextType::Error:
+            textTagColor = Color::Red;
             textTagText = "[ERROR]: ";
             break;
-        case Success:
-            textTagColor = Green;
+        case InfoTextType::Success:
+            textTagColor = Color::Green;
             textTagText = "[SUCCESS]: ";
             break;
-        case Loading:
-            textTagColor = LightBlue;
+        case InfoTextType::Loading:
+            textTagColor = Color::LightBlue;
             textTagText = "[LOADING]: ";
+            break;
+        case InfoTextType::KernelPanic:
+            textTagColor = Color::Red;
+            textTagText = "[KERNEL PANIC]: ";
             break;
     }
 
@@ -35,6 +40,7 @@ void printInfoLine(const enum InfoTextType textType, cstr infoText) {
 }
 
 void printSeperator() {
-    print_inline(str_repeat("-", 40), DarkGray);
+    //print_inline(str_repeat("-", 40), Color::DarkGray);
+    print_inline("----------------------------------------", Color::DarkGray);
     newline();
 }
