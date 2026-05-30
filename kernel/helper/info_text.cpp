@@ -28,6 +28,10 @@ void printInfoLine(const enum InfoTextType textType, const char* infoText) {
             textTagColor = Color::LightBlue;
             textTagText = "[LOADING]: ";
             break;
+        case InfoTextType::KernelPanic:
+            textTagColor = Color::Red;
+            textTagText = "[KERNEL PANIC]: ";
+            break;
     }
 
     print_inline(textTagText, textTagColor);

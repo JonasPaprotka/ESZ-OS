@@ -9,12 +9,37 @@
 #include <stdint.h>
 
 
+void halt() {
+    while(1) {
+        __asm__ volatile("hlt");
+    }
+}
+
 extern "C" void keyboard_isr();
 
-extern "C" void kernel_main() {
-    clearScreen();
 
+extern "C" void panic() {
+    printInfoLine(InfoTextType::KernelPanic, "CPU FAULT");
+    halt();
+}
+
+void populate_idt_entries() {
+    //TODO handle correctly
+    for (int i = 0; i <= 31; i++) {
+        idt_set_entry(i, (uint64_t) panic); 
+    }
+
+    idt_set_entry(33, (uint64_t) keyboard_isr); 
+}
+
+extern "C" void kernel_main() {
+    idt_init();
+
+    clearScreen();
     init_print();
+
+    populate_idt_entries();
+
 
     printInfoLine(InfoTextType::Loading, "Initializing Memory Info...");
     memory_info_init();
@@ -24,12 +49,6 @@ extern "C" void kernel_main() {
     
     pic_init();
 
-    idt_init();
-    idt_set_entry(33, (uint64_t) keyboard_isr); 
-    
     __asm__ volatile("sti"); 
-
-    while(1) {
-        __asm__ volatile("hlt");
-    }
+    halt();
 }

@@ -2,6 +2,7 @@
 #define LIMINE_BOOT_H
 
 #include <stdint.h>
+#include "limine.h"
 
 struct BootInfo {
     volatile uint32_t* framebuffer;
@@ -12,5 +13,10 @@ struct BootInfo {
 };
 
 extern BootInfo boot_info;
+
+volatile extern limine_framebuffer_request framebuffer_request;
+volatile extern limine_memmap_request memmap_request;
+volatile extern limine_hhdm_request hhdm_request;
+volatile extern limine_rsdp_request rsdp_request;
 
 #endif

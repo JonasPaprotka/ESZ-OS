@@ -7,7 +7,7 @@
 #include "string.h"
 #include "color.h"
 #include <stdint.h>
-
+#include "clear.h"
 
 int FONT_SIZE;
 
@@ -36,19 +36,24 @@ void newline() {
     handleScroll();
 }
 
-void handle_automatic_newline() {
-    if (cursorAt_X >= MAX_CHARS) newline();
-    // TODO cover other direction
+void prevline() {
+    cursorAt_Y--;
+    handleScroll;
 }
 
-void remove_prev_char() {
-    //TODO
+void handle_automatic_newline() {
+    if (cursorAt_X >= MAX_CHARS) newline();
 }
 
 void cursor_backspace() {
-    cursorAt_X--;
-    handle_automatic_newline();
-    remove_prev_char();
+    if (cursorAt_X == 0) {
+        if (cursorAt_Y > 0) {
+            cursorAt_Y--;
+            cursorAt_X = MAX_CHARS - 1;
+        } else return;
+    } else cursorAt_X--;
+
+    clear_char(cursorAt_X, cursorAt_Y);
 }
 
 void draw_char(char c, const int printAt_X, const int printAt_Y, Color color) {
@@ -65,7 +70,6 @@ void draw_char(char c, const int printAt_X, const int printAt_Y, Color color) {
             }
         }
     }
-    
 }
 
 void print_char(const char c) {

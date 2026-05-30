@@ -1,98 +1,91 @@
-/* #include "memory.h"
+#include "limine_boot.h"
+
+#include "memory.h"
 #include "string.h"
-#include "helper/info_text.h"
+#include "info_text.h"
 #include "bit.h"
+#include "math.h"
 
-extern char _bss_end; // linker symbol. end of the kernel in memory
+uint64_t memoryRegionCount = 0;
+uint64_t pageCount = 0;
+const uint64_t pageSize = 4096; // 4KiB Pages
+uint64_t freeBytes = 0;
+uint64_t highestAddress = 0;
 
-unsigned int memoryRegionCount;
-unsigned int pageCount;
-const unsigned int pageSize = 4096; // 4KB Pages
-
-unsigned char* pmm_bitmap = (unsigned char*) &_bss_end; // bitmap lives right after kernel
+unsigned char* pmm_bitmap;
 
 
 void get_memory_region_count() {
-    // counter with 4 bytes at 0x8000
-    unsigned int *memoryRegionCountPtr = (unsigned int *) 0x8000;
-    memoryRegionCount = *memoryRegionCountPtr;
-}
-
-void reserve_special_addresses() {
-    // Page0: 0x0000
-    // Page1-Kernel: 0x1000 – _bss_end
-    // Bitmap: _bss_end – _bss_end + pageCount/8
-    // -> Page0 til end of Bitmap
-
-    const unsigned int bitmapEndPage = ((unsigned int) &_bss_end + pageCount / 8) / pageSize;
-    for (unsigned i = 0; i < bitmapEndPage; i++) {
-        bit_write(pmm_bitmap, i, true);
-    }
-
-    // Memory Map: Page8 0x8000/4096
-    bit_write(pmm_bitmap, 8, true);
-
-    // Stack: Pages140–144
-    for (int i = 140; i < 144; i++) {
-        bit_write(pmm_bitmap, i, true);
-    }
+    memoryRegionCount = memmap_request.response->entry_count;
 }
 
 void get_memory_regions() {
-    // 8 + 8 + 4 + 4 bytes per region
-    // array starts at 0x8004
-    
-    MemoryRegionInfo *memoryRegionInfoPtr = (MemoryRegionInfo *) 0x8004;
-    
-    for (unsigned int i = 0; i < memoryRegionCount; i++) {
-        unsigned long long ramRegionByteAmount = memoryRegionInfoPtr[i].ramRegionLength;
+    for (uint64_t i = 0; i < memoryRegionCount; i++) {
+        struct limine_memmap_entry* entry = memmap_request.response->entries[i];
 
-        while (ramRegionByteAmount >= pageSize) {
-            if (memoryRegionInfoPtr[i].ramRegionType == 1) { // type 1 = useable
-                bit_write(pmm_bitmap, pageCount, false); // 0 = free
-            } else {
-                bit_write(pmm_bitmap, pageCount, true); // 1 = used
-            } 
-            ramRegionByteAmount -= pageSize;
-            pageCount++;
+        if (entry->type == LIMINE_MEMMAP_USABLE) {
+            uint64_t length = entry->length;
+            freeBytes += length;
+            uint64_t currAddr = entry->base + length;
+            if (currAddr > highestAddress) {
+                highestAddress = currAddr;
+            }
+        }
+    }
+}
+
+void init_bitmap_data() {
+    for (uint64_t i = 0; i < memoryRegionCount; i++) {
+        struct limine_memmap_entry* entry = memmap_request.response->entries[i];
+
+        if (entry->type == LIMINE_MEMMAP_USABLE) {
+            ppm_free(entry->base, entry->length);
+        }
+    } 
+}
+
+void get_free_location_for_bitmap() {
+    pageCount = highestAddress / pageSize;
+    uint64_t reqSize = divideRoundUp1(pageCount, 8);
+
+    for (uint64_t i = 0; i < memoryRegionCount; i++) {
+        struct limine_memmap_entry* entry = memmap_request.response->entries[i];
+
+        if (entry->type == LIMINE_MEMMAP_USABLE) {
+            if (entry->length >= reqSize) {
+                pmm_bitmap = (unsigned char*) entry->base;
+                break;
+            }
         }
     }
 
-    reserve_special_addresses();
+    memory_fill(pmm_bitmap, 0xFF, reqSize); // mark everything as filled
+    init_bitmap_data();
+    
+    uint64_t bitmapStartPage = (uint64_t)pmm_bitmap / pageSize;
+    uint64_t bitmapPagesCount = divideRoundUp1(reqSize, pageSize);
+    ppm_malloc_page_range(bitmapStartPage, bitmapPagesCount);
 }
 
-int get_free_ram_in_kb() {
-    unsigned int freePages = 0;
-    for (unsigned int i = 0; i < pageCount; i++) {
-        if (!bit_read(pmm_bitmap, i)) freePages++;
-    }
-    return freePages * 4;
+void print_memory_info() {
+    //printInfoLine(InfoTextType::Info, str_combine("Memory regions detected: ", to_string(memoryRegionCount)));
+    //printInfoLine(InfoTextType::Info, str_combine("Available RAM (KB): ", to_string(get_free_ram_in_kb())));
+    //printInfoLine(InfoTextType::Info, str_combine("Available RAM (MB): ", to_string(get_free_ram_in_kb() / 1024)));
 }
 
-void printMemoryInfo() {
-    //printInfoLine(Info, str_combine("Memory regions detected: ", to_string(memoryRegionCount)));
-    //printInfoLine(Info, str_combine("Available RAM (KB): ", to_string(get_free_ram_in_kb())));
-    //printInfoLine(Info, str_combine("Available RAM (MB): ", to_string(get_free_ram_in_kb() / 1024)));
-}
-
-unsigned int calculateReqPages(const unsigned int byteAmount) {
-    // round up to next page if needed
-    return (byteAmount + pageSize - 1) / pageSize;
-}
-
-void ppm_malloc_page_range(unsigned int page, const unsigned int pageAmount) {
-    for (unsigned int i = 0; i < pageAmount; i++) {
+void ppm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
+    for (uint64_t i = 0; i < pageAmount; i++) {
         bit_write(pmm_bitmap, page, true);
         page++;
     }
 }
 
-unsigned int ppm_malloc(const unsigned int byteAmount) {
-    const unsigned int reqPages = calculateReqPages(byteAmount);
-    unsigned int freePageCounter = 0;
-    unsigned int firstPageOfSeries = 0;
+uint64_t ppm_malloc(const uint64_t byteAmount) {
+    const uint64_t reqPages = divideRoundUp1(byteAmount, pageSize);
+    uint64_t freePageCounter = 0;
+    uint64_t firstPageOfSeries = 0;
 
-    for (unsigned int i = 0; i < pageCount; i++) {
+    for (uint64_t i = 0; i < pageCount; i++) {
         if (!bit_read(pmm_bitmap, i)) {
             if (freePageCounter == 0) {
                 firstPageOfSeries = i;
@@ -111,38 +104,39 @@ unsigned int ppm_malloc(const unsigned int byteAmount) {
     return 0;
 }
 
-void ppm_free(const unsigned int addr, const unsigned int byteAmount) {
-    const unsigned int reqPages = calculateReqPages(byteAmount);
-    unsigned int currPage = addr / pageSize;
+void ppm_free(const uint64_t addr, const uint64_t byteAmount) {
+    const uint64_t reqPages = divideRoundUp1(byteAmount, pageSize);
+    uint64_t currPage = addr / pageSize;
 
-    for (unsigned int i = 0; i < reqPages; i++) {
+    for (uint64_t i = 0; i < reqPages; i++) {
         bit_write(pmm_bitmap, currPage, false);
         currPage++;
     }
 }
 
-void memory_fill(void* target, const unsigned char value, const int amountOfBytesToFill) {
-    for (int i = 0; i < amountOfBytesToFill; ++i) {
+void memory_fill(void* target, const unsigned char value, const uint64_t amountOfBytesToFill) {
+    for (uint64_t i = 0; i < amountOfBytesToFill; ++i) {
         ((unsigned char*)target)[i] = value;
     }
 }
 
-void memory_clear(void* target, const int amoutOfBytesToClear) {
+void memory_clear(void* target, const uint64_t amoutOfBytesToClear) {
     memory_fill(target, 0, amoutOfBytesToClear);
 }
 
-void memory_copy(void* copyTo, const void* copyFrom, const int amountOfBytesToCopy) {
-    for (int i = 0; i < amountOfBytesToCopy; ++i) {
+void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfBytesToCopy) {
+    for (uint64_t i = 0; i < amountOfBytesToCopy; ++i) {
         ((unsigned char*)copyTo)[i] = ((unsigned char*)copyFrom)[i];
     }
 }
- */
+
 
 // --- INIT ---
 void memory_info_init() {
-/*     get_memory_region_count();
+    get_memory_region_count();
     get_memory_regions();
+    get_free_location_for_bitmap();
 
-    printMemoryInfo(); */
+    print_memory_info();
 }
 // ------------

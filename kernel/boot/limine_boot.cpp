@@ -9,28 +9,28 @@ __attribute__((used, section(".limine_requests")))
 static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(3);
 
 __attribute__((used, section(".limine_requests")))
-static volatile struct limine_framebuffer_request framebuffer_request = {
+volatile struct limine_framebuffer_request framebuffer_request = {
     .id       = LIMINE_FRAMEBUFFER_REQUEST_ID,
     .revision = 0,
     .response = NULL
 };
 
 __attribute__((used, section(".limine_requests")))
-static volatile struct limine_memmap_request memmap_request = {
+volatile struct limine_memmap_request memmap_request = {
     .id       = LIMINE_MEMMAP_REQUEST_ID,
     .revision = 0,
     .response = NULL
 };
 
 __attribute__((used, section(".limine_requests")))
-static volatile struct limine_hhdm_request hhdm_request = {
+volatile struct limine_hhdm_request hhdm_request = {
     .id       = LIMINE_HHDM_REQUEST_ID,
     .revision = 0,
     .response = NULL
 };
 
 __attribute__((used, section(".limine_requests")))
-static volatile struct limine_rsdp_request rsdp_request = {
+volatile struct limine_rsdp_request rsdp_request = {
     .id       = LIMINE_RSDP_REQUEST_ID,
     .revision = 0,
     .response = NULL

@@ -8,7 +8,8 @@ enum class InfoTextType {
     Warning,
     Error,
     Success,
-    Loading
+    Loading,
+    KernelPanic
 };
 
 void printInfoLine(enum InfoTextType textType, const char* infoText);
