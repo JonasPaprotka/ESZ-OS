@@ -2,7 +2,7 @@
 #include "clear.h"
 #include "terminal/terminal.h"
 #include "helper/info_text.h"
-#include "memory/memory.h"
+#include "memory.h"
 #include "io/pic.h"
 #include "io/idt.h"
 #include "io/keyboard.h"
