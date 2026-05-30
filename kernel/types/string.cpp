@@ -135,16 +135,27 @@ char* str_combine(const char* a, const char* b) {
     return returnString;
 }
 
-char* to_string(const int inputValue) {
-    char* composedString = ppm_malloc_str(12);
-    char* returnString = ppm_malloc_str(12);
+char* to_string(const uint64_t inputValue, const uint8_t basis) {
+    if (inputValue == 0 || basis == 0 || basis == 1) {
+        char* emptyReturnString = ppm_malloc_str(65);
+        emptyReturnString[0] = '0';
+        emptyReturnString[1] = 0;
+        return emptyReturnString;
+    }
 
-    int strLength = 0;
-    int calcValue = inputValue;
+    char* composedString = ppm_malloc_str(65);
+    char* returnString = ppm_malloc_str(65);
+    uint64_t strLength = 0;
+    uint64_t calcValue = inputValue;
 
     while (calcValue != 0) {
-        composedString[strLength] = calcValue % 10 + '0'; // + '0' is to make ascii
-        calcValue /= 10;
+        uint64_t newValue = calcValue % basis;
+        if (newValue < 10) {
+            composedString[strLength] = newValue + '0'; // make ascii
+        } else {
+            composedString[strLength] = 'a' + (newValue - 10); // make ascii
+        }
+        calcValue /= basis;
         strLength++;
     }
 
@@ -156,4 +167,25 @@ char* to_string(const int inputValue) {
 
     returnString[strLength] = 0;
     return returnString;
+}
+
+char* to_string(const int64_t inputValue, const uint8_t basis) {
+    if (inputValue >= 0) return to_string((uint64_t)inputValue, basis);
+    return str_combine("-", to_string((uint64_t)(-(inputValue)), basis));
+}
+
+char* to_string(const uint64_t inputValue) {
+    return to_string(inputValue, 10);
+}
+
+char* to_string(const int64_t inputValue) {
+    return to_string(inputValue, 10);
+}
+
+char* to_string(const int32_t inputValue) {
+    return to_string((int64_t)inputValue, 10);
+}
+
+char* to_string(const uint32_t inputValue) {
+    return to_string((uint64_t)inputValue, 10);
 }

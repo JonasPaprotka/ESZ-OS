@@ -19,6 +19,12 @@ bool str_starts_with(const char* text, const char* searchText);
 bool str_ends_with(const char* text, const char* searchText);
 void str_replace(char* text, const char* toBeReplacedText, const char* replacementText);
 
-char* to_string(const int inputValue);
+
+char* to_string(const uint64_t inputValue, const uint8_t basis);
+char* to_string(const int64_t inputValue, const uint8_t basis);
+char* to_string(const uint64_t inputValue);
+char* to_string(const int64_t inputValue);
+char* to_string(const int32_t inputValue);
+char* to_string(const uint32_t inputValue);
 
 #endif

@@ -60,6 +60,8 @@ extern "C" void isr_stub_31();
 extern "C" void keyboard_isr(); //33
 
 extern "C" void fault_handler(Registers* regs) {
+    newline();
+    printSeperator();
     switch (regs->interrupt_number) {
         case 0:
             printInfoLine(InfoTextType::KernelPanic, "DIVIDE BY ZERO FAULT");
@@ -103,9 +105,27 @@ extern "C" void fault_handler(Registers* regs) {
         case 13:
             printInfoLine(InfoTextType::KernelPanic, "GENERAL PROTECTION FAULT");
             break;
-        case 14:
+        case 14: {
+            uint64_t cr2;
+            __asm__ volatile("mov %%cr2, %0" : "=r"(cr2));
+
             printInfoLine(InfoTextType::KernelPanic, "PAGE FAULT");
+          
+            print_inline("[REASON]: ", Color::LightRed);
+            if (!(regs->error_code & 1)) print_inline("not-present ");
+            else                         print_inline("protection-violation ");
+            if (regs->error_code & 2)    print_inline("/ write ");
+            else                         print_inline("/ read ");
+            if (regs->error_code & 4)    print_inline("/ user ");
+            else                         print_inline("/ kernel ");
+            if (regs->error_code & 8)    print_inline("/ reserved-bit-violation ");
+            if (regs->error_code & 16)   print_inline("/ instruction-fetch ");
+            newline();
+
+            printInfoLine(InfoTextType::PanicInfo, str_combine("FAULT ADDR: ", to_string(cr2, 16)));
+
             break;
+        }
         case 15:
             printInfoLine(InfoTextType::KernelPanic, "RESERVED");
             break;
@@ -144,8 +164,12 @@ extern "C" void fault_handler(Registers* regs) {
             break;
     }
 
-    //printInfoLine(InfoTextType::KernelPanic, to_str(regs->rip)); //TODO print what line crashed
+    printInfoLine(InfoTextType::PanicInfo, str_combine("RIP: ", to_string(regs->rip, 16)));
+    printInfoLine(InfoTextType::PanicInfo, str_combine("RSP: ", to_string(regs->rsp, 16)));
+    printInfoLine(InfoTextType::PanicInfo, str_combine("CS: ", to_string(regs->cs, 16)));
+    printInfoLine(InfoTextType::PanicInfo, str_combine("ERROR: ", to_string(regs->error_code, 16)));
 
+    printSeperator();
     halt();
 }
 
@@ -196,11 +220,15 @@ extern "C" void kernel_main() {
 
     printInfoLine(InfoTextType::Loading, "Initializing Memory Info...");
     memory_info_init();
-    
+
+    pic_init();
+
+    // TEST DIV BY 0 FAULT
+    //volatile int x = 0;
+    //int a = 6 / x;
+
     printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
     terminal_init();
-    
-    pic_init();
 
     __asm__ volatile("sti"); 
     halt();
