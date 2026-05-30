@@ -5,6 +5,7 @@
 #include "info_text.h"
 #include "bit.h"
 #include "math.h"
+#include "print.h"
 
 uint64_t memoryRegionCount = 0;
 uint64_t pageCount = 0;
@@ -41,7 +42,7 @@ void init_bitmap_data() {
         struct limine_memmap_entry* entry = memmap_request.response->entries[i];
 
         if (entry->type == LIMINE_MEMMAP_USABLE) {
-            ppm_free(entry->base, entry->length);
+            pmm_free(entry->base, entry->length);
         }
     } 
 }
@@ -66,7 +67,7 @@ void get_free_location_for_bitmap() {
     
     uint64_t bitmapStartPage = (uint64_t)pmm_bitmap / pageSize;
     uint64_t bitmapPagesCount = divideRoundUp1(reqSize, pageSize);
-    ppm_malloc_page_range(bitmapStartPage, bitmapPagesCount);
+    pmm_malloc_page_range(bitmapStartPage, bitmapPagesCount);
 }
 
 void print_memory_info() {
@@ -74,25 +75,25 @@ void print_memory_info() {
     uint64_t MiB = KiB / 1024;
     uint64_t GiB = MiB / 1024;
 
-    printInfoLine(InfoTextType::Info, str_combine("Memory regions: ", to_string(memoryRegionCount)));
+    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
     
-    if (GiB > 0) {
-        printInfoLine(InfoTextType::Info, str_combine(str_combine("Available RAM: ", to_string(GiB)), " GiB"));
-    } else if (MiB > 0) {
-        printInfoLine(InfoTextType::Info, str_combine(str_combine("Available RAM: ", to_string(MiB)), " MiB"));
-    } else {
-        printInfoLine(InfoTextType::Info, str_combine(str_combine("Available RAM: ", to_string(KiB)), " KiB"));
-    }
+    //if (GiB > 0) {
+        printInfoLine(InfoTextType::Info, String("Available RAM: ", GiB, " GiB"));
+    //} else if (MiB > 0) {
+        printInfoLine(InfoTextType::Info, String("Available RAM: ", MiB, " MiB"));
+    //} else {
+        printInfoLine(InfoTextType::Info, String("Available RAM: ", KiB, " KiB"));
+    //}
 }
 
-void ppm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
+void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
     for (uint64_t i = 0; i < pageAmount; i++) {
         bit_write(pmm_bitmap, page, true);
         page++;
     }
 }
 
-uint64_t ppm_malloc(const uint64_t byteAmount) {
+uint64_t pmm_malloc(const uint64_t byteAmount) {
     const uint64_t reqPages = divideRoundUp1(byteAmount, pageSize);
     uint64_t freePageCounter = 0;
     uint64_t firstPageOfSeries = 0;
@@ -104,7 +105,7 @@ uint64_t ppm_malloc(const uint64_t byteAmount) {
             }
             freePageCounter++;
             if (freePageCounter == reqPages) {
-                ppm_malloc_page_range(firstPageOfSeries, reqPages);
+                pmm_malloc_page_range(firstPageOfSeries, reqPages);
                 return firstPageOfSeries * pageSize;
             }
         } else {
@@ -112,17 +113,17 @@ uint64_t ppm_malloc(const uint64_t byteAmount) {
         }
     }
 
-    printInfoLine(InfoTextType::Error, "ppm_malloc failed");
+    printInfoLine(InfoTextType::Error, "pmm_malloc failed");
     return 0;
 }
 
-void* ppm_malloc_addr(const uint64_t byteAmount) {
-    uint64_t phys_addr = ppm_malloc(byteAmount);
+void* pmm_malloc_addr(const uint64_t byteAmount) {
+    uint64_t phys_addr = pmm_malloc(byteAmount);
     if (phys_addr == 0) return nullptr;
     return (void*)(phys_addr + hhdm_offset); 
 }
 
-void ppm_free(const uint64_t addr, const uint64_t byteAmount) {
+void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
     const uint64_t reqPages = divideRoundUp1(byteAmount, pageSize);
     uint64_t currPage = addr / pageSize;
 
@@ -148,15 +149,77 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
     }
 }
 
+MemoryBlockHeader* heapStartPtr;
+
+const MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
+    MemoryBlockHeader newHeader;
+    newHeader.Length = length;
+    newHeader.Used = used;
+    return newHeader;
+}
+
+void try_defragment_page(void* ptr) {
+    //TODO look left and right - if is free then make block bigger
+}
+
+const MemoryBlockHeader* get_next_heap_block(MemoryBlockHeader* currMemBlock) {
+    return (MemoryBlockHeader*) ((char*) currMemBlock + sizeof(MemoryBlockHeader) + currMemBlock->Length);
+}
+
+void* malloc(uint64_t size) {
+    MemoryBlockHeader* currBlockPtr = heapStartPtr;
+
+    while (currBlockPtr->Length < size || currBlockPtr->Used == true)
+    {
+        currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
+    }
+    
+    uint64_t oldBlockLength = currBlockPtr->Length;
+
+    currBlockPtr->Length = size;
+    currBlockPtr->Used = true;
+
+    void* returnAddr = ((char*) currBlockPtr + sizeof(MemoryBlockHeader));
+    
+    if (oldBlockLength > size + sizeof(MemoryBlockHeader)) {
+        MemoryBlockHeader* nextBlock = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
+        nextBlock->Length = oldBlockLength - size - sizeof(MemoryBlockHeader);
+        nextBlock->Used = false;
+    }
+
+    return returnAddr;
+}
+
+void free(void* ptr) {
+    MemoryBlockHeader* header = (MemoryBlockHeader*) ((char*) ptr - sizeof(MemoryBlockHeader));
+    header->Used = false;
+
+    try_defragment_page(ptr);
+}
+
+void inint_heap_alloc() {
+    const uint64_t initialHeapLength = 4096 * 1024;
+
+    MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) pmm_malloc_addr(initialHeapLength);
+    initialHeapBlockPtr->Length = initialHeapLength - sizeof(MemoryBlockHeader);
+    initialHeapBlockPtr->Used = false;
+
+    heapStartPtr = initialHeapBlockPtr;
+}
+
 
 // --- INIT ---
 void memory_info_init() {
-    hhdm_offset = hhdm_request.response->offset;
-
+    printInfoLine(InfoTextType::Loading, "Loading Memory Info...");
+    hhdm_offset = hhdm_request.response->offset;    
     get_memory_region_count();
+    printInfoLine(InfoTextType::Loading, "Loading PMM...");
     get_memory_regions();
     get_free_location_for_bitmap();
-
+    printInfoLine(InfoTextType::Loading, "Loading Heap Alloc...");
+    inint_heap_alloc();
+    //--------------------------
+    
+    printInfoLine(InfoTextType::Success, "Initialized Memory");
     print_memory_info();
 }
-// ------------

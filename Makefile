@@ -71,8 +71,30 @@ $(ISO): $(KERNEL) limine.conf
 	    $(ISO_ROOT) -o $(ISO)
 	$(LIMINE)/limine bios-install $(ISO)
 
+# RUNS - DIFF RAM PRESETS
 run: $(ISO)
 	qemu-system-x86_64 -M q35 -m 512M -cdrom $(ISO) -boot d
+
+run-1: $(ISO)
+	qemu-system-x86_64 -M q35 -m 1024M -cdrom $(ISO) -boot d
+
+run-2: $(ISO)
+	qemu-system-x86_64 -M q35 -m 2048M -cdrom $(ISO) -boot d
+
+run-4: $(ISO)
+	qemu-system-x86_64 -M q35 -m 4096M -cdrom $(ISO) -boot d
+
+run-8: $(ISO)
+	qemu-system-x86_64 -M q35 -m 8192M -cdrom $(ISO) -boot d
+
+run-16: $(ISO)
+	qemu-system-x86_64 -M q35 -m 16384M -cdrom $(ISO) -boot d
+
+run-32: $(ISO)
+	qemu-system-x86_64 -M q35 -m 32768M -cdrom $(ISO) -boot d
+
+run-64: $(ISO)
+	qemu-system-x86_64 -M q35 -m 65536M -cdrom $(ISO) -boot d
 
 clean:
 	rm -rf bin

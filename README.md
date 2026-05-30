@@ -27,6 +27,7 @@ make clean && make run
 - UX
     - arrow key cursor movement
     - tab: command completion
+    - Padding for text rendering
 - Implement system timer and sleep()
 - Shutdown, Reboot, etc via APIC
 - Hex to string (and fix TODOs in string.cpp)

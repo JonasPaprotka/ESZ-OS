@@ -2,8 +2,10 @@
 #define STRING_H
 
 #include <stdint.h>
+#include "memory.h"
 
-char* ppm_malloc_str(const uint64_t size);
+char* malloc_str(const uint64_t size);
+
 int str_length(const char* str);
 char* str_repeat(const char* text, int amount);
  
@@ -26,5 +28,37 @@ char* to_string(const uint64_t inputValue);
 char* to_string(const int64_t inputValue);
 char* to_string(const int32_t inputValue);
 char* to_string(const uint32_t inputValue);
+
+
+struct String {
+    char* data;
+    
+    static const char* to_cstr(const char* s) { return s; }
+    static const char* to_cstr(uint64_t n) { return to_string(n); }
+    static const char* to_cstr(int64_t n) { return to_string(n); }
+    static const char* to_cstr(uint32_t n) { return to_string(n); }
+    static const char* to_cstr(int32_t n) { return to_string(n); }
+
+    // AI supported
+    template<typename... Args>
+    String(Args... args) {
+        const char* parts[] = { to_cstr(args)... };
+        data = malloc_str(1);
+
+        for (uint64_t i = 0; i < sizeof...(args); i++) {
+            char* combined = str_combine(data, parts[i]);
+            free(data);
+            data = combined;
+        }
+    }
+    
+    ~String() {
+        free(data);
+    }
+    
+    operator const char*() {
+        return data;
+    }
+};
 
 #endif

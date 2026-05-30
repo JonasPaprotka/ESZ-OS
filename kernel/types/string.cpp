@@ -2,8 +2,8 @@
 #include "memory.h"
 #include <stdint.h>
 
-char* ppm_malloc_str(const uint64_t size) {
-    char* string = (char*) ppm_malloc_addr(size);
+char* malloc_str(const uint64_t size) {
+    char* string = (char*) malloc(size);
     memory_clear(string, size);
     return string;
 }
@@ -105,7 +105,7 @@ void str_replace(char* text, const char* toBeReplacedText, const char* replaceme
 }
 
 char* str_repeat(const char* text, int amount) {
-    char* returnString = ppm_malloc_str(128);
+    char* returnString = malloc_str(128);
     const int text_len = str_length(text);
 
     for (int i = 0; i < amount; i++) {
@@ -119,7 +119,7 @@ char* str_repeat(const char* text, int amount) {
 }
 
 char* str_combine(const char* a, const char* b) {
-    char* returnString = ppm_malloc_str(128);
+    char* returnString = malloc_str(128);
 
     const int len_a = str_length(a);
     const int len_b = str_length(b);
@@ -137,14 +137,14 @@ char* str_combine(const char* a, const char* b) {
 
 char* to_string(const uint64_t inputValue, const uint8_t basis) {
     if (inputValue == 0 || basis == 0 || basis == 1) {
-        char* emptyReturnString = ppm_malloc_str(65);
+        char* emptyReturnString = malloc_str(sizeof(emptyReturnString) + 1);
         emptyReturnString[0] = '0';
         emptyReturnString[1] = 0;
         return emptyReturnString;
     }
 
-    char* composedString = ppm_malloc_str(65);
-    char* returnString = ppm_malloc_str(65);
+    char* composedString = malloc_str(65);
+    char* returnString = malloc_str(65);
     uint64_t strLength = 0;
     uint64_t calcValue = inputValue;
 

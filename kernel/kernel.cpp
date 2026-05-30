@@ -122,7 +122,7 @@ extern "C" void fault_handler(Registers* regs) {
             if (regs->error_code & 16)   print_inline("/ instruction-fetch ");
             newline();
 
-            printInfoLine(InfoTextType::PanicInfo, str_combine("FAULT ADDR: ", to_string(cr2, 16)));
+            printInfoLine(InfoTextType::PanicInfo, String("FAULT ADDR: ", to_string(cr2, 16)));
 
             break;
         }
@@ -164,10 +164,10 @@ extern "C" void fault_handler(Registers* regs) {
             break;
     }
 
-    printInfoLine(InfoTextType::PanicInfo, str_combine("RIP: ", to_string(regs->rip, 16)));
-    printInfoLine(InfoTextType::PanicInfo, str_combine("RSP: ", to_string(regs->rsp, 16)));
-    printInfoLine(InfoTextType::PanicInfo, str_combine("CS: ", to_string(regs->cs, 16)));
-    printInfoLine(InfoTextType::PanicInfo, str_combine("ERROR: ", to_string(regs->error_code, 16)));
+    printInfoLine(InfoTextType::PanicInfo, String("RIP: ", to_string(regs->rip, 16)));
+    printInfoLine(InfoTextType::PanicInfo, String("RSP: ", to_string(regs->rsp, 16)));
+    printInfoLine(InfoTextType::PanicInfo, String("CS: ", to_string(regs->cs, 16)));
+    printInfoLine(InfoTextType::PanicInfo, String("ERROR: ", to_string(regs->error_code, 16)));
 
     printSeperator();
     halt();
@@ -218,7 +218,6 @@ extern "C" void kernel_main() {
     idt_init();
     populate_idt_entries();
 
-    printInfoLine(InfoTextType::Loading, "Initializing Memory Info...");
     memory_info_init();
 
     pic_init();
@@ -227,7 +226,6 @@ extern "C" void kernel_main() {
     //volatile int x = 0;
     //int a = 6 / x;
 
-    printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
     terminal_init();
 
     __asm__ volatile("sti"); 

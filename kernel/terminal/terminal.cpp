@@ -128,6 +128,7 @@ void terminal_on_key(const unsigned char scancode) {
 }
 
 void terminal_init() {
+    printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
     printHeader();
     newTerminalInputLine();
 }

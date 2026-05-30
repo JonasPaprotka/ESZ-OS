@@ -2,6 +2,7 @@
 #include "string.h"
 #include "color.h"
 #include "print.h"
+#include "memory.h"
 
 void printInfoLine(const enum InfoTextType textType, const char* infoText) {
     Color textTagColor = Color::White;
@@ -44,6 +45,8 @@ void printInfoLine(const enum InfoTextType textType, const char* infoText) {
 }
 
 void printSeperator() {
-    print_inline(str_repeat("-", 40), Color::DarkGray);
+    char* s = str_repeat("-", 40);
+    print_inline(s, Color::DarkGray);
+    free(s);
     newline();
 }
