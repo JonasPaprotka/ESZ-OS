@@ -168,14 +168,14 @@ void redraw() {
 
     const uint64_t w = calc_line_pixels();
 
-    // move all pixel one row up
+    //[AI] move all pixel one row up
     memory_copy(
         (void*) boot_info.framebuffer,
         (void*) (boot_info.framebuffer + FONT_H * w),
         (boot_info.height - FONT_H) * w * 4
     );
 
-    // clear bottom band
+    //[AI] clear bottom band
     memory_fill(
         (void*) (boot_info.framebuffer + (boot_info.height - FONT_H) * w),
         0,
