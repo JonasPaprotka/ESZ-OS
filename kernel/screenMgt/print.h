@@ -11,6 +11,15 @@ extern int FONT_H;
 extern int cursorAt_X;
 extern int cursorAt_Y;
 
+extern unsigned int MAX_CHARS;
+extern unsigned int MAX_LINES;
+
+extern bool useScreenBuffer;
+
+
+void handle_scroll();
+uint64_t calc_line_pixels();
+
 // PRINT
 void print(const char* text, Color color);
 void print(const char* text);

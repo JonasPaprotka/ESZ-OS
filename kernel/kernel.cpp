@@ -7,6 +7,7 @@
 #include "io/idt.h"
 #include "io/keyboard.h"
 #include <stdint.h>
+#include "screenBuffer.h"
 
 
 void halt() {
@@ -60,8 +61,10 @@ extern "C" void isr_stub_31();
 extern "C" void keyboard_isr(); //33
 
 extern "C" void fault_handler(Registers* regs) {
+    clearScreen();
     newline();
     printSeperator();
+    
     switch (regs->interrupt_number) {
         case 0:
             printInfoLine(InfoTextType::KernelPanic, "DIVIDE BY ZERO FAULT");
@@ -226,6 +229,7 @@ extern "C" void kernel_main() {
     //volatile int x = 0;
     //int a = 6 / x;
 
+    init_screen_buffer();
     terminal_init();
 
     __asm__ volatile("sti"); 

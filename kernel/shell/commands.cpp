@@ -5,6 +5,7 @@
 #include "io/io.h"
 #include "memory.h"
 #include "clear.h"
+#include "info_text.h"
 
 void cmd_help(const char*) {
     for (int i = 0; commands[i].name != 0; i++) {
@@ -25,7 +26,7 @@ void cmd_echo(const char* args) {
 }
 
 void cmd_sysinfo(const char*) {
-    print("ESZ-OS (W.I.P.) by Jonas Paprotka");
+    printInfoLine(InfoTextType::Info, "ESZ-OS (W.I.P.) by Jonas Paprotka");
 }
 
 void cmd_reboot(const char*) {
