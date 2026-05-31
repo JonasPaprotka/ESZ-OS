@@ -38,6 +38,13 @@ void handle_show_history() {
 void printHeader() {
     printSeperator();
     printInfoLine(InfoTextType::Success, "Kernel Loaded");
+    newline();
+    print("#####  #####  #####");
+    print("#      #         ##");
+    print("####   #####   ##  ");
+    print("#          #  ##   ");
+    print("#####  #####  #####");
+    newline();
     cmd_sysinfo();
     printSeperator();
 }
