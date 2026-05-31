@@ -8,6 +8,8 @@ struct MemoryBlockHeader {
     bool Used;
 } __attribute__((packed));
 
+uint64_t get_free_pmm_page_count();
+uint64_t get_used_pmm_page_count();
 
 void memory_fill(void* target, unsigned char value, const uint64_t amountOfBytesToFill);
 void memory_clear(void* target, const uint64_t amoutOfBytesToClear);

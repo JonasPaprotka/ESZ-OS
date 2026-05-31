@@ -13,6 +13,8 @@ const uint64_t pageSize = 4096; // 4KiB Pages
 uint64_t freeBytes = 0;
 uint64_t highestAddress = 0;
 
+const uint64_t initialHeapLength = 4096 * 1024;
+
 uint64_t hhdm_offset;
 
 unsigned char* pmm_bitmap;
@@ -71,19 +73,21 @@ void get_free_location_for_bitmap() {
 }
 
 void print_memory_info() {
+    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
+    printInfoLine(InfoTextType::Info, String("Last Available Address: ", to_string(highestAddress, 16)));
+    
     uint64_t KiB = freeBytes / 1024;
     uint64_t MiB = KiB / 1024;
     uint64_t GiB = MiB / 1024;
+    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
+    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
+    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", KiB, " KiB"));
 
-    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
-    
-    //if (GiB > 0) {
-        printInfoLine(InfoTextType::Info, String("Available RAM: ", GiB, " GiB"));
-    //} else if (MiB > 0) {
-        printInfoLine(InfoTextType::Info, String("Available RAM: ", MiB, " MiB"));
-    //} else {
-        printInfoLine(InfoTextType::Info, String("Available RAM: ", KiB, " KiB"));
-    //}
+    const uint64_t freePages = get_free_pmm_page_count();
+    const uint64_t usedPages = get_used_pmm_page_count();
+    printInfoLine(InfoTextType::Info, String("(Total) Pages: ", freePages + usedPages));
+    printInfoLine(InfoTextType::Info, String("Free Pages: ", freePages));
+    printInfoLine(InfoTextType::Info, String("Used Pages: ", usedPages));
 }
 
 void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
@@ -117,6 +121,30 @@ uint64_t pmm_malloc(const uint64_t byteAmount) {
     return 0;
 }
 
+uint64_t get_free_pmm_page_count() {
+    uint64_t freePageCounter = 0;
+
+    for (uint64_t i = 0; i < pageCount; i++) {
+        if (!bit_read(pmm_bitmap, i)) {
+            freePageCounter++;
+        }
+    }
+
+    return freePageCounter;
+}
+
+uint64_t get_used_pmm_page_count() {
+    uint64_t usedPageCounter = 0;
+
+    for (uint64_t i = 0; i < pageCount; i++) {
+        if (bit_read(pmm_bitmap, i)) {
+            usedPageCounter++;
+        }
+    }
+
+    return usedPageCounter;
+}
+
 void* pmm_malloc_addr(const uint64_t byteAmount) {
     uint64_t phys_addr = pmm_malloc(byteAmount);
     if (phys_addr == 0) return nullptr;
@@ -134,8 +162,21 @@ void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
 }
 
 void memory_fill(void* target, const unsigned char value, const uint64_t amountOfBytesToFill) {
-    for (uint64_t i = 0; i < amountOfBytesToFill; ++i) {
-        ((unsigned char*)target)[i] = value;
+    // fill 8 bytes using uint64_t to make it faster
+    uint64_t* dest64 = (uint64_t*) target;
+    const uint64_t count64 = amountOfBytesToFill / 8;
+
+    const uint64_t value64 = (uint64_t) value * 0x0101010101010101ULL; //[AI-Supported Code] clone 1 byte to 8
+
+    for (uint64_t i = 0; i < count64; ++i) {
+        dest64[i] = value64;
+    }
+
+    // remaining bytes if not divideable by 8
+    unsigned char* dest8 = (unsigned char*) (dest64 + count64);
+    
+    for (uint64_t i = 0; i < (amountOfBytesToFill % 8); ++i) {
+        dest8[i] = value;
     }
 }
 
@@ -144,8 +185,21 @@ void memory_clear(void* target, const uint64_t amoutOfBytesToClear) {
 }
 
 void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfBytesToCopy) {
-    for (uint64_t i = 0; i < amountOfBytesToCopy; ++i) {
-        ((unsigned char*)copyTo)[i] = ((unsigned char*)copyFrom)[i];
+    // fill 8 bytes using uint64_t to make it faster
+    uint64_t* dest64 = (uint64_t*) copyTo;
+    const uint64_t* src64 = (const uint64_t*) copyFrom;
+    const uint64_t count64 = amountOfBytesToCopy / 8;
+
+    for (uint64_t i = 0; i < count64; ++i) {
+        dest64[i] = src64[i];
+    }
+
+    // remaining bytes if not divideable by 8
+    unsigned char* dest8 = (unsigned char*) (dest64 + count64);
+    const unsigned char* src8 = (const unsigned char*) (src64 + count64);
+
+    for (uint64_t i = 0; i < (amountOfBytesToCopy % 8); ++i) {
+        dest8[i] = src8[i];
     }
 }
 
@@ -198,8 +252,6 @@ void free(void* ptr) {
 }
 
 void inint_heap_alloc() {
-    const uint64_t initialHeapLength = 4096 * 1024;
-
     MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) pmm_malloc_addr(initialHeapLength);
     initialHeapBlockPtr->Length = initialHeapLength - sizeof(MemoryBlockHeader);
     initialHeapBlockPtr->Used = false;
@@ -213,9 +265,11 @@ void memory_info_init() {
     printInfoLine(InfoTextType::Loading, "Loading Memory Info...");
     hhdm_offset = hhdm_request.response->offset;    
     get_memory_region_count();
+    
     printInfoLine(InfoTextType::Loading, "Loading PMM...");
     get_memory_regions();
     get_free_location_for_bitmap();
+    
     printInfoLine(InfoTextType::Loading, "Loading Heap Alloc...");
     inint_heap_alloc();
     //--------------------------

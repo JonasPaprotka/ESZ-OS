@@ -80,7 +80,7 @@ void processLineInputBuffer() {
     } 
 
     newline();
-    printInfoLine(InfoTextType::Error, "Unknown Command");
+    printInfoLine(InfoTextType::Error, String("Unknown Command: '", lineInputBuffer, "'"));
     lineInputLength = 0;
     lineInputBuffer[0] = 0; // clear buffer
 }

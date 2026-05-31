@@ -170,9 +170,8 @@ void redraw() {
     );
 
     //[AI] clear bottom band
-    memory_fill(
+    memory_clear(
         (void*) (boot_info.framebuffer + (boot_info.height - FONT_H) * w),
-        0,
         FONT_H * w * 4
     );
 
