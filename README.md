@@ -20,10 +20,12 @@ make -C limine
 make clean && make run
 ```
 
+# MASSIVE Problem
+- On Real Hardware (not QUEMU) the scrolling part is SO fucking slow
+
 # Known Bugs
 - `str_copy` & `str_contains` & `str_count` broken
 - `to_string` leaks memory if caller doesn't `free()`
-- when using backspace on empty temrinal line - and afterwards writing e.g. echo command it isnt recognized
 
 # TODO
 - memory free defrag

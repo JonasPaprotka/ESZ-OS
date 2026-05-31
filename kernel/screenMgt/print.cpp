@@ -50,15 +50,11 @@ void handle_automatic_newline() {
 }
 
 void cursor_backspace() {
-    // EXIT IF CHAR IS PROTECTED
+    if (!screenBufferPtr) return;
 
     //TODO fix 0-1 bug and support newline backspace
-    if (screenBufferPtr) {
-        if (screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X - 1].interactable == false) {
-            return;
-        }
-    }
-
+    if (screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X - 1].interactable == false) return;
+ 
     if (cursorAt_X == 0) {
         if (cursorAt_Y > 0) {
             cursorAt_Y--;
@@ -66,10 +62,8 @@ void cursor_backspace() {
         } else return;
     } else cursorAt_X--;
 
-    if (useScreenBuffer) {
-        screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].text = 0;
-        screenBufferPtr->lines[cursorAt_Y].amountOfCells--;
-    }
+    screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].text = 0;
+    screenBufferPtr->lines[cursorAt_Y].amountOfCells--;
 
     clear_char(cursorAt_X, cursorAt_Y);
 }
@@ -244,7 +238,7 @@ void handle_scroll() {
 void init_print() {
     useScreenBuffer = false;
 
-    FONT_SIZE = 2;
+    FONT_SIZE = 1;
     FONT_W = 8 * FONT_SIZE;
     FONT_H = 16 * FONT_SIZE;
 

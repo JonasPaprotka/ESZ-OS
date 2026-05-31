@@ -128,7 +128,7 @@ void terminal_on_key(const unsigned char scancode) {
             newTerminalInputLine();
             break;
         case KeyCode::KEY_BACKSPACE:
-            // if (cursorAt_X <= charsProtectedTil) { break; }
+            if (lineInputLength == 0) break;
             cursor_backspace();
             --lineInputLength;
             lineInputBuffer[lineInputLength] = 0;

@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "io/pic.h"
 #include "io/idt.h"
+#include "io/io.h"
 #include "io/keyboard.h"
 #include <stdint.h>
 #include "screenBuffer.h"
@@ -224,6 +225,9 @@ extern "C" void kernel_main() {
     memory_info_init();
 
     pic_init();
+
+    // flush pending scancodes - fixes FUCKING anoying unuseable keyboard bug
+    while (inb(0x64) & 1) inb(0x60);
 
     // TEST DIV BY 0 FAULT
     //volatile int x = 0;
