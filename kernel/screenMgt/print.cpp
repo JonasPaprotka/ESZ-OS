@@ -74,6 +74,14 @@ void cursor_backspace() {
     clear_char(cursorAt_X, cursorAt_Y);
 }
 
+void delete_unprotected_chars() {
+    const unsigned int length = screenBufferPtr->lines[cursorAt_Y].amountOfCells;
+
+    for (int i = 0; i < length; i++) {
+        cursor_backspace();
+    }    
+}
+
 uint64_t calc_line_pixels() {
     return boot_info.pitch / 4;
 }
@@ -113,6 +121,15 @@ void print_char(const char c) {
     draw_char(c, cursorAt_X, cursorAt_Y, Color::White, true);
     cursorAt_X++;
     handle_automatic_newline();
+}
+
+void print_chars(const char* text, bool interactable) {
+    const int s_len = str_length(text);
+    for (int i = 0; i < s_len; i++) {
+        draw_char(text[i], cursorAt_X, cursorAt_Y, Color::White, interactable);
+        cursorAt_X++;
+        handle_automatic_newline();
+    }
 }
 
 void print_chars(const char* text, Color color) {
@@ -156,6 +173,13 @@ void redraw() {
         (void*) boot_info.framebuffer,
         (void*) (boot_info.framebuffer + FONT_H * w),
         (boot_info.height - FONT_H) * w * 4
+    );
+
+    // clear bottom band
+    memory_fill(
+        (void*) (boot_info.framebuffer + (boot_info.height - FONT_H) * w),
+        0,
+        FONT_H * w * 4
     );
 
     // redraw new line
@@ -206,6 +230,7 @@ void handle_scroll() {
         screenBufferPtr->amountOfLines--;
         if (screenBufferPtr->startRenderLine > 0) screenBufferPtr->startRenderLine--;
         cursorAt_Y--;
+        screenBufferPtr->lines[cursorAt_Y].amountOfCells = 0;
     }
 
     // SHIFT lines up

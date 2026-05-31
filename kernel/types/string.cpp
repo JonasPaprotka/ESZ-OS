@@ -26,7 +26,7 @@ bool str_equal(const char* a, const char* b) {
     return true;
 }
 
-void str_copy(const char* src, char* dest) {
+void str_copy(char* dest, const char* src) {
     const int src_len = str_length(src);
 
     for (int i = 0; i < src_len; ++i) {

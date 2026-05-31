@@ -3,6 +3,11 @@
 #include "screenBuffer.h"
 
 void clearScreen() {
+    if (useScreenBuffer) {
+        screenBufferPtr->amountOfLines = 0;
+        screenBufferPtr->startRenderLine = 0;
+    }
+
     const int width = calc_line_pixels(); 
     const int heigth = boot_info.height;
 

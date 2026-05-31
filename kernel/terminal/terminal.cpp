@@ -7,19 +7,32 @@
 #include "helper/info_text.h"
 #include "shell/commands.h"
 
-const KeyboardLayout current_layout = LAYOUT_DE;
+int lineInputLength = 0;
+char lineInputBuffer[256];
 
-uint16_t scancode_to_keycode(const unsigned char scancode) {
-    if (scancode >= 0x3A) return KEY_UNKNOWN;
-    int shift_idx = shift ? 1 : 0;
+char commandHistory[100][256];
+unsigned int cmdHistCount = 0;
+unsigned int goThroughHistoryCount = 0;
 
-    if (current_layout == LAYOUT_DE) {
-        return de_keymap[shift_idx][scancode];
+void add_command_to_history(char command[256]) {
+    if (cmdHistCount >= 100) {
+        for (int i = 0; i < cmdHistCount - 1; i++) {
+            str_copy(commandHistory[i], commandHistory[i + 1]);
+        }
+        commandHistory[cmdHistCount - 1][0] = 0;
+        cmdHistCount--;
     }
-
-    return us_keymap[shift_idx][scancode];
+    
+    str_copy(commandHistory[cmdHistCount], command);
+    cmdHistCount++;
 }
 
+void handle_show_history() {
+    delete_unprotected_chars();
+    str_copy(lineInputBuffer, commandHistory[cmdHistCount - goThroughHistoryCount]);
+    lineInputLength = str_length(lineInputBuffer);
+    print_chars(lineInputBuffer, true);
+}
 
 void printHeader() {
     printSeperator();
@@ -29,9 +42,6 @@ void printHeader() {
     print("by Jonas Paprotka");
     printSeperator();
 }
-
-int lineInputLength = 0;
-char lineInputBuffer[256];
 
 void processLineInputBuffer() {
     if (lineInputLength == 0) {
@@ -47,6 +57,8 @@ void processLineInputBuffer() {
         printInfoLine(InfoTextType::Error, "Command exceeds 256 chars");
         return;
     }
+
+    add_command_to_history(lineInputBuffer);
 
     const char* args = "";
     for (int i = 0; i < lineInputLength; i++) {
@@ -84,8 +96,20 @@ void terminal_on_key(const unsigned char scancode) {
     if (isExtendedScancode) {
         switch(scancode) {
             case 0x48: // ARROW UP
+                if (cmdHistCount == 0) break;
+                
+                if (goThroughHistoryCount < cmdHistCount) {
+                    goThroughHistoryCount++;   
+                } else {
+                    break;
+                }
+                
+                handle_show_history();
                 break;
             case 0x50: // ARROW DOWN
+                if (goThroughHistoryCount == 0) break;
+                goThroughHistoryCount--;
+                handle_show_history();
                 break;
             case 0x4B: // ARROW LEFT
                 break;
@@ -99,6 +123,7 @@ void terminal_on_key(const unsigned char scancode) {
 
     switch(key) {
         case KeyCode::KEY_ENTER:
+            goThroughHistoryCount = 0; // for arrow cmd history - default: 1
             processLineInputBuffer();
             newTerminalInputLine();
             break;
@@ -129,6 +154,7 @@ void terminal_on_key(const unsigned char scancode) {
 
 void terminal_init() {
     printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
+        
     printHeader();
     newTerminalInputLine();
 }

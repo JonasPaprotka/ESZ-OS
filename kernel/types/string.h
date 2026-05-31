@@ -11,7 +11,7 @@ char* str_repeat(const char* text, int amount);
  
 bool str_equal(const char* a, const char* b);
 
-void str_copy(const char* src, const char* dest);
+void str_copy(char* dest, const char* src);
 void str_add(char* target, const char* value);
 char* str_combine(const char* a, const char* b);
 

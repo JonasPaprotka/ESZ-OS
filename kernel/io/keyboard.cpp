@@ -14,7 +14,11 @@ extern "C" void keyboard_handler() {
     if (scancode == 0xAA || scancode == 0xB6) { shift = 0; return; } // shift up
     if (scancode == 0xE0) { isExtendedScancode = true; return; }
 
-    if (scancode & 0x80) return; // ignore key release
+    // ignore key release
+    if (scancode & 0x80) {
+        isExtendedScancode = false;
+        return;
+    }
 
     if (scancode) terminal_on_key(scancode);
 }

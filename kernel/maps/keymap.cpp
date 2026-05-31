@@ -2,6 +2,22 @@
 
 #include <stdint.h>
 #include "maps/keymap.h"
+#include "keyboard.h"
+
+const KeyboardLayout current_layout = LAYOUT_DE;
+
+
+uint16_t scancode_to_keycode(const unsigned char scancode) {
+    if (scancode >= 0x3A) return KEY_UNKNOWN;
+    int shift_idx = shift ? 1 : 0;
+
+    if (current_layout == LAYOUT_DE) {
+        return de_keymap[shift_idx][scancode];
+    }
+
+    return us_keymap[shift_idx][scancode];
+}
+
 
 // en-US
 uint16_t us_keymap[2][0x3A] = {

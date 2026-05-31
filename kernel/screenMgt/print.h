@@ -28,9 +28,12 @@ void print_inline(const char* text, Color color);
 void print_inline(const char* text);
 
 void print_chars(const char* text, Color color);
+void print_chars(const char* text, bool interactable);
 void print_char(const char c);
 
 void newline();
+
+void delete_unprotected_chars();
 void cursor_backspace();
 
 void init_print();
