@@ -19,6 +19,11 @@ uint64_t hhdm_offset;
 
 unsigned char* pmm_bitmap;
 
+MemoryBlockHeader* heapStartPtr;
+
+
+// --------------------------------------------------------
+
 
 void get_memory_region_count() {
     memoryRegionCount = memmap_request.response->entry_count;
@@ -73,21 +78,46 @@ void get_free_location_for_bitmap() {
 }
 
 void print_memory_info() {
-    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
-    printInfoLine(InfoTextType::Info, String("Last Available Address: ", to_string(highestAddress, 16)));
-    
+    printSeperator();
+
     uint64_t KiB = freeBytes / 1024;
     uint64_t MiB = KiB / 1024;
     uint64_t GiB = MiB / 1024;
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", KiB, " KiB"));
 
     const uint64_t freePages = get_free_pmm_page_count();
     const uint64_t usedPages = get_used_pmm_page_count();
-    printInfoLine(InfoTextType::Info, String("(Total) Pages: ", freePages + usedPages));
-    printInfoLine(InfoTextType::Info, String("Free Pages: ", freePages));
-    printInfoLine(InfoTextType::Info, String("Used Pages: ", usedPages));
+    const uint64_t totalPages = freePages + usedPages;
+
+    print("--- PHYSICAL MEMORY MANAGER (PMM) ---");
+    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
+    printInfoLine(InfoTextType::Info, String("Last Physical Address: ", to_string(highestAddress, 16)));
+    // PAGES
+    printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
+    printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
+    printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
+    // RAM
+    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
+    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
+    printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", usedPages * 100 / totalPages, " %"));
+    printInfoLine(InfoTextType::Info, String("RAM Used: ", usedPages * pageSize / 1024 / 1024, " MiB"));
+    printInfoLine(InfoTextType::Info, String("RAM Free: ", freePages * pageSize / 1024 / 1024, " MiB"));
+
+    // TODO consider splitting in diffrent info functions - or command usage advanced parameter etc.
+
+    print("--- KERNEL HEAP ALLOCATOR ---");
+    printInfoLine(InfoTextType::Info, String("Heap Start Address: ", to_string((uint64_t) heapStartPtr, 16)));
+    // TODO Consider adding these:
+    //Total Heap Capacity KiB
+    //Metadata Overhead KiB and %
+    //Free Heap Space KiB
+    //Active Allocations x Blocks
+    //Fragmented Free Blocks x Blocks
+    //Avg Free Block Size KiB
+
+    //print("--- KERNEL HEAP ALLOCATOR ---");
+    //create a map with chars idk somehow [U used - F Free] - add a legend next line
+
+    printSeperator();
 }
 
 void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
@@ -203,8 +233,6 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
     }
 }
 
-MemoryBlockHeader* heapStartPtr;
-
 const MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
     MemoryBlockHeader newHeader;
     newHeader.Length = length;
@@ -276,4 +304,6 @@ void memory_info_init() {
     
     printInfoLine(InfoTextType::Success, "Initialized Memory");
     print_memory_info();
+
+    // pmm_malloc(4094 * 120000); // TEST HIGH UTILISATION!!!!
 }
