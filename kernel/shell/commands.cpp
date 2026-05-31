@@ -1,3 +1,4 @@
+#include "config.h"
 #include "string.h"
 #include "print.h"
 #include "commands.h"
@@ -26,7 +27,7 @@ void cmd_echo(const char* args) {
 }
 
 void cmd_sysinfo(const char*) {
-    printInfoLine(InfoTextType::Info, "ESZ-OS (W.I.P.) by Jonas Paprotka");
+    printInfoLine(InfoTextType::Info, String(OS_NAME, " - ", ARCH_NAME, " - (", OS_VERSION_STRING, ") by ", OS_AUTHOR));
 }
 
 void cmd_reboot(const char*) {

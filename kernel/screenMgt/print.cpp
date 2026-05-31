@@ -1,4 +1,5 @@
 #include "limine_boot.h"
+#include "config.h"
 
 #define FONT8x16_IMPLEMENTATION
 
@@ -10,8 +11,6 @@
 #include "clear.h"
 #include "screenBuffer.h"
 #include "math.h"
-
-int FONT_SIZE;
 
 int cursorAt_X;
 int cursorAt_Y;
@@ -224,7 +223,6 @@ void handle_scroll() {
 void init_print() {
     useScreenBuffer = false;
 
-    FONT_SIZE = 1;
     FONT_W = 8 * FONT_SIZE;
     FONT_H = 16 * FONT_SIZE;
 

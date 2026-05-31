@@ -1,4 +1,5 @@
 #include "limine_boot.h"
+#include "config.h"
 
 #include "memory.h"
 #include "string.h"
@@ -9,11 +10,11 @@
 
 uint64_t memoryRegionCount = 0;
 uint64_t pageCount = 0;
-const uint64_t pageSize = 4096; // 4KiB Pages
+const uint64_t pageSize = PAGE_SIZE;
 uint64_t freeBytes = 0;
 uint64_t highestAddress = 0;
 
-const uint64_t initialHeapLength = 4096 * 1024;
+const uint64_t initialHeapLength = INIT_HEAP_SIZE;
 
 uint64_t hhdm_offset;
 

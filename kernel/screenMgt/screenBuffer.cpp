@@ -1,3 +1,4 @@
+#include "config.h"
 #include "screenMgt/screenBuffer.h"
 #include "memory.h"
 #include "print.h"
@@ -6,7 +7,7 @@
 ScreenBuffer* screenBufferPtr;
 
 void init_empty_screen_buffer() {
-    const unsigned int storedRenderLineHistory = 100;
+    const unsigned int storedRenderLineHistory = SCROLL_HISTORY_LINES;
 
     screenBufferPtr = (ScreenBuffer*) malloc(
         sizeof(ScreenBuffer) +

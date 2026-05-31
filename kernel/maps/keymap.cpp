@@ -1,10 +1,16 @@
 // File Updated with AI / Assisted by AI
-
+#include "config.h"
 #include <stdint.h>
 #include "maps/keymap.h"
 #include "keyboard.h"
 
+#ifdef KEYBOARD_LAYOUT_DE
 const KeyboardLayout current_layout = LAYOUT_DE;
+#endif
+
+#ifdef KEYBOARD_LAYOUT_US
+const KeyboardLayout current_layout = LAYOUT_US;
+#endif
 
 
 uint16_t scancode_to_keycode(const unsigned char scancode) {

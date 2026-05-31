@@ -1,3 +1,4 @@
+#include "config.h"
 #include "terminal.h"
 #include "io/keyboard.h"
 #include "string.h"
@@ -8,14 +9,14 @@
 #include "shell/commands.h"
 
 int lineInputLength = 0;
-char lineInputBuffer[256];
+char lineInputBuffer[TERMINAL_BUFFER_SIZE];
 
-char commandHistory[100][256];
-unsigned int cmdHistCount = 0;
-unsigned int goThroughHistoryCount = 0;
+char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
+int cmdHistCount = 0;
+int goThroughHistoryCount = 0;
 
-void add_command_to_history(char command[256]) {
-    if (cmdHistCount >= 100) {
+void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]) {
+    if (cmdHistCount >= MAX_COMMAND_HISTORY) {
         for (int i = 0; i < cmdHistCount - 1; i++) {
             str_copy(commandHistory[i], commandHistory[i + 1]);
         }
@@ -37,9 +38,7 @@ void handle_show_history() {
 void printHeader() {
     printSeperator();
     printInfoLine(InfoTextType::Success, "Kernel Loaded");
-    printInfoLine(InfoTextType::Warning, "Project W.I.P.");
-    print("ESZ-OS (64bit)");
-    print("by Jonas Paprotka");
+    cmd_sysinfo();
     printSeperator();
 }
 
@@ -50,11 +49,11 @@ void processLineInputBuffer() {
         return;
     }
 
-    if (lineInputLength > 256) {
+    if (lineInputLength > TERMINAL_BUFFER_SIZE) {
         lineInputLength = 0;
         lineInputBuffer[0] = 0;
         newline();
-        printInfoLine(InfoTextType::Error, "Command exceeds 256 chars");
+        printInfoLine(InfoTextType::Error, String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
         return;
     }
 
