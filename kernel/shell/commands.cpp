@@ -24,7 +24,7 @@ void cmd_echo(const char* args) {
     print(args);
 }
 
-void cmd_os_info(const char*) {
+void cmd_sysinfo(const char*) {
     print("ESZ-OS (W.I.P.) by Jonas Paprotka");
 }
 
@@ -40,7 +40,7 @@ const Command commands[] = {
     { "help", cmd_help },
     { "echo", cmd_echo },
     { "clear", cmd_clear },
-    { "os-info", cmd_os_info },
+    { "sysinfo", cmd_sysinfo },
     { "reboot", cmd_reboot },
     { "memory-info", cmd_memory_info },
     { 0, 0 }

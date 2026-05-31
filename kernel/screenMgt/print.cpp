@@ -56,6 +56,10 @@ void cursor_backspace() {
     clear_char(cursorAt_X, cursorAt_Y);
 }
 
+uint64_t calc_line_pixels() {
+    return boot_info.pitch / 4;
+}
+
 void draw_char(char c, const int printAt_X, const int printAt_Y, Color color) {
     // 8 x 16 arr char rendering
     int x = printAt_X * FONT_W;
@@ -66,7 +70,7 @@ void draw_char(char c, const int printAt_X, const int printAt_Y, Color color) {
         
         for (int col = 0; col < FONT_W; col++) {
             if (bits & (0x80 >> (col / FONT_SIZE))) {
-                boot_info.framebuffer[(y + row) * boot_info.width + (x + col)] = (unsigned int) color;
+                boot_info.framebuffer[(y + row) * calc_line_pixels() + (x + col)] = (unsigned int) color;
             }
         }
     }
@@ -111,5 +115,5 @@ void init_print() {
     FONT_W = 8 * FONT_SIZE;
     FONT_H = 16 * FONT_SIZE;
 
-    MAX_CHARS = boot_info.width / FONT_W;
+    MAX_CHARS = calc_line_pixels() / FONT_W;
 }
