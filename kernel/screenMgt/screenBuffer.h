@@ -4,6 +4,7 @@
 #include "color.h"
 
 void init_screen_buffer();
+void init_empty_screen_buffer();
 
 struct Cell {
     char text;

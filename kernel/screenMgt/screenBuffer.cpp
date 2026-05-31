@@ -5,11 +5,8 @@
 
 ScreenBuffer* screenBufferPtr;
 
-
-void init_screen_buffer() {
-    printInfoLine(InfoTextType::Loading, "Loading Screen Buffer...");
-
-    const int storedRenderLineHistory = 100;
+void init_empty_screen_buffer() {
+    const unsigned int storedRenderLineHistory = 100;
 
     screenBufferPtr = (ScreenBuffer*) malloc(
         sizeof(ScreenBuffer) +
@@ -31,6 +28,10 @@ void init_screen_buffer() {
         screenBufferPtr->lines[i].cells = cellBlock + i * MAX_CHARS;
         screenBufferPtr->lines[i].amountOfCells = 0;
     }
+}
 
+void init_screen_buffer() {
+    printInfoLine(InfoTextType::Loading, "Loading Screen Buffer...");
+    init_empty_screen_buffer();
     useScreenBuffer = true;
 }

@@ -80,9 +80,9 @@ void get_free_location_for_bitmap() {
 void print_memory_info() {
     printSeperator();
 
-    uint64_t KiB = freeBytes / 1024;
-    uint64_t MiB = KiB / 1024;
-    uint64_t GiB = MiB / 1024;
+    const uint64_t KiB = freeBytes / 1024;
+    const uint64_t MiB = KiB / 1024;
+    const uint64_t GiB = MiB / 1024;
 
     const uint64_t freePages = get_free_pmm_page_count();
     const uint64_t usedPages = get_used_pmm_page_count();
@@ -303,7 +303,8 @@ void memory_info_init() {
     //--------------------------
     
     printInfoLine(InfoTextType::Success, "Initialized Memory");
-    print_memory_info();
+    
+    //print_memory_info();
 
     // pmm_malloc(4094 * 120000); // TEST HIGH UTILISATION!!!!
 }

@@ -19,8 +19,8 @@ int cursorAt_Y;
 int FONT_W;
 int FONT_H;
 
-unsigned int MAX_CHARS;
-unsigned int MAX_LINES;
+int MAX_CHARS;
+int MAX_LINES;
 
 bool useScreenBuffer;
 bool isRedrawing;
@@ -69,7 +69,7 @@ void cursor_backspace() {
 }
 
 void delete_unprotected_chars() {
-    const unsigned int length = screenBufferPtr->lines[cursorAt_Y].amountOfCells;
+    const int length = screenBufferPtr->lines[cursorAt_Y].amountOfCells;
 
     for (int i = 0; i < length; i++) {
         cursor_backspace();
@@ -88,15 +88,13 @@ void draw_char(char c, const int printAt_X, const int printAt_Y, Color color, bo
 
         screenBufferPtr->lines[cursorAt_Y].amountOfCells++;
     }
-    
-    if (c == ' ') return;
 
     int renderY = printAt_Y;
     if (useScreenBuffer) renderY -= (int) screenBufferPtr->startRenderLine;
 
     // 8 x 16 arr char rendering
-    int x = printAt_X * FONT_W;
-    int y = renderY * FONT_H;
+    const int x = printAt_X * FONT_W;
+    const int y = renderY * FONT_H;
 
     const int width = calc_line_pixels();
 
@@ -104,9 +102,7 @@ void draw_char(char c, const int printAt_X, const int printAt_Y, Color color, bo
         uint8_t bits = font8x16[(unsigned char) c][row / FONT_SIZE];
         
         for (int col = 0; col < FONT_W; col++) {
-            if (bits & (0x80 >> (col / FONT_SIZE))) {
-                boot_info.framebuffer[(y + row) * width + (x + col)] = (unsigned int) color;
-            }
+            boot_info.framebuffer[(y + row) * width + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
         }
     }
 }
@@ -135,23 +131,26 @@ void print_chars(const char* text, Color color) {
     }
 }
 
-void print_char(const char c, Color color, bool interactable) {
+void redraw_char(const char c, Color color, bool interactable) {
+    draw_char(' ', cursorAt_X, cursorAt_Y, color, interactable);
     draw_char(c, cursorAt_X, cursorAt_Y, color, interactable);
     cursorAt_X++;
     handle_automatic_newline();
 }
 
 void redraw_line(const int line) {
-    const unsigned int cellAmount = screenBufferPtr->lines[line].amountOfCells;
+    const int cellAmount = screenBufferPtr->lines[line].amountOfCells;
     cursorAt_X = 0;
     cursorAt_Y = line;
 
-    for (int i = 0; i < cellAmount; i++) {
-        print_char(
-            screenBufferPtr->lines[line].cells[i].text,
-            screenBufferPtr->lines[line].cells[i].color,
-            screenBufferPtr->lines[line].cells[i].interactable
-        );
+    for (int i = 0; i < MAX_CHARS; i++) {
+        if (i < cellAmount) {
+            Cell& cell = screenBufferPtr->lines[line].cells[i];
+            draw_char(cell.text, cursorAt_X, cursorAt_Y, cell.color, cell.interactable);
+        } else {
+            draw_char(' ', cursorAt_X, cursorAt_Y, Color::White, false);
+        }
+        cursorAt_X++;
     }
 }
 
@@ -160,24 +159,12 @@ void redraw() {
     const int savedX = cursorAt_X;
     const int savedY = cursorAt_Y;
 
-    const uint64_t w = calc_line_pixels();
+    const int lineAmount = screenBufferPtr->visibleLines;
+    const int renderStart = screenBufferPtr->startRenderLine;
 
-    //[AI] move all pixel one row up
-    memory_copy(
-        (void*) boot_info.framebuffer,
-        (void*) (boot_info.framebuffer + FONT_H * w),
-        (boot_info.height - FONT_H) * w * 4
-    );
-
-    //[AI] clear bottom band
-    memory_clear(
-        (void*) (boot_info.framebuffer + (boot_info.height - FONT_H) * w),
-        FONT_H * w * 4
-    );
-
-    // redraw new line
-    const int newLine = screenBufferPtr->startRenderLine + screenBufferPtr->visibleLines - 1;
-    redraw_line(newLine);
+    for (int i = 0; i < lineAmount; i++) {
+        redraw_line(renderStart + i);
+    }
 
     cursorAt_X = savedX;
     cursorAt_Y = savedY;
@@ -206,11 +193,11 @@ void handle_scroll() {
     if (!useScreenBuffer || isRedrawing) return;
 
     // HANDLE dropping old history
-    const unsigned int maxLines = screenBufferPtr->maxStoredLines;
+    const int maxLines = screenBufferPtr->maxStoredLines;
     if (cursorAt_Y >= maxLines) {
         for (int line = 0; line < maxLines - 1; line++) {
-            const unsigned int nextLine = line + 1;
-            const unsigned int cellAmount = screenBufferPtr->lines[nextLine].amountOfCells;
+            const int nextLine = line + 1;
+            const int cellAmount = screenBufferPtr->lines[nextLine].amountOfCells;
             screenBufferPtr->lines[line].amountOfCells = cellAmount;
             
             for (int cell = 0; cell < cellAmount; cell++) {

@@ -4,8 +4,7 @@
 
 void clearScreen() {
     if (useScreenBuffer) {
-        screenBufferPtr->amountOfLines = 0;
-        screenBufferPtr->startRenderLine = 0;
+        init_empty_screen_buffer();
     }
 
     const int width = calc_line_pixels(); 
@@ -22,8 +21,8 @@ void clear_char(const int printAt_X, const int printAt_Y) {
     int renderY = printAt_Y;
     if (useScreenBuffer) renderY -= (int) screenBufferPtr->startRenderLine;
     
-    int x = printAt_X * FONT_W;
-    int y = renderY * FONT_H;
+    const int x = printAt_X * FONT_W;
+    const int y = renderY * FONT_H;
 
     const int width = calc_line_pixels();
 

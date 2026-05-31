@@ -28,7 +28,7 @@ char* to_string(const uint64_t inputValue);
 char* to_string(const int64_t inputValue);
 char* to_string(const int32_t inputValue);
 char* to_string(const uint32_t inputValue);
-
+//char* to_string(const double inputValue);
 
 struct String {
     char* data;
@@ -38,7 +38,8 @@ struct String {
     static const char* to_cstr(int64_t n) { return to_string(n); }
     static const char* to_cstr(uint32_t n) { return to_string(n); }
     static const char* to_cstr(int32_t n) { return to_string(n); }
-
+    //static const char* to_cstr(double n) { return to_string(n); }
+  
     // AI supported
     template<typename... Args>
     String(Args... args) {

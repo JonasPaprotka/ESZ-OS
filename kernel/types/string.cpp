@@ -135,6 +135,7 @@ char* str_combine(const char* a, const char* b) {
     return returnString;
 }
 
+
 char* to_string(const uint64_t inputValue, const uint8_t basis) {
     if (inputValue == 0 || basis == 0 || basis == 1) {
         char* emptyReturnString = malloc_str(2);
