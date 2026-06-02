@@ -20,7 +20,10 @@ uint64_t hhdm_offset;
 
 unsigned char* pmm_bitmap;
 
+
+
 MemoryBlockHeader* heapStartPtr;
+MemoryBlockHeader* heapEndPtr;
 
 
 // --------------------------------------------------------
@@ -92,10 +95,12 @@ void print_memory_info() {
     print("--- PHYSICAL MEMORY MANAGER (PMM) ---");
     printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
     printInfoLine(InfoTextType::Info, String("Last Physical Address: ", to_string(highestAddress, 16)));
+    
     // PAGES
     printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
     printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
     printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
+    
     // RAM
     printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
     printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
@@ -105,6 +110,7 @@ void print_memory_info() {
 
     // TODO consider splitting in diffrent info functions - or command usage advanced parameter etc.
 
+    newline();
     print("--- KERNEL HEAP ALLOCATOR ---");
     printInfoLine(InfoTextType::Info, String("Heap Start Address: ", to_string((uint64_t) heapStartPtr, 16)));
     // TODO Consider adding these:
@@ -115,8 +121,9 @@ void print_memory_info() {
     //Fragmented Free Blocks x Blocks
     //Avg Free Block Size KiB
 
-    //print("--- KERNEL HEAP ALLOCATOR ---");
-    //create a map with chars idk somehow [U used - F Free] - add a legend next line
+    newline();
+    print("--- HEAP FRAGMENTATION ---");
+    print_memory_fragmentation_graph(MAX_CHARS);
 
     printSeperator();
 }
@@ -234,6 +241,10 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
     }
 }
 
+
+///////////////////////////////////
+// HEAP STUFF HERE
+
 const MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
     MemoryBlockHeader newHeader;
     newHeader.Length = length;
@@ -241,12 +252,45 @@ const MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
     return newHeader;
 }
 
-void try_defragment_page(void* ptr) {
-    //TODO look left and right - if is free then make block bigger
-}
-
 const MemoryBlockHeader* get_next_heap_block(MemoryBlockHeader* currMemBlock) {
     return (MemoryBlockHeader*) ((char*) currMemBlock + sizeof(MemoryBlockHeader) + currMemBlock->Length);
+}
+
+void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
+    if (maxBlocks == 0) return;
+
+    char outputText[maxBlocks + 5];
+    memory_clear(outputText, maxBlocks + 5);
+
+    uint64_t blockCounter = 0;
+    MemoryBlockHeader* currBlockPtr = heapStartPtr;
+    outputText[0] = '[';
+
+    while (currBlockPtr < heapEndPtr)
+    {
+        if (currBlockPtr->Used) {
+            str_add(outputText, "U");
+        } else {
+            str_add(outputText, "F");
+        }
+
+        blockCounter++;
+        if (blockCounter >= maxBlocks) {
+            str_add(outputText, "...");
+            break;
+        }
+    
+        // GET NEXT BLOCK
+        currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
+    }
+
+    str_add(outputText, "]");
+    print(outputText);
+    print("Legend: [U] = Used; [F] = Free");
+}
+
+void try_defragment_page(void* ptr) {
+    //TODO look left and right - if is free then make block bigger
 }
 
 void* malloc(uint64_t size) {
@@ -286,6 +330,7 @@ void inint_heap_alloc() {
     initialHeapBlockPtr->Used = false;
 
     heapStartPtr = initialHeapBlockPtr;
+    heapEndPtr = (MemoryBlockHeader*) ((char*) initialHeapBlockPtr + initialHeapLength);
 }
 
 
@@ -305,7 +350,5 @@ void memory_info_init() {
     
     printInfoLine(InfoTextType::Success, "Initialized Memory");
     
-    //print_memory_info();
-
     // pmm_malloc(4094 * 120000); // TEST HIGH UTILISATION!!!!
 }
