@@ -95,8 +95,10 @@ void print_memory_info() {
 
     print("--- PHYSICAL MEMORY MANAGER (PMM) ---");
     printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
-    printInfoLine(InfoTextType::Info, String("Last Physical Address: ", to_string(highestAddress, 16)));
-    
+    char* highestAddressText = to_string(highestAddress, 16);
+    printInfoLine(InfoTextType::Info, String("Last Physical Address: ", highestAddressText));
+    free(highestAddressText);
+
     // PAGES
     printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
     printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));

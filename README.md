@@ -24,6 +24,7 @@ make clean && make run
 - `str_copy` & `str_contains` & `str_count` broken
 
 # TODO
+- Dynamic Heap Page allocation
 - UX
     - arrow key cursor movement
     - tab: command completion
