@@ -112,7 +112,12 @@ void print_memory_info() {
 
     newline();
     print("--- KERNEL HEAP ALLOCATOR ---");
-    printInfoLine(InfoTextType::Info, String("Heap Start Address: ", to_string((uint64_t) heapStartPtr, 16)));
+    char* heapStartAddr = to_string((uint64_t) heapStartPtr, 16);
+    printInfoLine(InfoTextType::Info, String("Heap Start Address: ", heapStartAddr));
+    free(heapStartAddr);
+    char* heapEndAddr = to_string((uint64_t) heapEndPtr, 16);
+    printInfoLine(InfoTextType::Info, String("Heap End Address: ", heapEndAddr));
+    free(heapEndAddr);
     // TODO Consider adding these:
     //Total Heap Capacity KiB
     //Metadata Overhead KiB and %
@@ -122,8 +127,8 @@ void print_memory_info() {
     //Avg Free Block Size KiB
 
     newline();
-    print("--- HEAP FRAGMENTATION ---");
-    print_memory_fragmentation_graph(MAX_CHARS);
+    print("--- HEAP FRAGMENTATION VIEW ---");
+    print_memory_fragmentation_graph(100, true);
 
     printSeperator();
 }
@@ -245,22 +250,40 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
 ///////////////////////////////////
 // HEAP STUFF HERE
 
-const MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
+MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
     MemoryBlockHeader newHeader;
     newHeader.Length = length;
     newHeader.Used = used;
     return newHeader;
 }
 
-const MemoryBlockHeader* get_next_heap_block(MemoryBlockHeader* currMemBlock) {
+MemoryBlockHeader* get_next_heap_block(MemoryBlockHeader* currMemBlock) {
     return (MemoryBlockHeader*) ((char*) currMemBlock + sizeof(MemoryBlockHeader) + currMemBlock->Length);
 }
 
-void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
-    if (maxBlocks == 0) return;
+MemoryBlockHeader* get_prev_heap_block(MemoryBlockHeader* currMemBlock) {
+    // need loop through all blocks due to not knowing length of prev block
 
-    char outputText[maxBlocks + 5];
-    memory_clear(outputText, maxBlocks + 5);
+    MemoryBlockHeader* loopBlockPtr = heapStartPtr;
+    while (loopBlockPtr >= heapStartPtr && loopBlockPtr < currMemBlock)
+    {
+        MemoryBlockHeader* nextBlockHeader = get_next_heap_block(loopBlockPtr);
+        if (nextBlockHeader == currMemBlock) {
+            return loopBlockPtr;
+        }
+        loopBlockPtr = nextBlockHeader;
+    }
+
+    return nullptr;
+}
+
+void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showSize) {
+    if (maxBlocks == 0) return; //TODO consider treating it as all blocks
+
+    uint64_t outputTextLength = maxBlocks + 5;
+    if (showSize) outputTextLength += maxBlocks * sizeof(uint64_t);
+    char outputText[outputTextLength];
+    memory_clear(outputText, outputTextLength);
 
     uint64_t blockCounter = 0;
     MemoryBlockHeader* currBlockPtr = heapStartPtr;
@@ -274,23 +297,29 @@ void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
             str_add(outputText, "F");
         }
 
+        if (showSize) {
+            //const uint64_t KiB = currBlockPtr->Length / 1024;
+            //const uint64_t MiB = KiB / 1024;
+            str_add(outputText, String("-", currBlockPtr->Length));
+        }
+
         blockCounter++;
         if (blockCounter >= maxBlocks) {
             str_add(outputText, "...");
             break;
         }
-    
+
         // GET NEXT BLOCK
         currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
+
+        if (showSize && currBlockPtr < heapEndPtr) {
+            str_add(outputText, ", ");
+        }
     }
 
     str_add(outputText, "]");
     print(outputText);
     print("Legend: [U] = Used; [F] = Free");
-}
-
-void try_defragment_page(void* ptr) {
-    //TODO look left and right - if is free then make block bigger
 }
 
 void* malloc(uint64_t size) {
@@ -299,6 +328,10 @@ void* malloc(uint64_t size) {
     while (currBlockPtr->Length < size || currBlockPtr->Used == true)
     {
         currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
+        if (currBlockPtr >= heapEndPtr) {
+            printInfoLine(InfoTextType::Error, "Malloc can\'t build a suitable new block");
+            return nullptr;
+        }
     }
     
     uint64_t oldBlockLength = currBlockPtr->Length;
@@ -310,18 +343,46 @@ void* malloc(uint64_t size) {
     
     if (oldBlockLength > size + sizeof(MemoryBlockHeader)) {
         MemoryBlockHeader* nextBlock = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
-        nextBlock->Length = oldBlockLength - size - sizeof(MemoryBlockHeader);
+        const uint64_t nextBlockLength = oldBlockLength - size - sizeof(MemoryBlockHeader);
+        
+        // skip splitting if to small - avoid like F-1 blocks
+        if (nextBlockLength <= sizeof(MemoryBlockHeader)) {
+            currBlockPtr->Length = oldBlockLength;
+            return returnAddr;
+        }
+
+        nextBlock->Length = nextBlockLength;
         nextBlock->Used = false;
+    } else {
+        currBlockPtr->Length = oldBlockLength;
     }
 
     return returnAddr;
+}
+
+void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
+    MemoryBlockHeader* rightBlockPtr = get_next_heap_block(freedBlockPtr);
+    if (rightBlockPtr < heapEndPtr) {
+        if (rightBlockPtr->Used == false) {
+            freedBlockPtr->Length += rightBlockPtr->Length + sizeof(MemoryBlockHeader);
+        }
+    }
+    
+    MemoryBlockHeader* leftBlockPtr = get_prev_heap_block(freedBlockPtr);
+    if (leftBlockPtr == nullptr) { return; }
+
+    if (leftBlockPtr >= heapStartPtr) {
+        if (leftBlockPtr->Used == false) {
+            leftBlockPtr->Length += freedBlockPtr->Length + sizeof(MemoryBlockHeader);
+        }
+    }
 }
 
 void free(void* ptr) {
     MemoryBlockHeader* header = (MemoryBlockHeader*) ((char*) ptr - sizeof(MemoryBlockHeader));
     header->Used = false;
 
-    try_defragment_page(ptr);
+    try_defragment_page(header);
 }
 
 void inint_heap_alloc() {
@@ -350,5 +411,5 @@ void memory_info_init() {
     
     printInfoLine(InfoTextType::Success, "Initialized Memory");
     
-    // pmm_malloc(4094 * 120000); // TEST HIGH UTILISATION!!!!
+    //pmm_malloc(4096 * 120000); // TEST HIGH UTILISATION!!!!
 }

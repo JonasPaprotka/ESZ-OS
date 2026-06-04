@@ -17,9 +17,9 @@
 #define SCROLL_HISTORY_LINES 100
 
 #define PAGE_SIZE 4096 
-#define INIT_HEAP_SIZE 4096 * 1024 // 4 MiB (reccomended: use multiple of page syse)
+#define INIT_HEAP_SIZE 4096 * 1024 * 32 // 128 MiB
 
-#define FONT_SIZE 1
+#define FONT_SIZE 2
 
 
 // MAKROS

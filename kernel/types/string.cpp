@@ -8,8 +8,8 @@ char* malloc_str(const uint64_t size) {
     return string;
 }
 
-int str_length(const char* str) {
-    int i = 0;
+uint64_t str_length(const char* str) {
+    uint64_t i = 0;
     while (str[i] != 0) i++;
     return i;
 }
@@ -99,14 +99,14 @@ bool str_ends_with(const char* text, const char* searchText) {
     }
     return true;
 }
-
+/* 
 void str_replace(char* text, const char* toBeReplacedText, const char* replacementText) {
     //TODO
-}
+} */
 
 char* str_repeat(const char* text, int amount) {
-    char* returnString = malloc_str(128);
     const int text_len = str_length(text);
+    char* returnString = malloc_str(text_len * amount + 1);
 
     for (int i = 0; i < amount; i++) {
         for (int j = 0; j < text_len; j++) {
@@ -119,10 +119,10 @@ char* str_repeat(const char* text, int amount) {
 }
 
 char* str_combine(const char* a, const char* b) {
-    char* returnString = malloc_str(128);
-
     const int len_a = str_length(a);
     const int len_b = str_length(b);
+
+    char* returnString = malloc_str(len_a + len_b + 1);
 
     for (int i = 0; i < len_a; i++) {
         returnString[i] = a[i];
@@ -144,11 +144,19 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
         return emptyReturnString;
     }
 
-    char* composedString = malloc_str(65);
-    char* returnString = malloc_str(65);
     uint64_t strLength = 0;
     uint64_t calcValue = inputValue;
 
+    while (calcValue != 0) {
+        calcValue /= basis;
+        strLength++;
+    }
+
+    char* composedString = malloc_str(strLength + 1);
+    char* returnString = malloc_str(strLength + 1);
+
+    calcValue = inputValue;
+    strLength = 0;
     while (calcValue != 0) {
         uint64_t newValue = calcValue % basis;
         if (newValue < 10) {
@@ -166,6 +174,7 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
         ++counter;
     }
 
+    free(composedString);
     returnString[strLength] = 0;
     return returnString;
 }

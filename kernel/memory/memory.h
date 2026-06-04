@@ -17,7 +17,7 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
 
 void memory_info_init();
 
-void print_memory_fragmentation_graph(const uint64_t maxBlocks);
+void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showSize);
 
 uint64_t pmm_malloc(const uint64_t byteAmount);
 void* pmm_malloc_addr(const uint64_t byteAmount);
