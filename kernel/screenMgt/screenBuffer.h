@@ -7,10 +7,10 @@ void init_screen_buffer();
 void init_empty_screen_buffer();
 
 struct Cell {
-    char text;
     Color color;
+    char text;
     bool interactable;
-} __attribute__((packed));
+};
 
 struct Line {
     Cell* cells;

@@ -19,7 +19,7 @@
 #define PAGE_SIZE 4096 
 #define INIT_HEAP_SIZE 4096 * 1024 * 32 // 128 MiB
 
-#define FONT_SIZE 2
+#define FONT_SIZE 1
 
 
 // MAKROS

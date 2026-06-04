@@ -88,8 +88,9 @@ void print_memory_info() {
     const uint64_t MiB = KiB / 1024;
     const uint64_t GiB = MiB / 1024;
 
-    const uint64_t freePages = get_free_pmm_page_count();
-    const uint64_t usedPages = get_used_pmm_page_count();
+    uint64_t freePages;
+    uint64_t usedPages;
+    get_pmm_page_counts(freePages, usedPages);
     const uint64_t totalPages = freePages + usedPages;
 
     print("--- PHYSICAL MEMORY MANAGER (PMM) ---");
@@ -164,28 +165,17 @@ uint64_t pmm_malloc(const uint64_t byteAmount) {
     return 0;
 }
 
-uint64_t get_free_pmm_page_count() {
-    uint64_t freePageCounter = 0;
+void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {
+    freePageCounter = 0;
+    usedPageCounter = 0;
 
     for (uint64_t i = 0; i < pageCount; i++) {
         if (!bit_read(pmm_bitmap, i)) {
             freePageCounter++;
-        }
-    }
-
-    return freePageCounter;
-}
-
-uint64_t get_used_pmm_page_count() {
-    uint64_t usedPageCounter = 0;
-
-    for (uint64_t i = 0; i < pageCount; i++) {
-        if (bit_read(pmm_bitmap, i)) {
+        } else {
             usedPageCounter++;
         }
     }
-
-    return usedPageCounter;
 }
 
 void* pmm_malloc_addr(const uint64_t byteAmount) {
@@ -250,18 +240,18 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
 ///////////////////////////////////
 // HEAP STUFF HERE
 
-MemoryBlockHeader create_mem_block(uint64_t length, bool used) {
+MemoryBlockHeader create_mem_block(const uint64_t length, const bool used) {
     MemoryBlockHeader newHeader;
     newHeader.Length = length;
     newHeader.Used = used;
     return newHeader;
 }
 
-MemoryBlockHeader* get_next_heap_block(MemoryBlockHeader* currMemBlock) {
+MemoryBlockHeader* get_next_heap_block(const MemoryBlockHeader* currMemBlock) {
     return (MemoryBlockHeader*) ((char*) currMemBlock + sizeof(MemoryBlockHeader) + currMemBlock->Length);
 }
 
-MemoryBlockHeader* get_prev_heap_block(MemoryBlockHeader* currMemBlock) {
+MemoryBlockHeader* get_prev_heap_block(const MemoryBlockHeader* currMemBlock) {
     // need loop through all blocks due to not knowing length of prev block
 
     MemoryBlockHeader* loopBlockPtr = heapStartPtr;
@@ -322,7 +312,7 @@ void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showS
     print("Legend: [U] = Used; [F] = Free");
 }
 
-void* malloc(uint64_t size) {
+void* malloc(const uint64_t size) {
     MemoryBlockHeader* currBlockPtr = heapStartPtr;
 
     while (currBlockPtr->Length < size || currBlockPtr->Used == true)
@@ -378,7 +368,7 @@ void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
     }
 }
 
-void free(void* ptr) {
+void free(const void* ptr) {
     MemoryBlockHeader* header = (MemoryBlockHeader*) ((char*) ptr - sizeof(MemoryBlockHeader));
     header->Used = false;
 
