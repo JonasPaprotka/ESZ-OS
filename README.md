@@ -20,17 +20,10 @@ make -C limine
 make clean && make run
 ```
 
-# MASSIVE Problem
-- On Real Hardware (not QUEMU) the scrolling part is SO fucking slow
-
 # Known Bugs
 - `str_copy` & `str_contains` & `str_count` broken
-- `to_string` leaks memory if caller doesn't `free()`
 
 # TODO
-- memory free defrag
-- Rewrite line rendering - actually store all lines
-  - Allow scroll up/down
 - UX
     - arrow key cursor movement
     - tab: command completion
