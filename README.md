@@ -20,9 +20,6 @@ make -C limine
 make clean && make run
 ```
 
-# Known Bugs
-- `str_copy` & `str_contains` & `str_count` broken
-
 # TODO
 - Dynamic Heap Page allocation
 - UX
@@ -30,8 +27,9 @@ make clean && make run
     - tab: command completion
     - Padding for text rendering
 - Implement system timer and sleep()
-- Shutdown, Reboot, etc via APIC
-- Fix TODOs in string.cpp
+- APIC
+- ACIP
+- implement `str_replace` string.cpp
 
 # Future TODOs
 - Filesystem FAT16, later FAT32
