@@ -1,22 +1,23 @@
 # ESZ-OS
 
 # Install
-bios 32 bit edition (outdated)
-```powershell
-brew install qemu nasm make
-brew tap nativeos/i386-elf-toolchain
-brew install i386-elf-binutils i386-elf-gcc
-```
-
-new uefi 64 bit edition
-```powershell
+```zsh
 brew install x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
-git clone https://github.com/limine-bootloader/limine.git --branch=v9.x-binary --depth=1 limine
+curl -L -o limine.tar.xz \
+  https://github.com/limine-bootloader/limine/releases/download/v12.3.2/limine-binary.tar.xz
+tar -xf limine.tar.xz -C limine --strip-components=1
+rm limine.tar.xz
 make -C limine
 ```
 
+get limine.h
+```zsh
+curl -L -o kernel/types/limine.h \
+  https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+```
+
 # Test
-```powershell
+```zsh
 make clean && make run
 ```
 

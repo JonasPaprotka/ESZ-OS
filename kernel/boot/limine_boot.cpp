@@ -6,7 +6,7 @@
 
 // REQUESTS
 __attribute__((used, section(".limine_requests")))
-static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(3);
+static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(4);
 
 __attribute__((used, section(".limine_requests")))
 volatile struct limine_framebuffer_request framebuffer_request = {

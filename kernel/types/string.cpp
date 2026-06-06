@@ -20,7 +20,7 @@ bool str_equal(const char* a, const char* b) {
     
     if (a_len != b_len) return false;
 
-    for (int i = 0; i < a_len; ++i) {
+    for (uint64_t i = 0; i < a_len; ++i) {
         if (a[i] != b[i]) return false;
     }
     return true;
@@ -171,7 +171,7 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     }
 
     uint64_t counter = 0;
-    for (uint64_t i = strLength - 1; i >= 0; --i) {
+    for (int64_t i = strLength - 1; i >= 0; --i) {
         returnString[counter] = composedString[i];
         ++counter;
     }
