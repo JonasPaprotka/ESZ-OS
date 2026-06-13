@@ -1,4 +1,6 @@
-## v0.1.1 - 
+# CHANGELOG
+
+## v0.1.1 - 2025-06-13
 
 - New functions in the string library
     - str_replace
@@ -8,6 +10,7 @@
 - Config changes
     - Reduced init heap size from 32 MiB to 16 MiB
     - Switched default keyboard layout from DE to US
+- Added a baic cursor renderer
 
 ## v0.1.0 - 2025-06-13
 
