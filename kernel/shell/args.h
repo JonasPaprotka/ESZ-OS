@@ -7,6 +7,6 @@
 const char* getLastTokenFromBuffer(const uint64_t inputLength, const char inputBuffer[TERMINAL_BUFFER_SIZE]);
 
 const char* getInputArgs(const uint64_t inputLength, char inputBuffer[TERMINAL_BUFFER_SIZE]);
-bool executeCommand(uint64_t inputLength, char inputBuffer[TERMINAL_BUFFER_SIZE], const char* args);
+bool executeCommand(char inputBuffer[TERMINAL_BUFFER_SIZE], const char* args);
 
 #endif

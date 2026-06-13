@@ -64,7 +64,7 @@ void processLineInputBuffer() {
         return;
     }
 
-    if (lineInputLength > TERMINAL_BUFFER_SIZE) {
+    if (lineInputLength >= TERMINAL_BUFFER_SIZE) {
         displayTerminalError(String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
         return;
     }
@@ -72,7 +72,7 @@ void processLineInputBuffer() {
     add_command_to_history(lineInputBuffer);
 
     const char* args = getInputArgs(lineInputLength, lineInputBuffer);
-    if (executeCommand(lineInputLength, lineInputBuffer, args)) {
+    if (executeCommand(lineInputBuffer, args)) {
         lineInputLength = 0;
         lineInputBuffer[0] = 0;
     } else {
@@ -166,7 +166,14 @@ void terminal_on_key(const unsigned char scancode) {
             case 0x50: // ARROW DOWN
                 if (goThroughHistoryCount == 0) break;
                 goThroughHistoryCount--;
-                handle_show_history();
+
+                if (goThroughHistoryCount == 0) {
+                    delete_unprotected_chars();
+                    lineInputBuffer[0] = 0;
+                    lineInputLength = 0;
+                } else {
+                    handle_show_history();
+                }
                 break;
             case 0x4B: // ARROW LEFT
                 break;

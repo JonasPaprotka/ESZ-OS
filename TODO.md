@@ -13,12 +13,8 @@
 - Filesystem FAT16, later FAT32
 - Networking
     - translate linux drivers for the quemu intel network card
+- Unit Tests für lib and core functions
 
 # Known Bugs
-- first char at all is a space for some reasoning
-- many new lines then "clear" -> crashes (page fault)
-- cursor_backspace accesses cells[cursorAt_X - 1] BEFORE checking
-- str_ends_with is completely broken:
-- arrow DOWN through command history - go through history count - maybe out of bounds check
-- terminal buffer off-by-one. checks lineInputLength > TERMINAL_BUFFER_SIZE instead of >=
+- str_ends_with is completely broken
 - str_replace hardcoded stack array of 1024 max findings

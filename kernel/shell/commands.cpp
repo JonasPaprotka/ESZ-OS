@@ -38,6 +38,9 @@ void cmd_clear(const char*) {
     clearScreen();
     cursorAt_X = 0;
     cursorAt_Y = 0;
+
+    cursorRendered_X = 0;
+    cursorRendered_Y = 0;
 }
 
 void cmd_echo(const char* args) {
