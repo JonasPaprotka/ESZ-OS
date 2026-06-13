@@ -45,7 +45,5 @@ const Command commands[] = {
     { "sysinfo", cmd_sysinfo },
     { "reboot", cmd_reboot },
     { "meminfo", cmd_memory_info },
-    { "meminfo2", cmd_memory_info },
-    { "meminfo3", cmd_memory_info },
     { 0, 0 }
 };
