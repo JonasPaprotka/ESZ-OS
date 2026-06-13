@@ -7,6 +7,7 @@
 #include "memory.h"
 #include "clear.h"
 #include "info_text.h"
+#include "terminal.h"
 
 void cmd_help(const char*) {
     for (uint64_t i = 0; commands[i].name != 0; i++) {
@@ -38,8 +39,15 @@ void cmd_memory_info(const char*) {
     print_memory_info();
 }
 
+void cmd_history(const char*) {
+    for (uint64_t i = 0; i < cmdHistCount; i++) {
+        print(commandHistory[i]);
+    }
+}
+
 const Command commands[] = {
     { "help", cmd_help },
+    { "history", cmd_history },
     { "echo", cmd_echo },
     { "clear", cmd_clear },
     { "sysinfo", cmd_sysinfo },
