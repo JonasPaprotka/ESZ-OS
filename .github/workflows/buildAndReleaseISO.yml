@@ -1,0 +1,65 @@
+name: Build and Release ESZ-OS ISO
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm xorriso mtools gcc-x86-64-linux-gnu g++-x86-64-linux-gnu curl tar make
+
+      - name: Download and Setup Limine Bootloader
+        run: |
+          mkdir -p limine
+          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.3.2/limine-binary.tar.xz
+          tar -xf limine.tar.xz -C limine --strip-components=1
+          rm limine.tar.xz
+          make -C limine
+
+      - name: Fetch Limine Header Protocol
+        run: |
+          mkdir -p kernel/types
+          curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+
+      - name: Compile OS and Generate ISO
+        run: |
+          make clean
+          make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
+
+      - name: Attach ISO to Action Run (Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: eszos-latest-iso
+          path: bin/eszos.iso
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Update Rolling GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "ESZ-OS Continuous Build"
+          body: |
+            Automated build generated from the `main` branch.
+            
+            **Latest Commit:** ${{ github.sha }}
+            **Timestamp:** ${{ github.event.head_commit.timestamp }}
+          draft: false
+          prerelease: true
+          files: bin/eszos.iso
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
