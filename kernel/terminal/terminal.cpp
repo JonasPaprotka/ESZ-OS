@@ -1,12 +1,12 @@
 #include "config.h"
 #include "terminal.h"
-#include "io/keyboard.h"
+#include "keyboard.h"
 #include "string.h"
 #include "print.h"
 #include "commands.h"
-#include "maps/keymap.h"
-#include "helper/info_text.h"
-#include "shell/commands.h"
+#include "keymap.h"
+#include "info_text.h"
+#include "commands.h"
 #include "args.h"
 
 uint64_t lineInputLength = 0;

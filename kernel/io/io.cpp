@@ -1,6 +1,6 @@
 // File Updated with AI / Assisted by AI
 
-void outb(unsigned short port, unsigned char value) {
+void outb(const unsigned short port, const unsigned char value) {
     __asm__("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 

@@ -1,5 +1,5 @@
 #include "config.h"
-#include "screenMgt/screenBuffer.h"
+#include "screenBuffer.h"
 #include "memory.h"
 #include "print.h"
 #include "info_text.h"

@@ -21,6 +21,8 @@
 
 #define FONT_SIZE 1
 
+#define PIT_TICK_HZ 100 // timer percision in Hz
+
 
 // MAKROS
 #define STRINGIFY_IMPL(x) #x

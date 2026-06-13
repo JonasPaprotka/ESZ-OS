@@ -1,13 +1,15 @@
+#include <stdint.h>
+
 #include "print.h"
 #include "clear.h"
-#include "terminal/terminal.h"
-#include "helper/info_text.h"
+#include "terminal.h"
+#include "info_text.h"
 #include "memory.h"
-#include "io/pic.h"
-#include "io/idt.h"
-#include "io/io.h"
-#include "io/keyboard.h"
-#include <stdint.h>
+#include "pic.h"
+#include "pit.h"
+#include "idt.h"
+#include "io.h"
+#include "keyboard.h"
 #include "screenBuffer.h"
 
 
@@ -59,6 +61,7 @@ extern "C" void isr_stub_29();
 extern "C" void isr_stub_30();
 extern "C" void isr_stub_31();
 
+extern "C" void timer_isr(); // 32
 extern "C" void keyboard_isr(); //33
 
 extern "C" void fault_handler(Registers* regs) {
@@ -212,6 +215,7 @@ void populate_idt_entries() {
     idt_set_entry(30, (uint64_t) isr_stub_30); 
     idt_set_entry(31, (uint64_t) isr_stub_31); 
 
+    idt_set_entry(32, (uint64_t) timer_isr);
     idt_set_entry(33, (uint64_t) keyboard_isr); 
 }
 
@@ -225,6 +229,7 @@ extern "C" void kernel_main() {
 
     memory_info_init();
 
+    pit_init();
     pic_init();
 
     // flush pending scancodes - fixes FUCKING anoying unuseable keyboard bug
