@@ -2,7 +2,10 @@
 
 ## v0.1.2 -
 
-- 
+// TODO - this release planned changelog:
+- Stability Update
+    - Fixed known bugs
+    - Fixed remaining compiler warnings
 
 ## v0.1.1 - 2025-06-13
 
