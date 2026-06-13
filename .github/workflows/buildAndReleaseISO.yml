@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -24,7 +29,7 @@ jobs:
       - name: Download and Setup Limine Bootloader
         run: |
           mkdir -p limine
-          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.3.2/limine-binary.tar.xz
+          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.3.3/limine-binary.tar.xz
           tar -xf limine.tar.xz -C limine --strip-components=1
           rm limine.tar.xz
           make -C limine
@@ -40,6 +45,7 @@ jobs:
           make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
 
       - name: Attach ISO to Action Run (Artifact)
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: eszos-latest-iso
@@ -47,17 +53,40 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Update Rolling GitHub Release
-        if: github.ref == 'refs/heads/main'
+  publish:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download ISO Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: eszos-latest-iso
+          path: bin/
+
+      - name: Create Version Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ESZ-OS ${{ github.ref_name }}
+          body: |
+            **Official Release:** ${{ github.ref_name }}
+            **Commit:** ${{ github.sha }}
+          draft: false
+          prerelease: false
+          files: bin/eszos.iso
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update 'latest' Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: "ESZ-OS Continuous Build"
-          body: |
-            Automated build generated from the `main` branch.
-            
-            **Latest Commit:** ${{ github.sha }}
-            **Timestamp:** ${{ github.event.head_commit.timestamp }}
+          body: |            
+            **Commit:** ${{ github.sha }}
           draft: false
           prerelease: true
           files: bin/eszos.iso
