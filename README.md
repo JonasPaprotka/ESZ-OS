@@ -57,3 +57,11 @@ You can also simulate more RAM with the given presets
  - run-16 -> 16384 MB
  - run-32 -> 32768 MB
  - run-64 -> 65536 MB
+
+# Release new Version
+
+To release a new Version of ESZ-OS you need to be on the pulled commit on the main branch and tag it.
+```zsh
+git tag <version>
+git push origin <version>
+```
