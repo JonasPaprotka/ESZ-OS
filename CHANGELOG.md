@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.1.2 -
+
+- 
+
 ## v0.1.1 - 2025-06-13
 
 - New functions in the string library
