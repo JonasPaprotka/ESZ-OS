@@ -7,8 +7,6 @@ bool shift = false;
 bool isExtendedScancode = false;
 
 extern "C" void keyboard_handler() {
-    __asm__ volatile("sti"); // allow timer interrupts while handling keyboard
-
     unsigned char scancode = inb(0x60);
     outb(0x20, 0x20);
 

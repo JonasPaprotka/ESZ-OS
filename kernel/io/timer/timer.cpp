@@ -6,11 +6,11 @@
 volatile uint64_t ticks = 0;
 
 extern "C" void timer_handler() {
-    ticks++;
+    ticks = ticks + 1;
     EIO_Finished_Interrupt();
 }
 
-const uint64_t get_ticks_in_ms() {
+uint64_t get_ticks_in_ms() {
     return ticks * 1000 / PIT_TICK_HZ;
 }
 
