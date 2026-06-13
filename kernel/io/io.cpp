@@ -1,4 +1,3 @@
-// File Updated with AI / Assisted by AI
 
 void outb(const unsigned short port, const unsigned char value) {
     __asm__("outb %0, %1" : : "a"(value), "Nd"(port));
