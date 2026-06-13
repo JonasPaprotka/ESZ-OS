@@ -5,8 +5,10 @@
 #define OS_AUTHOR "Jonas Paprotka"
 #define ARCH_NAME "x84_64"
 
-#define KEYBOARD_LAYOUT_DE
-// #define KEYBOARD_LAYOUT_US
+// --- ONLY COMMENT IN ONE ---
+#define KEYBOARD_LAYOUT_US
+//#define KEYBOARD_LAYOUT_DE
+// ---------------------------
 
 #define OS_VERSION_MAJOR 0
 #define OS_VERSION_MINOR 1
@@ -17,7 +19,7 @@
 #define SCROLL_HISTORY_LINES 100
 
 #define PAGE_SIZE 4096 
-#define INIT_HEAP_SIZE 4096 * 1024 * 8 // 32 MiB
+#define INIT_HEAP_SIZE 4096 * 1024 * 4 // 16 MiB
 
 #define FONT_SIZE 1
 

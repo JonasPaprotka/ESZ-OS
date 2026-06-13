@@ -6,7 +6,6 @@
     - consider: padding for text rendering
 - APIC
 - ACIP
-- implement `str_replace` string.cpp
 
 # Future
 - Filesystem FAT16, later FAT32

@@ -1,5 +1,13 @@
 ## v0.1.1 - 
 
+- New functions in the string library
+    - str_replace
+    - str_move_left
+    - str_trim_start
+- Minor clean code / performance optimizations
+- Config changes
+    - Reduced init heap size from 32 MiB to 16 MiB
+    - Switched default keyboard layout from DE to US
 
 ## v0.1.0 - 2025-06-13
 
