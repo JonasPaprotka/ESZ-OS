@@ -85,7 +85,7 @@ jobs:
           tag_name: latest
           name: "ESZ-OS Latest Build"
           body: |
-            **Continuous build** — nicht unbedingt stabil
+            **Continuous build**
             **Commit:** ${{ github.sha }}
           draft: false
           prerelease: true
