@@ -8,6 +8,13 @@ char* malloc_str(const uint64_t size) {
     return string;
 }
 
+char* malloc_empty_str() {
+    char* ret = malloc_str(2);
+    ret[0] = '0';
+    ret[1] = 0;
+    return ret;
+}
+
 uint64_t str_length(const char* str) {
     uint64_t i = 0;
     while (str[i] != 0) i++;
@@ -43,6 +50,15 @@ void str_add(char* target, const char* value) {
         target[target_length + i] = value[i];
     }
     target[target_length + value_length] = 0;
+}
+
+void str_add(char* target, const char char_value) {
+    const uint64_t target_length = str_length(target);
+
+    for (uint64_t i = 0; i < 1; ++i) {
+        target[target_length + i] = char_value;
+    }
+    target[target_length + 1] = 0;
 }
 
 bool str_contains(const char* text, const char* searchText) {
@@ -140,10 +156,7 @@ char* str_combine(const char* a, const char* b) {
 
 char* to_string(const uint64_t inputValue, const uint8_t basis) {
     if (inputValue == 0 || basis == 0 || basis == 1) {
-        char* emptyReturnString = malloc_str(2);
-        emptyReturnString[0] = '0';
-        emptyReturnString[1] = 0;
-        return emptyReturnString;
+        return malloc_empty_str();
     }
 
     uint64_t strLength = 0;
@@ -200,4 +213,15 @@ char* to_string(const int32_t inputValue) {
 
 char* to_string(const uint32_t inputValue) {
     return to_string((uint64_t)inputValue, 10);
+}
+
+
+void str_trim_end(char* Text, const uint64_t n) {
+    uint64_t text_length = str_length(Text);
+    if (n >= text_length) {
+        Text[0] = 0;
+        return;
+    }
+
+    Text[text_length - n] = 0;
 }

@@ -108,6 +108,12 @@ void print_char(const char c) {
     handle_automatic_newline();
 }
 
+void print_char(const char c, const bool interactable) {
+    draw_char(c, cursorAt_X, cursorAt_Y, Color::White, interactable);
+    cursorAt_X++;
+    handle_automatic_newline();
+}
+
 void print_chars(const char* text, const bool interactable) {
     const int s_len = str_length(text);
     for (int i = 0; i < s_len; i++) {

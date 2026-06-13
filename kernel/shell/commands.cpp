@@ -9,7 +9,7 @@
 #include "info_text.h"
 
 void cmd_help(const char*) {
-    for (int i = 0; commands[i].name != 0; i++) {
+    for (uint64_t i = 0; commands[i].name != 0; i++) {
         print_inline(commands[i].name);
         print_inline("; ");
     }
@@ -45,5 +45,7 @@ const Command commands[] = {
     { "sysinfo", cmd_sysinfo },
     { "reboot", cmd_reboot },
     { "meminfo", cmd_memory_info },
+    { "meminfo2", cmd_memory_info },
+    { "meminfo3", cmd_memory_info },
     { 0, 0 }
 };

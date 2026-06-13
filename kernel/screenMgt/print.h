@@ -28,7 +28,9 @@ void print_inline(const char* text);
 
 void print_chars(const char* text, const Color color);
 void print_chars(const char* text, const bool interactable);
+
 void print_char(const char c);
+void print_char(const char c, const bool interactable);
 
 void newline();
 

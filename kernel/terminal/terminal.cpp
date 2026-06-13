@@ -40,11 +40,11 @@ void printHeader() {
     printSeperator();
     printInfoLine(InfoTextType::Success, "Kernel Loaded");
     newline();
-    print("#####  #####  #####");
-    print("#      #         ##");
-    print("####   #####   ##  ");
-    print("#          #  ##   ");
-    print("#####  #####  #####");
+    print("   #####  #####  #####");
+    print("   ##     ##        ##");
+    print("   #####  #####   ##  ");
+    print("   ##        ##  ##   ");
+    print("   #####  #####  #####");
     newline();
     cmd_sysinfo();
     printSeperator();
@@ -72,15 +72,79 @@ void processLineInputBuffer() {
     add_command_to_history(lineInputBuffer);
 
     const char* args = getInputArgs(lineInputLength, lineInputBuffer);
-    if (!executeCommand(lineInputLength, lineInputBuffer, args)) {
+    if (executeCommand(lineInputLength, lineInputBuffer, args)) {
+        lineInputLength = 0;
+        lineInputBuffer[0] = 0;
+    } else {
         displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
-        return;
     }
 }
 
 void newTerminalInputLine() {
     const char* linePrefix = "esz >> ";
     print_inline(linePrefix);
+}
+
+void replaceCurrentToken(const char* oldToken, const char* newToken) {
+    const uint64_t oldTokenLength = str_length(oldToken);
+    for (uint64_t i = 0; i < oldTokenLength; i++) {
+        cursor_backspace();
+    }
+
+    lineInputLength -= oldTokenLength;
+    lineInputLength += str_length(newToken);
+
+    str_trim_end(lineInputBuffer, oldTokenLength);
+    str_add(lineInputBuffer, newToken);
+
+    print_chars(newToken, true);
+}
+
+void handleTabAutoCompletion() {
+    uint64_t maxCommandCounter = 0;
+    for (uint64_t i = 0; commands[i].name != 0; i++) {
+        maxCommandCounter++;
+    }
+
+    const char* lastToken = getLastTokenFromBuffer(lineInputLength, lineInputBuffer);
+    if (lastToken[0] == 0) return;
+
+    uint64_t validTabCannidates = 0;
+    Command cannidateList[maxCommandCounter];
+    
+    // match input to list
+    for (uint64_t i = 0; commands[i].name != 0; i++) {
+        if (str_starts_with(commands[i].name, lastToken)) {
+            cannidateList[validTabCannidates] = commands[i];
+            validTabCannidates++;
+        }
+    }
+
+    if (validTabCannidates == 0) return;
+
+    // == 1 -> autocomplete directly
+    if (validTabCannidates == 1) {
+        replaceCurrentToken(lastToken, cannidateList[0].name);
+        return;
+    };
+
+    // > 1 -> show possibilities in newline and refill the input in another newline
+    // more tabs -> rotate through
+    if (validTabCannidates > 1) {
+        newline();
+        for(uint64_t i = 0; i < validTabCannidates; i++) {
+            print_chars(cannidateList[i].name, false);
+            if (i != validTabCannidates - 1) print_chars(" | ", false);
+        }
+
+        newline();
+        newTerminalInputLine();
+        print_chars(lineInputBuffer, true);
+
+        //TODO rotation
+
+        return;
+    }
 }
 
 void terminal_on_key(const unsigned char scancode) {
@@ -127,11 +191,12 @@ void terminal_on_key(const unsigned char scancode) {
             lineInputBuffer[lineInputLength] = 0;
             break;
         case KeyCode::KEY_TAB:
+            if (lineInputLength == 0) break;
+            handleTabAutoCompletion();
             break;
         //TODO:
-        // - cmd + "+" / "-" to change font size (needs storing of lines first!)
-        // - Arrow key cursor movement right/left; up/down for prev/next command (also needs storage)
-        // - TAB to complete command/paths etc
+        // - Arrow key cursor movement right/left
+        // - TAB improvements
 
         default:
             char c = scancode_to_keycode(scancode);

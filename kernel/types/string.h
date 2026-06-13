@@ -28,6 +28,8 @@ char* to_string(const int64_t inputValue);
 char* to_string(const int32_t inputValue);
 char* to_string(const uint32_t inputValue);
 
+void str_trim_end(char* Text, const uint64_t n);
+
 struct String {
     char* data;
     
