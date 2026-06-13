@@ -1,25 +1,17 @@
-name: Build and Release ESZ-OS ISO
-
+name: Release ESZ-OS
 on:
   push:
     branches:
       - main
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - main
-
 env:
   LIMINE_VERSION: "12.3.3"
-
 permissions:
   contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6.0.3
@@ -47,26 +39,27 @@ jobs:
           make clean
           make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
 
-      - name: Attach ISO to Action Run (Artifact)
-        if: github.event_name != 'pull_request'
+      - name: Upload ISO Artifact
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: eszos-latest-iso
+          name: eszos-iso
           path: bin/eszos.iso
           if-no-files-found: error
           retention-days: 7
 
   publish:
     needs: build
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-
     steps:
       - name: Download ISO Artifact
         uses: actions/download-artifact@v8.0.1
         with:
-          name: eszos-latest-iso
+          name: eszos-iso
           path: bin/
+
+      - name: Rename ISO for Version Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: cp bin/eszos.iso "bin/eszos-${{ github.ref_name }}.iso"
 
       - name: Create Version Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -79,19 +72,23 @@ jobs:
             **Commit:** ${{ github.sha }}
           draft: false
           prerelease: false
-          files: bin/eszos.iso
+          files: bin/eszos-${{ github.ref_name }}.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rename ISO for Latest
+        run: cp bin/eszos.iso bin/eszos-latest.iso
 
       - name: Update 'latest' Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: latest
-          name: "ESZ-OS Continuous Build"
-          body: |            
+          name: "ESZ-OS Latest Build"
+          body: |
+            **Continuous build** — nicht unbedingt stabil
             **Commit:** ${{ github.sha }}
           draft: false
           prerelease: true
-          files: bin/eszos.iso
+          files: bin/eszos-latest.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
