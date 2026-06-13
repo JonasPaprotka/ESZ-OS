@@ -1,6 +1,6 @@
 # ESZ-OS
 
-v0.1.2
+v0.1.3
 
 A hobby x86_64 kernel written in C++ and Assembly
 
