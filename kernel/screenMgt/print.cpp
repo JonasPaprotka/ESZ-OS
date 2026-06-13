@@ -29,7 +29,7 @@ int MAX_LINES;
 bool useScreenBuffer;
 bool isRedrawing;
 
-void render_cursor(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable) {
+void render_cursor(const char c, const int printAt_X, const int printAt_Y, const Color color) {
     int renderY = printAt_Y;
     renderY -= (int) screenBufferPtr->startRenderLine;
         
@@ -58,7 +58,7 @@ void update_cursor_render() {
         screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].interactable
     );
 
-    render_cursor('_', cursorAt_X, cursorAt_Y, Color::White, false);
+    render_cursor('_', cursorAt_X, cursorAt_Y, Color::White);
     isRedrawing = false;
 
     cursorRendered_X = cursorAt_X;
@@ -90,31 +90,21 @@ void handle_automatic_newline() {
 
 void cursor_backspace() {
     if (!screenBufferPtr) return;
+    if (cursorAt_X == 0) return;
 
-    //TODO fix 0-1 bug and support newline backspace
     if (screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X - 1].interactable == false) return;
- 
-    if (cursorAt_X == 0) {
-        if (cursorAt_Y > 0) {
-            cursorAt_Y--;
-            cursorAt_X = MAX_CHARS - 1;
-        } else return;
-    } else cursorAt_X--;
 
+    cursorAt_X--;
     screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].text = 0;
     screenBufferPtr->lines[cursorAt_Y].amountOfCells--;
-
     clear_char(cursorAt_X, cursorAt_Y);
-    
     update_cursor_render();
 }
 
 void delete_unprotected_chars() {
-    const int length = screenBufferPtr->lines[cursorAt_Y].amountOfCells;
-
-    for (int i = 0; i < length; i++) {
+    while (cursorAt_X > 0 && screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X - 1].interactable) {
         cursor_backspace();
-    }    
+    }   
 }
 
 void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable) {

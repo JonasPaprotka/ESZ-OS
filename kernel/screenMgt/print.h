@@ -11,6 +11,9 @@ extern int ADJUSTED_WIDTH;
 extern int cursorAt_X;
 extern int cursorAt_Y;
 
+extern int cursorRendered_X;
+extern int cursorRendered_Y;
+
 extern int MAX_CHARS;
 extern int MAX_LINES;
 
