@@ -1,8 +1,6 @@
 name: Release ESZ-OS
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
 env:
@@ -58,11 +56,9 @@ jobs:
           path: bin/
 
       - name: Rename ISO for Version Release
-        if: startsWith(github.ref, 'refs/tags/')
         run: cp bin/eszos.iso "bin/eszos-${{ github.ref_name }}.iso"
 
       - name: Create Version Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
@@ -73,22 +69,5 @@ jobs:
           draft: false
           prerelease: false
           files: bin/eszos-${{ github.ref_name }}.iso
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Rename ISO for Latest
-        run: cp bin/eszos.iso bin/eszos-latest.iso
-
-      - name: Update 'latest' Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: latest
-          name: "ESZ-OS Latest Build"
-          body: |
-            **Continuous build**
-            **Commit:** ${{ github.sha }}
-          draft: false
-          prerelease: true
-          files: bin/eszos-latest.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
