@@ -19,7 +19,7 @@ bool str_contains(const char* text, const char* searchText);
 uint64_t str_count(const char* text, const char* searchText);
 bool str_starts_with(const char* text, const char* searchText);
 bool str_ends_with(const char* text, const char* searchText);
-//void str_replace(char* text, const char* toBeReplacedText, const char* replacementText);
+void str_replace(char* text, const char* searchText, const char* replacedBy);
 
 char* to_string(const uint64_t inputValue, const uint8_t basis);
 char* to_string(const int64_t inputValue, const uint8_t basis);
@@ -29,6 +29,8 @@ char* to_string(const int32_t inputValue);
 char* to_string(const uint32_t inputValue);
 
 void str_trim_end(char* Text, const uint64_t n);
+char* str_trim_start(const char* text, const uint64_t trimAmount);
+char* str_move_left(const char* text, const uint64_t moveAmount);
 
 struct String {
     char* data;

@@ -20,6 +20,8 @@ extern bool isRedrawing;
 void handle_scroll();
 
 // PRINT
+void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable);
+
 void print(const char* text, const Color color);
 void print(const char* text);
 

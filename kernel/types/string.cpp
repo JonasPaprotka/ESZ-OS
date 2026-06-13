@@ -64,7 +64,6 @@ void str_add(char* target, const char char_value) {
 bool str_contains(const char* text, const char* searchText) {
     const uint64_t searchText_len = str_length(searchText);
     const uint64_t text_len = str_length(text);
-
     if (searchText_len > text_len) return 0;
 
     char comparison[searchText_len + 1];
@@ -80,12 +79,11 @@ bool str_contains(const char* text, const char* searchText) {
 }
 
 uint64_t str_count(const char* text, const char* searchText) {
-    uint64_t counterHits = 0;
     const uint64_t searchText_len = str_length(searchText);
     const uint64_t text_len = str_length(text);
-
     if (searchText_len > text_len) return 0;
-
+    
+    uint64_t counterHits = 0;
     char comparison[searchText_len + 1];
 
     for (uint64_t i = 0; i <= text_len - searchText_len; i++) {
@@ -118,9 +116,55 @@ bool str_ends_with(const char* text, const char* searchText) {
     return true;
 }
 
-/* void str_replace(char* text, const char* toBeReplacedText, const char* replacementText) {
-    //TODO
-} */
+void str_replace(char* text, const char* searchText, const char* replacedBy) {
+    const uint64_t searchText_len = str_length(searchText);
+    const uint64_t text_len = str_length(text);
+    if (searchText_len > text_len) return;
+
+    uint64_t counter = 0;
+    char* findingsStartPtr[1024];
+    char comparison[searchText_len + 1];
+
+    for (uint64_t i = 0; i <= text_len - searchText_len; i++) {
+        for (uint64_t j = 0; j < searchText_len; j++) {
+            comparison[j] = text[i + j];
+        }
+        comparison[searchText_len] = 0;
+        if (str_equal(searchText, comparison)) {
+            findingsStartPtr[counter] = &text[i];
+            counter++;
+        }
+    }
+
+    if (counter == 0) return;
+
+    const uint64_t replacedBy_len = str_length(replacedBy);
+    const int64_t requiredPadding = searchText_len - replacedBy_len;
+
+    int64_t offset = 0;
+
+    for (uint64_t i = 0; i < counter; i++) {
+        char* ptr = findingsStartPtr[i] + offset;
+
+        if (requiredPadding == 0) { // same length
+            for (uint64_t j = 0; j < replacedBy_len; j++) {
+                ptr[j] = replacedBy[j];
+            }
+        } else { // trim start of tail - add back after
+            char* tail = str_trim_start(ptr, searchText_len);
+
+            for (uint64_t j = 0; j < replacedBy_len; j++) {
+                ptr[j] = replacedBy[j];
+            }
+            ptr[replacedBy_len] = 0;
+
+            str_add(ptr, tail);
+            free(tail);
+        }
+
+        offset += (int64_t)replacedBy_len - (int64_t)searchText_len;
+    }
+}
 
 char* str_repeat(const char* text, uint64_t amount) {
     const uint64_t text_len = str_length(text);
@@ -224,4 +268,28 @@ void str_trim_end(char* Text, const uint64_t n) {
     }
 
     Text[text_length - n] = 0;
+}
+
+char* str_trim_start(const char* text, const uint64_t trimAmount) {
+    const uint64_t text_len = str_length(text);
+
+    const uint64_t return_len = text_len - trimAmount + 1;
+    char* returnString = malloc_str(return_len);
+    for (uint64_t i = trimAmount; i < text_len; i++) {
+        returnString[i - trimAmount] = text[i];
+    }
+    return returnString;
+}
+
+char* str_move_left(const char* text, const uint64_t moveAmount) {
+    const uint64_t text_len = str_length(text);
+
+    char* ret = malloc_str(text_len + moveAmount + 1);
+
+    for (uint64_t i = 0; i < moveAmount; i++) {
+        str_add(ret, ' ');
+    }
+    str_add(ret, text);
+    
+    return ret;
 }

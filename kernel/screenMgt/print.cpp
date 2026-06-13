@@ -15,6 +15,9 @@
 int cursorAt_X;
 int cursorAt_Y;
 
+int cursorRendered_X;
+int cursorRendered_Y;
+
 int FONT_W;
 int FONT_H;
 
@@ -26,6 +29,41 @@ int MAX_LINES;
 bool useScreenBuffer;
 bool isRedrawing;
 
+void render_cursor(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable) {
+    int renderY = printAt_Y;
+    renderY -= (int) screenBufferPtr->startRenderLine;
+        
+    const int x = printAt_X * FONT_W;
+    const int y = renderY * FONT_H;
+
+    for (int row = 0; row < FONT_H; row++) {
+        uint8_t bits = font8x16[(unsigned char) c][row / FONT_SIZE];
+        
+        for (int col = 0; col < FONT_W; col++) {
+            boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
+        }
+    }
+}
+
+void update_cursor_render() {
+    if (!useScreenBuffer) return;
+    if (isRedrawing) return;
+
+    isRedrawing = true;
+    draw_char(
+        screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].text,
+        cursorRendered_X,
+        cursorRendered_Y,
+        screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].color,
+        screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].interactable
+    );
+
+    render_cursor('_', cursorAt_X, cursorAt_Y, Color::White, false);
+    isRedrawing = false;
+
+    cursorRendered_X = cursorAt_X;
+    cursorRendered_Y = cursorAt_Y;
+}
 
 void newline() {
     if (useScreenBuffer && !isRedrawing) {
@@ -67,6 +105,8 @@ void cursor_backspace() {
     screenBufferPtr->lines[cursorAt_Y].amountOfCells--;
 
     clear_char(cursorAt_X, cursorAt_Y);
+    
+    update_cursor_render();
 }
 
 void delete_unprotected_chars() {
@@ -105,12 +145,14 @@ void draw_char(const char c, const int printAt_X, const int printAt_Y, const Col
 void print_char(const char c) {
     draw_char(c, cursorAt_X, cursorAt_Y, Color::White, true);
     cursorAt_X++;
+    update_cursor_render();
     handle_automatic_newline();
 }
 
 void print_char(const char c, const bool interactable) {
     draw_char(c, cursorAt_X, cursorAt_Y, Color::White, interactable);
     cursorAt_X++;
+    update_cursor_render();
     handle_automatic_newline();
 }
 
@@ -119,6 +161,7 @@ void print_chars(const char* text, const bool interactable) {
     for (int i = 0; i < s_len; i++) {
         draw_char(text[i], cursorAt_X, cursorAt_Y, Color::White, interactable);
         cursorAt_X++;
+        update_cursor_render();
         handle_automatic_newline();
     }
 }
@@ -128,15 +171,9 @@ void print_chars(const char* text, const Color color) {
     for (int i = 0; i < s_len; i++) {
         draw_char(text[i], cursorAt_X, cursorAt_Y, color, false);
         cursorAt_X++;
+        update_cursor_render();
         handle_automatic_newline();
     }
-}
-
-void redraw_char(const char c, const Color color, const bool interactable) {
-    draw_char(' ', cursorAt_X, cursorAt_Y, color, interactable);
-    draw_char(c, cursorAt_X, cursorAt_Y, color, interactable);
-    cursorAt_X++;
-    handle_automatic_newline();
 }
 
 void redraw_line(const int line) {
@@ -219,6 +256,8 @@ void handle_scroll() {
         screenBufferPtr->startRenderLine++;
         redraw();
     }
+
+    update_cursor_render();
 }
 
 // INIT
