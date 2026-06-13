@@ -7,17 +7,18 @@
 #include "maps/keymap.h"
 #include "helper/info_text.h"
 #include "shell/commands.h"
+#include "args.h"
 
-int lineInputLength = 0;
+uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
 
 char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
-int cmdHistCount = 0;
-int goThroughHistoryCount = 0;
+uint64_t cmdHistCount = 0;
+uint64_t goThroughHistoryCount = 0;
 
 void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]) {
     if (cmdHistCount >= MAX_COMMAND_HISTORY) {
-        for (int i = 0; i < cmdHistCount - 1; i++) {
+        for (uint64_t i = 0; i < cmdHistCount - 1; i++) {
             str_copy(commandHistory[i], commandHistory[i + 1]);
         }
         commandHistory[cmdHistCount - 1][0] = 0;
@@ -49,6 +50,13 @@ void printHeader() {
     printSeperator();
 }
 
+void displayTerminalError(const char* Text) {
+    newline();
+    printInfoLine(InfoTextType::Error, Text);
+    lineInputLength = 0;
+    lineInputBuffer[0] = 0; // clear buffer
+}
+
 void processLineInputBuffer() {
     if (lineInputLength == 0) {
         newline();
@@ -57,38 +65,17 @@ void processLineInputBuffer() {
     }
 
     if (lineInputLength > TERMINAL_BUFFER_SIZE) {
-        lineInputLength = 0;
-        lineInputBuffer[0] = 0;
-        newline();
-        printInfoLine(InfoTextType::Error, String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
+        displayTerminalError(String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
         return;
     }
 
     add_command_to_history(lineInputBuffer);
 
-    const char* args = "";
-    for (int i = 0; i < lineInputLength; i++) {
-        if (lineInputBuffer[i] == ' ') {
-            lineInputBuffer[i] = 0;
-            args = &lineInputBuffer[i+1];
-            break;
-        }
+    const char* args = getInputArgs(lineInputLength, lineInputBuffer);
+    if (!executeCommand(lineInputLength, lineInputBuffer, args)) {
+        displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
+        return;
     }
-
-    for (int i = 0; commands[i].name != 0; i++) {
-        if (str_equal(lineInputBuffer, commands[i].name)) {
-            newline();
-            commands[i].execute(args);
-            lineInputLength = 0;
-            lineInputBuffer[0] = 0;
-            return;
-        }
-    } 
-
-    newline();
-    printInfoLine(InfoTextType::Error, String("Unknown Command: '", lineInputBuffer, "'"));
-    lineInputLength = 0;
-    lineInputBuffer[0] = 0; // clear buffer
 }
 
 void newTerminalInputLine() {
