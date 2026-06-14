@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v0.1.4
+
+- Stability Update
+    - Fixed known bugs
+        - Input buffer not accepting text after running a command
+        - Protected prompt chars could be overwritten
+        - History navigation leaving ghost characters on screen when cursor was mid-line
+        - Tab completion not working after running a command
+        - Stray character rendered at end of line after scrolling output
+        - Ghost cursor appearing one line above after scroll
+        - Arrow Down not fully clearing input when returning to empty line
+        - Tab completion only worked for last token
+    - Fixed other minor bugs
+
 ## v0.1.3
 
 - Improved Screenbuffer Performance

@@ -12,11 +12,18 @@
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
-unsigned int lineInputCursorPos = 0;
+unsigned int lineInputCursorPos;
+unsigned int lineInputStart_X;
 
 char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
 uint64_t cmdHistCount = 0;
 uint64_t goThroughHistoryCount = 0;
+
+void reset_line_input() {
+    lineInputLength = 0;
+    lineInputCursorPos = 0;
+    lineInputBuffer[0] = 0;
+}
 
 void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]) {
     if (cmdHistCount >= MAX_COMMAND_HISTORY) {
@@ -31,10 +38,32 @@ void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]) {
     cmdHistCount++;
 }
 
+void clear_input_on_screen() {
+    Line* line = get_screen_buffer_line(cursorAt_Y);
+
+    const int totalCells = (int) line->amountOfCells;
+    for (int i = lineInputStart_X; i < totalCells && i < MAX_CHARS; i++) {
+        Cell* cell = &line->cells[i];
+        cell->text = 0;
+        cell->interactable = false;
+        cell->color = Color::White;
+    }
+    line->amountOfCells = lineInputStart_X;
+
+    isRedrawing = true;
+    redraw_line(cursorAt_Y);
+    isRedrawing = false;
+
+    cursorAt_X = lineInputStart_X;
+    lineInputCursorPos = 0;
+    update_cursor_render();
+}
+
 void handle_show_history() {
-    delete_unprotected_chars();
+    clear_input_on_screen();
     str_copy(lineInputBuffer, commandHistory[cmdHistCount - goThroughHistoryCount]);
     lineInputLength = str_length(lineInputBuffer);
+    lineInputCursorPos = lineInputLength;
     print_chars(lineInputBuffer, true);
 }
 
@@ -55,14 +84,13 @@ void printHeader() {
 void displayTerminalError(const char* Text) {
     newline();
     printInfoLine(InfoTextType::Error, Text);
-    lineInputLength = 0;
-    lineInputBuffer[0] = 0; // clear buffer
+    reset_line_input();
 }
 
 void processLineInputBuffer() {
     if (lineInputLength == 0) {
         newline();
-        lineInputBuffer[0] = 0;
+        reset_line_input();
         return;
     }
 
@@ -75,8 +103,7 @@ void processLineInputBuffer() {
 
     const char* args = getInputArgs(lineInputLength, lineInputBuffer);
     if (executeCommand(lineInputBuffer, args)) {
-        lineInputLength = 0;
-        lineInputBuffer[0] = 0;
+        reset_line_input();
     } else {
         displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
     }
@@ -85,21 +112,18 @@ void processLineInputBuffer() {
 void newTerminalInputLine() {
     const char* linePrefix = "esz >> ";
     print_inline(linePrefix);
+    lineInputStart_X = cursorAt_X;
 }
 
 void replaceCurrentToken(const char* oldToken, const char* newToken) {
-    const uint64_t oldTokenLength = str_length(oldToken);
-    for (uint64_t i = 0; i < oldTokenLength; i++) {
-        cursor_backspace();
-    }
-
-    lineInputLength -= oldTokenLength;
-    lineInputLength += str_length(newToken);
-
-    str_trim_end(lineInputBuffer, oldTokenLength);
-    str_add(lineInputBuffer, newToken);
-
-    print_chars(newToken, true);
+    while (lineInputCursorPos < lineInputLength && lineInputBuffer[lineInputCursorPos] != ' ')
+        cursor_move_inline(true);
+    
+    for (uint64_t i = 0; i < str_length(oldToken); i++)
+        handle_input_buffer_deletion();
+    
+    for (uint64_t i = 0; i < str_length(newToken); i++)
+        insert_char_at_cursor(newToken[i]);
 }
 
 void handleTabAutoCompletion() {
@@ -110,27 +134,36 @@ void handleTabAutoCompletion() {
         maxCommandCounter++;
     }
 
-    const char* lastToken = getLastTokenFromBuffer(lineInputLength, lineInputBuffer);
-    if (lastToken[0] == 0) return;
+    const char* currentToken = getCurrTokenFromBuffer(lineInputCursorPos, lineInputLength, lineInputBuffer);
+    if (currentToken[0] == 0) {
+        free(currentToken);
+        return;
+    }
 
     uint64_t validTabCannidates = 0;
     Command cannidateList[maxCommandCounter];
     
     // match input to list
     for (uint64_t i = 0; commands[i].name != 0; i++) {
-        if (str_starts_with(commands[i].name, lastToken)) {
+        if (str_starts_with(commands[i].name, currentToken)) {
             cannidateList[validTabCannidates] = commands[i];
             validTabCannidates++;
         }
     }
 
-    if (validTabCannidates == 0) return;
+    if (validTabCannidates == 0) {
+        free(currentToken);
+        return;
+    }
 
     // == 1 -> autocomplete directly
     if (validTabCannidates == 1) {
-        replaceCurrentToken(lastToken, cannidateList[0].name);
+        replaceCurrentToken(currentToken, cannidateList[0].name);
+        free(currentToken);
         return;
     };
+    
+    free(currentToken);
 
     // > 1 -> show possibilities in newline and refill the input in another newline
     // more tabs -> rotate through
@@ -144,6 +177,7 @@ void handleTabAutoCompletion() {
         newline();
         newTerminalInputLine();
         print_chars(lineInputBuffer, true);
+        lineInputCursorPos = lineInputLength;
 
         //TODO rotation
 
@@ -169,14 +203,17 @@ void handle_input_buffer_deletion() {
     if (lineInputLength == 0) return;
     if (lineInputCursorPos == 0) return;
 
+    Line* line = get_screen_buffer_line(cursorAt_Y);
+    if (cursorAt_X <= 0) return;
+    if (!line->cells[cursorAt_X - 1].interactable) return;
+
     for (uint64_t i = lineInputCursorPos - 1; i < lineInputLength - 1; i++) {
         lineInputBuffer[i] = lineInputBuffer[i + 1];
     }
     lineInputLength--;
     lineInputBuffer[lineInputLength] = 0;
 
-    Line* line = get_screen_buffer_line(cursorAt_Y);
-    const unsigned int amountOfCells = (int)line->amountOfCells;
+    const int amountOfCells = (int) line->amountOfCells;
     for (int i = cursorAt_X - 1; i < amountOfCells - 1; i++) {
         line->cells[i] = line->cells[i + 1];
     }
@@ -188,20 +225,15 @@ void handle_input_buffer_deletion() {
     cursorAt_X--;
 
     const int savedX = cursorAt_X;
-
     isRedrawing = true;
     redraw_line(cursorAt_Y);
     isRedrawing = false;
-
     cursorAt_X = savedX;
     update_cursor_render();
 }
 
-void handle_input_buffer_insertion(const unsigned char scancode) {
-    const char c = scancode_to_keycode(scancode);
-    if (!c) return;
-
-    for (uint64_t i = lineInputLength; i > lineInputCursorPos; i--) {
+void insert_char_at_cursor(const char c) {
+ for (uint64_t i = lineInputLength; i > lineInputCursorPos; i--) {
         lineInputBuffer[i] = lineInputBuffer[i - 1];
     }
     lineInputBuffer[lineInputCursorPos] = c;
@@ -221,13 +253,17 @@ void handle_input_buffer_insertion(const unsigned char scancode) {
     cursorAt_X++;
 
     const int savedX = cursorAt_X;
-
     isRedrawing = true;
     redraw_line(cursorAt_Y);
     isRedrawing = false;
-    
     cursorAt_X = savedX;
     update_cursor_render();
+}
+
+void handle_input_buffer_insertion(const unsigned char scancode) {
+    const char c = scancode_to_keycode(scancode);
+    if (!c) return;
+    insert_char_at_cursor(c);
 }
 
 void terminal_on_key(const unsigned char scancode) {
@@ -250,9 +286,8 @@ void terminal_on_key(const unsigned char scancode) {
                 goThroughHistoryCount--;
 
                 if (goThroughHistoryCount == 0) {
-                    delete_unprotected_chars();
-                    lineInputBuffer[0] = 0;
-                    lineInputLength = 0;
+                    clear_input_on_screen();
+                    reset_line_input();
                 } else {
                     handle_show_history();
                 }
