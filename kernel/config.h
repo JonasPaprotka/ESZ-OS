@@ -11,6 +11,7 @@
 // ---------------------------
 
 #define CURSOR_HEIGHT 2
+#define CURSOR_BLINK_INTERVAL 400 // in ms
 
 #define OS_VERSION_MAJOR 0
 #define OS_VERSION_MINOR 1

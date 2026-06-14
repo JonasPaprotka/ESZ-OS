@@ -19,3 +19,4 @@
 - str_ends_with is completely broken
 - str_replace hardcoded stack array of 1024 max findings
 - Multiline Terminal Commands are very broken
+- After scrolling - fake chars can appear on cursor

@@ -2,7 +2,8 @@
 
 ## v0.1.5
 
-- 
+- Cursor now blinks
+    - Tick interval configureable as CURSOR_BLINK_INTERVAL (default 0,4sec)
 
 ## v0.1.4
 

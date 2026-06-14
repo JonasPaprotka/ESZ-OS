@@ -11,6 +11,8 @@ extern int ADJUSTED_WIDTH;
 extern int cursorAt_X;
 extern int cursorAt_Y;
 
+extern bool cursor_visible;
+
 extern int cursorRendered_X;
 extern int cursorRendered_Y;
 
