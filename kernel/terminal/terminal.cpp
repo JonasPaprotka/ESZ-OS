@@ -12,6 +12,7 @@
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
+unsigned int lineInputCursorPos = 0;
 
 char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
 uint64_t cmdHistCount = 0;
@@ -152,12 +153,14 @@ void handleTabAutoCompletion() {
 
 void cursor_move_inline(const bool move_right) {
     if (move_right) {
-        if (!is_next_char_editable()) return;
+        if (lineInputCursorPos >= lineInputLength) return;
         cursorAt_X++;
+        lineInputCursorPos++;
         update_cursor_render();
     } else {
-        if (!is_prev_char_editable()) return;
+        if (lineInputCursorPos == 0) return;
         cursorAt_X--;
+        lineInputCursorPos--;
         update_cursor_render();
     }
 }
@@ -166,7 +169,8 @@ void handle_input_buffer_deletion() {
     if (lineInputLength == 0) return;
 
     cursor_backspace();
-    lineInputLength++;
+    lineInputLength--;
+    lineInputCursorPos--;
     lineInputBuffer[lineInputLength] = 0;
 }
 
@@ -175,8 +179,9 @@ void handle_input_buffer_insertion(const unsigned char scancode) {
     if (!c) return;
     print_char(c);
 
-    lineInputBuffer[lineInputLength] = c;
-    ++lineInputLength;
+    lineInputBuffer[lineInputCursorPos] = c;
+    lineInputLength++;
+    lineInputCursorPos++;
     lineInputBuffer[lineInputLength] = 0;
 }
 
