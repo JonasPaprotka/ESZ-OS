@@ -281,7 +281,7 @@ char* str_trim_start(const char* text, const uint64_t trimAmount) {
     return returnString;
 }
 
-char* str_move_left(const char* text, const uint64_t moveAmount) {
+char* str_move_right(const char* text, const uint64_t moveAmount) {
     const uint64_t text_len = str_length(text);
 
     char* ret = malloc_str(text_len + moveAmount + 1);

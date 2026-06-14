@@ -10,6 +10,8 @@
 //#define KEYBOARD_LAYOUT_DE
 // ---------------------------
 
+#define CURSOR_HEIGHT 2
+
 #define OS_VERSION_MAJOR 0
 #define OS_VERSION_MINOR 1
 #define OS_VERSION_PATCH 3

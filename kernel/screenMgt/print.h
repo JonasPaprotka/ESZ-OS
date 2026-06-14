@@ -21,6 +21,7 @@ extern bool useScreenBuffer;
 extern bool isRedrawing;
 
 void handle_scroll();
+void update_cursor_render();
 
 // PRINT
 void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable);
@@ -41,6 +42,8 @@ void newline();
 
 void delete_unprotected_chars();
 void cursor_backspace();
+
+void redraw_line(const int line);
 
 void init_print();
 

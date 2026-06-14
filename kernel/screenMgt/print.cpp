@@ -29,18 +29,13 @@ int MAX_LINES;
 bool useScreenBuffer;
 bool isRedrawing;
 
-void render_cursor(const char c, const int printAt_X, const int printAt_Y, const Color color) {
-    int renderY = printAt_Y;
-    renderY -= (int) screenBufferPtr->startRenderLine;
-        
+void render_cursor(const int printAt_X, const int printAt_Y, const Color color) {
     const int x = printAt_X * FONT_W;
-    const int y = renderY * FONT_H;
+    const int y = (printAt_Y - (int) screenBufferPtr->startRenderLine) * FONT_H;
 
-    for (int row = 0; row < FONT_H; row++) {
-        uint8_t bits = font8x16[(unsigned char) c][row / FONT_SIZE];
-        
+    for (int row = FONT_H - CURSOR_HEIGHT * FONT_SIZE; row < FONT_H; row++) {
         for (int col = 0; col < FONT_W; col++) {
-            boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
+            boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (uint32_t) color;
         }
     }
 }
@@ -49,16 +44,18 @@ void update_cursor_render() {
     if (!useScreenBuffer) return;
     if (isRedrawing) return;
 
+    Cell* cell = get_screen_buffer_cell(cursorRendered_Y, cursorRendered_X);
+
     isRedrawing = true;
     draw_char(
-        screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].text,
+        cell->text,
         cursorRendered_X,
         cursorRendered_Y,
-        screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].color,
-        screenBufferPtr->lines[cursorRendered_Y].cells[cursorRendered_X].interactable
+        cell->color,
+        cell->interactable
     );
 
-    render_cursor('_', cursorAt_X, cursorAt_Y, Color::White);
+    render_cursor(cursorAt_X, cursorAt_Y, Color::White);
     isRedrawing = false;
 
     cursorRendered_X = cursorAt_X;
@@ -92,28 +89,33 @@ void cursor_backspace() {
     if (!screenBufferPtr) return;
     if (cursorAt_X == 0) return;
 
-    if (screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X - 1].interactable == false) return;
+    Line* line = get_screen_buffer_line(cursorAt_Y);
+    if (line->cells[cursorAt_X - 1].interactable == false) return;
+
 
     cursorAt_X--;
-    screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].text = 0;
-    screenBufferPtr->lines[cursorAt_Y].amountOfCells--;
+    line->cells[cursorAt_X].text = 0;
+    line->amountOfCells--;
     clear_char(cursorAt_X, cursorAt_Y);
     update_cursor_render();
 }
 
 void delete_unprotected_chars() {
-    while (cursorAt_X > 0 && screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X - 1].interactable) {
+    while (cursorAt_X > 0 && get_screen_buffer_cell(cursorAt_Y, cursorAt_X - 1)->interactable) {
         cursor_backspace();
-    }   
+    }
 }
 
 void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable) {
     if (useScreenBuffer && !isRedrawing) {
-        screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].text = c;
-        screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].color = color;
-        screenBufferPtr->lines[cursorAt_Y].cells[cursorAt_X].interactable = interactable;
+        Line* line = get_screen_buffer_line(cursorAt_Y);
+        Cell* cell = get_screen_buffer_cell(line, cursorAt_X);
+        
+        cell->text = c;
+        cell->color = color;
+        cell->interactable = interactable;
 
-        screenBufferPtr->lines[cursorAt_Y].amountOfCells++;
+        line->amountOfCells++;
     }
 
     int renderY = printAt_Y;
@@ -224,14 +226,19 @@ void handle_scroll() {
     const int maxLines = screenBufferPtr->maxStoredLines;
     if (cursorAt_Y >= maxLines) {
         for (int line = 0; line < maxLines - 1; line++) {
-            const int nextLine = line + 1;
-            const int cellAmount = screenBufferPtr->lines[nextLine].amountOfCells;
-            screenBufferPtr->lines[line].amountOfCells = cellAmount;
+            Line* curr_buff_line = get_screen_buffer_line(line);
+            Line* next_buff_line = get_screen_buffer_line(line + 1);
+
+            const int cellAmount = next_buff_line->amountOfCells;
+            curr_buff_line->amountOfCells = cellAmount;
             
             for (int cell = 0; cell < cellAmount; cell++) {
-                screenBufferPtr->lines[line].cells[cell].text = screenBufferPtr->lines[nextLine].cells[cell].text;
-                screenBufferPtr->lines[line].cells[cell].color = screenBufferPtr->lines[nextLine].cells[cell].color;
-                screenBufferPtr->lines[line].cells[cell].interactable = screenBufferPtr->lines[nextLine].cells[cell].interactable;
+                Cell* curr_buff_cell = get_screen_buffer_cell(curr_buff_line, cell);
+                Cell* next_line_buff_cell = get_screen_buffer_cell(next_buff_line, cell);
+
+                curr_buff_cell->text = next_line_buff_cell->text;
+                curr_buff_cell->color = next_line_buff_cell->color;
+                curr_buff_cell->interactable = next_line_buff_cell->interactable;
             }
         }
 

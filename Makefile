@@ -22,6 +22,8 @@ CXXFLAGS := \
     -fno-pie -fno-pic \
     -fno-exceptions -fno-rtti \
     -Wall -Wextra \
+	-pipe \
+	-O2 \
     $(INC_FLAGS)
 
 ASMFLAGS := -f elf64

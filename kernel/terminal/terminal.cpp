@@ -8,6 +8,7 @@
 #include "info_text.h"
 #include "commands.h"
 #include "args.h"
+#include "screenBuffer.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
@@ -101,6 +102,8 @@ void replaceCurrentToken(const char* oldToken, const char* newToken) {
 }
 
 void handleTabAutoCompletion() {
+    if (lineInputLength == 0) return;
+
     uint64_t maxCommandCounter = 0;
     for (uint64_t i = 0; commands[i].name != 0; i++) {
         maxCommandCounter++;
@@ -147,6 +150,36 @@ void handleTabAutoCompletion() {
     }
 }
 
+void cursor_move_inline(const bool move_right) {
+    if (move_right) {
+        if (!is_next_char_editable()) return;
+        cursorAt_X++;
+        update_cursor_render();
+    } else {
+        if (!is_prev_char_editable()) return;
+        cursorAt_X--;
+        update_cursor_render();
+    }
+}
+
+void handle_input_buffer_deletion() {
+    if (lineInputLength == 0) return;
+
+    cursor_backspace();
+    lineInputLength++;
+    lineInputBuffer[lineInputLength] = 0;
+}
+
+void handle_input_buffer_insertion(const unsigned char scancode) {
+    const char c = scancode_to_keycode(scancode);
+    if (!c) return;
+    print_char(c);
+
+    lineInputBuffer[lineInputLength] = c;
+    ++lineInputLength;
+    lineInputBuffer[lineInputLength] = 0;
+}
+
 void terminal_on_key(const unsigned char scancode) {
     uint16_t key = scancode_to_keycode(scancode);
     
@@ -157,12 +190,11 @@ void terminal_on_key(const unsigned char scancode) {
                 
                 if (goThroughHistoryCount < cmdHistCount) {
                     goThroughHistoryCount++;   
-                } else {
-                    break;
-                }
+                } else break;
                 
                 handle_show_history();
                 break;
+
             case 0x50: // ARROW DOWN
                 if (goThroughHistoryCount == 0) break;
                 goThroughHistoryCount--;
@@ -175,9 +207,13 @@ void terminal_on_key(const unsigned char scancode) {
                     handle_show_history();
                 }
                 break;
+
             case 0x4B: // ARROW LEFT
+                cursor_move_inline(false);
                 break;
+
             case 0x4D: // ARROW RIGHT
+                cursor_move_inline(true);
                 break;
         }
 
@@ -191,28 +227,17 @@ void terminal_on_key(const unsigned char scancode) {
             processLineInputBuffer();
             newTerminalInputLine();
             break;
+
         case KeyCode::KEY_BACKSPACE:
-            if (lineInputLength == 0) break;
-            cursor_backspace();
-            --lineInputLength;
-            lineInputBuffer[lineInputLength] = 0;
+            handle_input_buffer_deletion();
             break;
+
         case KeyCode::KEY_TAB:
-            if (lineInputLength == 0) break;
             handleTabAutoCompletion();
             break;
-        //TODO:
-        // - Arrow key cursor movement right/left
-        // - TAB improvements
 
         default:
-            char c = scancode_to_keycode(scancode);
-            if (!c) return;
-            print_char(c);
-
-            lineInputBuffer[lineInputLength] = c;
-            ++lineInputLength;
-            lineInputBuffer[lineInputLength] = 0; // null-terminate
+            handle_input_buffer_insertion(scancode);
             break;
     }
 }

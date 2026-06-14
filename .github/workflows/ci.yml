@@ -1,36 +1,18 @@
-name: CI - Build Check
+name: CI
+
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - main
-env:
-  LIMINE_VERSION: "12.3.3"
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6.0.3
-
-      - name: Install Build Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y nasm xorriso mtools gcc-x86-64-linux-gnu g++-x86-64-linux-gnu curl tar make
-
-      - name: Download and Setup Limine Bootloader
-        run: |
-          mkdir -p limine
-          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v${{ env.LIMINE_VERSION }}/limine-binary.tar.xz
-          tar -xf limine.tar.xz -C limine --strip-components=1
-          rm limine.tar.xz
-          make -C limine
-
-      - name: Fetch Limine Header Protocol
-        run: |
-          mkdir -p kernel/types
-          curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
-
-      - name: Compile OS and Generate ISO
-        run: |
-          make clean
-          make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
+    uses: ./.github/workflows/build.yml
