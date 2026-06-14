@@ -19,6 +19,8 @@ int cursorAt_Y;
 int cursorRendered_X;
 int cursorRendered_Y;
 
+bool cursor_visible = false;
+
 int FONT_W;
 int FONT_H;
 
@@ -56,7 +58,7 @@ void update_cursor_render() {
         cell->interactable
     );
 
-    render_cursor(cursorAt_X, cursorAt_Y, Color::White);
+    if (cursor_visible) render_cursor(cursorAt_X, cursorAt_Y, Color::White);
     isRedrawing = false;
 
     cursorRendered_X = cursorAt_X;

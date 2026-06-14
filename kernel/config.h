@@ -11,10 +11,11 @@
 // ---------------------------
 
 #define CURSOR_HEIGHT 2
+#define CURSOR_BLINK_INTERVAL 400 // in ms
 
 #define OS_VERSION_MAJOR 0
 #define OS_VERSION_MINOR 1
-#define OS_VERSION_PATCH 4
+#define OS_VERSION_PATCH 5
 
 #define TERMINAL_BUFFER_SIZE 256
 #define MAX_COMMAND_HISTORY 100
