@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.1.4
+
+- Stability Update
+    - Fixed known bugs
+        - ...
+
 ## v0.1.3
 
 - Improved Screenbuffer Performance
