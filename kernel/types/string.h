@@ -30,7 +30,7 @@ char* to_string(const uint32_t inputValue);
 
 void str_trim_end(char* Text, const uint64_t n);
 char* str_trim_start(const char* text, const uint64_t trimAmount);
-char* str_move_left(const char* text, const uint64_t moveAmount);
+char* str_move_right(const char* text, const uint64_t moveAmount);
 
 struct String {
     char* data;

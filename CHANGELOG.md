@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v0.1.3
+
+- Improved Screenbuffer Performance
+- Allow Cursor movement with Arrow Right/Left keys
+- Fixed and improved Cursor rendering - added CURSOR_HEIGHT config
+- C++ Compiler Flags
+    - O2 optimisation instead with O0
+    - faster compile times due to pipe flag
+- GitHub
+    - Added Dependabot
+        - daily interval
+    - Reworked GitHub Actions
+
 ## v0.1.2
 
 - Stability Update

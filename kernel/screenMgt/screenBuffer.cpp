@@ -6,6 +6,18 @@
 
 ScreenBuffer* screenBufferPtr;
 
+Line* get_screen_buffer_line(const int y) {
+    return &screenBufferPtr->lines[y];
+}
+
+Cell* get_screen_buffer_cell(const int y, const int x) {
+    return &screenBufferPtr->lines[y].cells[x];
+}
+
+Cell* get_screen_buffer_cell(const Line* line, const int x) {
+    return &line->cells[x];
+}
+
 void init_empty_screen_buffer() {
     const unsigned int storedRenderLineHistory = SCROLL_HISTORY_LINES;
 

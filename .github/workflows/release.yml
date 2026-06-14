@@ -1,73 +1,51 @@
-name: Release ESZ-OS
+name: Release
+
 on:
   push:
     tags:
       - 'v*'
-env:
-  LIMINE_VERSION: "12.3.3"
+
 permissions:
   contents: write
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6.0.3
-
-      - name: Install Build Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y nasm xorriso mtools gcc-x86-64-linux-gnu g++-x86-64-linux-gnu curl tar make
-
-      - name: Download and Setup Limine Bootloader
-        run: |
-          mkdir -p limine
-          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v${{ env.LIMINE_VERSION }}/limine-binary.tar.xz
-          tar -xf limine.tar.xz -C limine --strip-components=1
-          rm limine.tar.xz
-          make -C limine
-
-      - name: Fetch Limine Header Protocol
-        run: |
-          mkdir -p kernel/types
-          curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
-
-      - name: Compile OS and Generate ISO
-        run: |
-          make clean
-          make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
-
-      - name: Upload ISO Artifact
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: eszos-iso
-          path: bin/eszos.iso
-          if-no-files-found: error
-          retention-days: 7
+    uses: ./.github/workflows/build.yml
 
   publish:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download ISO Artifact
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Extract Changelog Section
+        id: changelog
+        run: |
+          VERSION="${{ github.ref_name }}"
+          NOTES=$(sed -n "/^## ${VERSION}$/,/^## /{/^## /d;p}" CHANGELOG.md)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Download ISO
         uses: actions/download-artifact@v8.0.1
         with:
           name: eszos-iso
           path: bin/
 
-      - name: Rename ISO for Version Release
-        run: cp bin/eszos.iso "bin/eszos-${{ github.ref_name }}.iso"
+      - name: Rename ISO
+        run: mv bin/eszos.iso "bin/eszos-${{ github.ref_name }}.iso"
 
-      - name: Create Version Release
+      - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ github.ref_name }}
           name: ESZ-OS ${{ github.ref_name }}
           body: |
-            **Official Release:** ${{ github.ref_name }}
-            **Commit:** ${{ github.sha }}
-          draft: false
-          prerelease: false
+            ${{ steps.changelog.outputs.notes }}
+
+            ---
+            [CHANGELOG.md](https://github.com/JonasPaprotka/ESZ-OS/blob/${{ github.sha }}/CHANGELOG.md)
           files: bin/eszos-${{ github.ref_name }}.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

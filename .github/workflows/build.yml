@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Cache Limine
+        uses: actions/cache@v4
+        with:
+          path: limine
+          key: limine-${{ vars.LIMINE_VERSION }}
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm xorriso mtools \
+            gcc-x86-64-linux-gnu g++-x86-64-linux-gnu \
+            curl tar make
+
+      - name: Setup Limine
+        run: |
+          mkdir -p limine
+          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v${{ vars.LIMINE_VERSION }}/limine-binary.tar.xz
+          tar -xf limine.tar.xz -C limine --strip-components=1
+          rm limine.tar.xz
+          make -C limine
+
+      - name: Fetch Limine Header
+        run: |
+          mkdir -p kernel/types
+          curl -L -o kernel/types/limine.h \
+            https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+
+      - name: Build
+        run: |
+          make clean
+          make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: eszos-iso
+          path: bin/eszos.iso
+          if-no-files-found: error
+          retention-days: 7

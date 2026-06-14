@@ -3,9 +3,6 @@
 
 #include "color.h"
 
-void init_screen_buffer();
-void init_empty_screen_buffer();
-
 struct Cell {
     Color color;
     char text;
@@ -26,5 +23,12 @@ struct ScreenBuffer {
 } __attribute__((packed));
 
 extern ScreenBuffer* screenBufferPtr;
+
+Line* get_screen_buffer_line(const int y);
+Cell* get_screen_buffer_cell(const int y, const int x);
+Cell* get_screen_buffer_cell(const Line* line, const int x);
+
+void init_screen_buffer();
+void init_empty_screen_buffer();
 
 #endif
