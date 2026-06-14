@@ -11,6 +11,7 @@
 #include "clear.h"
 #include "screenBuffer.h"
 #include "math.h"
+#include "terminal.h"
 
 int cursorAt_X;
 int cursorAt_Y;
@@ -87,13 +88,14 @@ void handle_automatic_newline() {
 
 void cursor_backspace() {
     if (!screenBufferPtr) return;
-    if (cursorAt_X == 0) return;
+    if (cursorAt_X == lineInputStart_X) return;
 
     Line* line = get_screen_buffer_line(cursorAt_Y);
     if (line->cells[cursorAt_X - 1].interactable == false) return;
 
-
     cursorAt_X--;
+    lineInputCursorPos--;
+
     line->cells[cursorAt_X].text = 0;
     line->amountOfCells--;
     clear_char(cursorAt_X, cursorAt_Y);
@@ -199,6 +201,9 @@ void redraw() {
     cursorAt_X = savedX;
     cursorAt_Y = savedY;
     isRedrawing = false;
+
+    cursorRendered_X = cursorAt_X;
+    cursorRendered_Y = cursorAt_Y;
 }
 
 void print_inline(const char* text, const Color color) {

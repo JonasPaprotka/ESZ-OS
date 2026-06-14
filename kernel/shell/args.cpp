@@ -3,18 +3,26 @@
 #include "info_text.h"
 #include "commands.h"
 
-const char* getLastTokenFromBuffer(const uint64_t inputLength, const char inputBuffer[TERMINAL_BUFFER_SIZE]) {
-    uint64_t lastSpaceAt = 0;
+const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64_t inputBufferLength, const char inputBuffer[TERMINAL_BUFFER_SIZE]) {
+    uint64_t tokenStartsAt = 0;
 
-    for (uint64_t i = 0; i < inputLength; i++) {
-        if (inputBuffer[i] == ' ') lastSpaceAt = i;
+    for (uint64_t i = inputBufferCursorAt_X; i > 0; i--) {
+        if (inputBuffer[i] == ' ') {
+            tokenStartsAt = i;
+            break;
+        }
     }
 
-    if (lastSpaceAt != 0) {
-        return &inputBuffer[lastSpaceAt + 1];
+    // when space found -> starts at next char
+    if (tokenStartsAt != 0) tokenStartsAt++;
+
+    char* retToken = malloc_str(inputBufferLength + 1);
+    for (uint64_t i = tokenStartsAt; i < inputBufferLength; i++) {
+        if (inputBuffer[i] == ' ') return retToken;
+        str_add(retToken, inputBuffer[i]);
     }
 
-    return &inputBuffer[0];
+    return retToken;
 }
 
 const char* getInputArgs(const uint64_t inputLength, char inputBuffer[TERMINAL_BUFFER_SIZE]) {

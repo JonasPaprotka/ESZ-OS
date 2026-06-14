@@ -5,6 +5,7 @@
 #include "memory.h"
 
 char* malloc_str(const uint64_t size);
+char* malloc_empty_str();
 
 uint64_t str_length(const char* str);
 char* str_repeat(const char* text, uint64_t amount);
@@ -12,7 +13,10 @@ char* str_repeat(const char* text, uint64_t amount);
 bool str_equal(const char* a, const char* b);
 
 void str_copy(char* dest, const char* src);
+
 void str_add(char* target, const char* value);
+void str_add(char* target, const char char_value);
+
 char* str_combine(const char* a, const char* b);
 
 bool str_contains(const char* text, const char* searchText);
