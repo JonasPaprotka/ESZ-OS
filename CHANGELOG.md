@@ -8,7 +8,6 @@
 - C++ Compiler Flags
     - O2 optimisation instead with O0
     - faster compile times due to pipe flag
-
 - GitHub
     - Added Dependabot
         - daily interval

@@ -18,3 +18,6 @@
 # Known Bugs
 - str_ends_with is completely broken
 - str_replace hardcoded stack array of 1024 max findings
+- Tab Completion
+    - keyword to complete alwas at end not at current cursor
+    - completing a command replaces word at cursor position not at word position
