@@ -4,6 +4,7 @@
 
 - Fixes
     - Fixed a typo in config.h ARCH_NAME value
+    - Fixed Tab completion not working when cursor was on space char after a token
 
 ## v0.1.5
 
