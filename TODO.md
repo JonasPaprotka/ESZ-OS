@@ -1,10 +1,8 @@
 # TODO
 - Dynamic Heap Page allocation
 - UX
-    - arrow key cursor movement (left/right)
     - tab command completion for n>1 matches
     - consider: padding for text rendering
-- Blinking cursor
 - APIC
 - ACIP
 - Fix known bugs
@@ -14,6 +12,9 @@
 - Networking
     - translate linux drivers for the quemu intel network card
 - Unit Tests für lib and core functions
+- USB Drivers
+    - 1.X
+    - 3.X
 
 # Known Bugs
 - str_ends_with is completely broken

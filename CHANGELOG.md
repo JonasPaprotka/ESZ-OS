@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.1.6
+
+- Fixes
+    - Fixed a typo in config.h ARCH_NAME value
+
 ## v0.1.5
 
 - Cursor now blinks
