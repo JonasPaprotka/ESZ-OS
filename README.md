@@ -18,20 +18,19 @@ A hobby x86_64 kernel written in C++ and Assembly
 
 ```zsh
 brew install x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
+mkdir limine
 curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.3.3/limine-binary.tar.xz
+curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine
-```
-
-get limine.h
-```zsh
-curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+make clean && make
 ```
 
 # Update
 
 ```zsh
+brew upgrade x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
 rm -rf limine
 mkdir -p limine
 curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.3.3/limine-binary.tar.xz
