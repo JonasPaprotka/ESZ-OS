@@ -1,14 +1,15 @@
 # TODO
-- Dynamic Heap Page allocation
+- Fix known bugs
 - UX
     - tab command completion for n>1 matches
     - consider: padding for text rendering
-- APIC
-- ACIP
-- Fix known bugs
+- Dynamic Heap Page allocation
+- Refactoring & Code cleanup/improvements
 
 # Future
 - Filesystem FAT16, later FAT32
+- APIC
+- ACIP
 - Networking
     - translate linux drivers for the quemu intel network card
 - Unit Tests für lib and core functions

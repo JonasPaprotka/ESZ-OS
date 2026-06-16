@@ -4,9 +4,9 @@
 #include "commands.h"
 
 const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64_t inputBufferLength, const char inputBuffer[TERMINAL_BUFFER_SIZE]) {
-    uint64_t tokenStartsAt = 0;
+    int tokenStartsAt = 0;
 
-    for (uint64_t i = inputBufferCursorAt_X; i > 0; i--) {
+    for (int i = inputBufferCursorAt_X; i > 0; i--) {
         if (inputBuffer[i] == ' ' and i != inputBufferCursorAt_X) {
             tokenStartsAt = i;
             break;
