@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## v0.1.6
+
+- Fixes
+    - Fixed a typo in config.h ARCH_NAME value
+    - Fixed tab completion not working when cursor was on space char after a token
+    - Uptime command days counter resets after every 7th day
+- Developer Infos
+    - Added new char library
+        - bool is_digit(const char c);
+        - bool is_alpha(const char c);
+        - bool is_upper_alpha(const char c);
+        - bool is_lower_alpha(const char c);
+        - bool is_whitespace(const char c);
+        - char to_upper(const char c);
+        - char to_lower(const char c);
+    - Improved string library
+        - char* str_trim_start(const char* text);
+        - char* str_trim_end(const char* text);
+        - char* str_trim(const char* text);
+        - char* str_to_upper(const char* text);
+        - char* str_to_lower(const char* text);
+    - Improved math library
+        - uint64_t abs(const int64_t n);
+        - int64_t clamp(const int64_t n, const int64_t min, const int64_t max);
+        - bool is_power_of_two(const int64_t n);
+    - Sorted files in Types folder in subfolders
+    - Fixed compiler warninigs
+
 ## v0.1.5
 
 - Cursor now blinks

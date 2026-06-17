@@ -3,7 +3,7 @@
 
 #define OS_NAME "ESZ-OS"
 #define OS_AUTHOR "Jonas Paprotka"
-#define ARCH_NAME "x84_64"
+#define ARCH_NAME "x86_64"
 
 // --- ONLY COMMENT IN ONE ---
 #define KEYBOARD_LAYOUT_US
@@ -15,7 +15,7 @@
 
 #define OS_VERSION_MAJOR 0
 #define OS_VERSION_MINOR 1
-#define OS_VERSION_PATCH 5
+#define OS_VERSION_PATCH 6
 
 #define TERMINAL_BUFFER_SIZE 256
 #define MAX_COMMAND_HISTORY 100

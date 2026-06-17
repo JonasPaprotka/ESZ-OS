@@ -18,7 +18,7 @@ void cmd_get_uptime(const char*) {
     const uint64_t days = hour / 24;
 
     print(String(
-        days % 7, "d, ",
+        days, "d, ",
         hour % 24, "h, ",
         min % 60, "m, ",
         sec % 60, "s, ",

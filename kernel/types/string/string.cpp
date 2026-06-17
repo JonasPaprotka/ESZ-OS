@@ -1,6 +1,7 @@
 #include "string.h"
 #include "memory.h"
 #include <stdint.h>
+#include "char.h"
 
 char* malloc_str(const uint64_t size) {
     char* string = (char*) malloc(size);
@@ -151,7 +152,7 @@ void str_replace(char* text, const char* searchText, const char* replacedBy) {
                 ptr[j] = replacedBy[j];
             }
         } else { // trim start of tail - add back after
-            char* tail = str_trim_start(ptr, searchText_len);
+            char* tail = str_cut_start(ptr, searchText_len);
 
             for (uint64_t j = 0; j < replacedBy_len; j++) {
                 ptr[j] = replacedBy[j];
@@ -260,7 +261,7 @@ char* to_string(const uint32_t inputValue) {
 }
 
 
-void str_trim_end(char* Text, const uint64_t n) {
+void str_cut_end(char* Text, const uint64_t n) {
     uint64_t text_length = str_length(Text);
     if (n >= text_length) {
         Text[0] = 0;
@@ -270,13 +271,13 @@ void str_trim_end(char* Text, const uint64_t n) {
     Text[text_length - n] = 0;
 }
 
-char* str_trim_start(const char* text, const uint64_t trimAmount) {
+char* str_cut_start(const char* text, const uint64_t n) {
     const uint64_t text_len = str_length(text);
 
-    const uint64_t return_len = text_len - trimAmount + 1;
+    const uint64_t return_len = text_len - n + 1;
     char* returnString = malloc_str(return_len);
-    for (uint64_t i = trimAmount; i < text_len; i++) {
-        returnString[i - trimAmount] = text[i];
+    for (uint64_t i = n; i < text_len; i++) {
+        returnString[i - n] = text[i];
     }
     return returnString;
 }
@@ -287,9 +288,87 @@ char* str_move_right(const char* text, const uint64_t moveAmount) {
     char* ret = malloc_str(text_len + moveAmount + 1);
 
     for (uint64_t i = 0; i < moveAmount; i++) {
-        str_add(ret, ' ');
+        ret[i] = ' ';
     }
     str_add(ret, text);
     
     return ret;
+}
+
+char* str_trim_start(const char* text) {
+    const uint64_t text_len = str_length(text);
+    char* returnString = malloc_str(text_len + 1);
+    bool spottedChars = false;
+    uint64_t newLength = 0;
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        if (is_whitespace(text[i]) && !spottedChars) {
+            continue;
+        } else spottedChars = true;
+
+        returnString[newLength] = text[i];
+        newLength++;
+    }
+
+    return returnString;
+}
+
+char* str_trim_end(const char* text) {
+    const uint64_t text_len = str_length(text);
+    char* returnString = malloc_str(text_len + 1);
+    str_copy(returnString, text);
+
+    for (int64_t i = text_len - 1; i >= 0; i--) {
+        if (is_whitespace(returnString[i])) {
+            returnString[i] = 0;
+        } else break;
+    }
+
+    return returnString;
+}
+
+char* str_trim(const char* text) {
+    const uint64_t text_len = str_length(text);
+    char* returnString = malloc_str(text_len + 1);
+    bool spottedChars = false;
+    uint64_t newLength = 0;
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        if (is_whitespace(text[i]) && !spottedChars) {
+            continue;
+        } else spottedChars = true;
+
+        returnString[newLength] = text[i];
+        newLength++;
+    }
+
+    for (int64_t i = newLength - 1; i >= 0; i--) {
+        if (is_whitespace(returnString[i])) {
+            returnString[i] = 0;
+        } else break;
+    }
+
+    return returnString;
+}
+
+char* str_to_upper(const char* text) {
+    const uint64_t text_len = str_length(text);
+    char* returnString = malloc_str(text_len + 1);
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        returnString[i] = to_upper(text[i]);
+    }
+
+    return returnString;
+}
+
+char* str_to_lower(const char* text) {
+    const uint64_t text_len = str_length(text);
+    char* returnString = malloc_str(text_len + 1);
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        returnString[i] = to_lower(text[i]);
+    }
+
+    return returnString;
 }

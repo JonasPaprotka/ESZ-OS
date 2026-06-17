@@ -1,23 +1,42 @@
 # TODO
-- Dynamic Heap Page allocation
+- String library improvements
+    - str_to_int, str_to_hex
+    - str_index_of
+    - str_split
+- Math libary improvements
+    - align_up(uint64_t addr, uint64_t align) -> uint64_t
+    - align_down(uint64_t addr, uint64_t align) -> uint64_t
+    - is_aligned(uint64_t addr, uint64_t align) -> bool
+    - log2_floor(uint64_t n) -> uint64_t
+    - int64_t pow_int(const int64_t base, const int64_t exp)
+    - int64_t sqrt_int(const int64_t n)
+- Fix
+    - Known Bugs
+- Memory
+    - Dynamic Heap Page allocation
+- Clean Code
+    - Refactoring
+    - Cleanup / Improvements
 - UX
-    - arrow key cursor movement (left/right)
-    - tab command completion for n>1 matches
-    - consider: padding for text rendering
-- Blinking cursor
-- APIC
-- ACIP
-- Fix known bugs
+    - Tab command completion for n>1 matches
 
 # Future
+- Unit Tests für lib and core functions
 - Filesystem FAT16, later FAT32
+- APIC
+- ACIP
 - Networking
     - translate linux drivers for the quemu intel network card
-- Unit Tests für lib and core functions
+- USB Drivers
+    - 1.X
+    - 3.X
 
 # Known Bugs
 - str_ends_with is completely broken
 - str_replace hardcoded stack array of 1024 max findings
 - Multiline Terminal Commands are very broken
 - After scrolling - fake chars can appear on cursor (from line above)
-- "Test mem_ 123" _ signaling the cursor -> on tab nothing happens 
+
+# CONSIDER
+- Header file update to C++ specific verion (.h -> .hpp)
+- Padding for text rendering

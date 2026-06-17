@@ -90,7 +90,7 @@ void handle_automatic_newline() {
 
 void cursor_backspace() {
     if (!screenBufferPtr) return;
-    if (cursorAt_X == lineInputStart_X) return;
+    if (cursorAt_X == (int) lineInputStart_X) return;
 
     Line* line = get_screen_buffer_line(cursorAt_Y);
     if (line->cells[cursorAt_X - 1].interactable == false) return;
