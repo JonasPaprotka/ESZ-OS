@@ -1,18 +1,17 @@
 # TODO
 - Fix known bugs
-- UX
-    - tab command completion for n>1 matches
-    - consider: padding for text rendering
 - Dynamic Heap Page allocation
 - Refactoring & Code cleanup/improvements
+- UX
+    - tab command completion for n>1 matches
 
 # Future
+- Unit Tests für lib and core functions
 - Filesystem FAT16, later FAT32
 - APIC
 - ACIP
 - Networking
     - translate linux drivers for the quemu intel network card
-- Unit Tests für lib and core functions
 - USB Drivers
     - 1.X
     - 3.X
@@ -25,3 +24,4 @@
 
 # CONSIDER
 - Header file update to C++ specific verion (.h -> .hpp)
+- Padding for text rendering
