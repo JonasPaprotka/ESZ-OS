@@ -60,7 +60,7 @@ void init_bitmap_data() {
 
 void get_free_location_for_bitmap() {
     pageCount = highestAddress / pageSize;
-    uint64_t reqSize = divideRoundUp1(pageCount, 8);
+    uint64_t reqSize = divide_round_up(pageCount, 8);
 
     for (uint64_t i = 0; i < memoryRegionCount; i++) {
         struct limine_memmap_entry* entry = memmap_request.response->entries[i];
@@ -77,7 +77,7 @@ void get_free_location_for_bitmap() {
     init_bitmap_data();
     
     uint64_t bitmapStartPage = (uint64_t)pmm_bitmap / pageSize;
-    uint64_t bitmapPagesCount = divideRoundUp1(reqSize, pageSize);
+    uint64_t bitmapPagesCount = divide_round_up(reqSize, pageSize);
     pmm_malloc_page_range(bitmapStartPage, bitmapPagesCount);
 }
 
@@ -144,7 +144,7 @@ void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
 }
 
 uint64_t pmm_malloc(const uint64_t byteAmount) {
-    const uint64_t reqPages = divideRoundUp1(byteAmount, pageSize);
+    const uint64_t reqPages = divide_round_up(byteAmount, pageSize);
     uint64_t freePageCounter = 0;
     uint64_t firstPageOfSeries = 0;
 
@@ -187,7 +187,7 @@ void* pmm_malloc_addr(const uint64_t byteAmount) {
 }
 
 void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
-    const uint64_t reqPages = divideRoundUp1(byteAmount, pageSize);
+    const uint64_t reqPages = divide_round_up(byteAmount, pageSize);
     uint64_t currPage = addr / pageSize;
 
     for (uint64_t i = 0; i < reqPages; i++) {

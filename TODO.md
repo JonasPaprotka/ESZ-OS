@@ -3,6 +3,13 @@
     - str_to_int, str_to_hex
     - str_index_of
     - str_split
+- Math libary improvements
+    - align_up(uint64_t addr, uint64_t align) -> uint64_t
+    - align_down(uint64_t addr, uint64_t align) -> uint64_t
+    - is_aligned(uint64_t addr, uint64_t align) -> bool
+    - log2_floor(uint64_t n) -> uint64_t
+    - int64_t pow_int(const int64_t base, const int64_t exp)
+    - int64_t sqrt_int(const int64_t n)
 - Fix
     - Known Bugs
 - Memory
