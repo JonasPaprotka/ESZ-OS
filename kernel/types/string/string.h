@@ -6,35 +6,33 @@
 
 char* malloc_str(const uint64_t size);
 char* malloc_empty_str();
-
 uint64_t str_length(const char* str);
 char* str_repeat(const char* text, uint64_t amount);
- 
 bool str_equal(const char* a, const char* b);
-
 void str_copy(char* dest, const char* src);
-
 void str_add(char* target, const char* value);
 void str_add(char* target, const char char_value);
-
 char* str_combine(const char* a, const char* b);
-
 bool str_contains(const char* text, const char* searchText);
 uint64_t str_count(const char* text, const char* searchText);
 bool str_starts_with(const char* text, const char* searchText);
 bool str_ends_with(const char* text, const char* searchText);
 void str_replace(char* text, const char* searchText, const char* replacedBy);
-
 char* to_string(const uint64_t inputValue, const uint8_t basis);
 char* to_string(const int64_t inputValue, const uint8_t basis);
 char* to_string(const uint64_t inputValue);
 char* to_string(const int64_t inputValue);
 char* to_string(const int32_t inputValue);
 char* to_string(const uint32_t inputValue);
-
-void str_trim_end(char* Text, const uint64_t n);
-char* str_trim_start(const char* text, const uint64_t trimAmount);
+void str_cut_end(char* Text, const uint64_t n);
+char* str_cut_start(const char* text, const uint64_t n);
 char* str_move_right(const char* text, const uint64_t moveAmount);
+
+char* str_trim_start(const char* text);
+char* str_trim_end(const char* text);
+char* str_trim(const char* text);
+char* str_to_upper(const char* text);
+char* str_to_lower(const char* text);
 
 struct String {
     char* data;

@@ -5,7 +5,24 @@
 - Fixes
     - Fixed a typo in config.h ARCH_NAME value
     - Fixed tab completion not working when cursor was on space char after a token
-- Fixed compiler warninigs
+    - Uptime command days counter resets after every 7th day
+- Developer Infos
+    - Added new char library
+        - bool is_digit(const char c);
+        - bool is_alpha(const char c);
+        - bool is_upper_alpha(const char c);
+        - bool is_lower_alpha(const char c);
+        - bool is_whitespace(const char c);
+        - char to_upper(const char c);
+        - char to_lower(const char c);
+    - Improved string library
+        - char* str_trim_start(const char* text);
+        - char* str_trim_end(const char* text);
+        - char* str_trim(const char* text);
+        - char* str_to_upper(const char* text);
+        - char* str_to_lower(const char* text);
+    - Sorted files in Types folder in subfolders
+    - Fixed compiler warninigs
 
 ## v0.1.5
 

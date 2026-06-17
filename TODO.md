@@ -1,9 +1,17 @@
 # TODO
-- Fix known bugs
-- Dynamic Heap Page allocation
-- Refactoring & Code cleanup/improvements
+- String library improvements
+    - str_to_int, str_to_hex
+    - str_index_of
+    - str_split
+- Fix
+    - Known Bugs
+- Memory
+    - Dynamic Heap Page allocation
+- Clean Code
+    - Refactoring
+    - Cleanup / Improvements
 - UX
-    - tab command completion for n>1 matches
+    - Tab command completion for n>1 matches
 
 # Future
 - Unit Tests für lib and core functions
