@@ -54,6 +54,10 @@ struct PCI_Device {
     uint8_t  MaxLat;
 } __attribute__((packed));
 
+
+extern PCI_Device* found_pci_devices;
+extern uint32_t PCIDeviceAmount;
+
 void init_pci();
 
 #endif

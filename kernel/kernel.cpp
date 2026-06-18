@@ -128,8 +128,9 @@ extern "C" void fault_handler(Registers* regs) {
             if (regs->error_code & 16)   print_inline("/ instruction-fetch ");
             newline();
 
-            // dont free to string memory - its to late anyways
-            printInfoLine(InfoTextType::PanicInfo, String("FAULT ADDR: ", to_string(cr2, 16)));
+            const char* hexString = to_string(cr2, 16);
+            printInfoLine(InfoTextType::PanicInfo, String("FAULT ADDR: ", hexString));
+            free(hexString);
 
             break;
         }
@@ -171,11 +172,18 @@ extern "C" void fault_handler(Registers* regs) {
             break;
     }
 
-    // dont free to string memory - its to late anyways
-    printInfoLine(InfoTextType::PanicInfo, String("RIP: ", to_string(regs->rip, 16)));
-    printInfoLine(InfoTextType::PanicInfo, String("RSP: ", to_string(regs->rsp, 16)));
-    printInfoLine(InfoTextType::PanicInfo, String("CS: ", to_string(regs->cs, 16)));
-    printInfoLine(InfoTextType::PanicInfo, String("ERROR: ", to_string(regs->error_code, 16)));
+    char* hexString = to_string(regs->rip, 16);
+    printInfoLine(InfoTextType::PanicInfo, String("RIP: ", hexString));
+    free(hexString);
+    hexString = to_string(regs->rsp, 16);
+    printInfoLine(InfoTextType::PanicInfo, String("RSP: ", hexString));
+    free(hexString);
+    hexString = to_string(regs->cs, 16);
+    printInfoLine(InfoTextType::PanicInfo, String("CS: ", hexString));
+    free(hexString);
+    hexString = to_string(regs->error_code, 16);
+    printInfoLine(InfoTextType::PanicInfo, String("ERROR: ", hexString));
+    free(hexString);
 
     print_separator();
     halt();

@@ -9,6 +9,7 @@
 #include "info_text.h"
 #include "terminal.h"
 #include "timer.h"
+#include "pci.h"
 
 void cmd_get_uptime(const char*) {
     const uint64_t ms = get_ticks_in_ms();
@@ -65,6 +66,28 @@ void cmd_history(const char*) {
     }
 }
 
+void cmd_pciinfo(const char*) {
+    if (PCIDeviceAmount == 0) {
+        printInfoLine(InfoTextType::Error, "No PCI devices were detected on boot");
+        return;
+    }
+
+    printInfoLine(InfoTextType::Info, String(PCIDeviceAmount, " PCI Devices were detected on boot."));
+
+    char* hexString;
+    for (uint32_t i = 0; i < PCIDeviceAmount; i++) {
+        print(String(" - [Device ", i, "]:"), Color::Yellow);
+
+        hexString = to_string(found_pci_devices[i].VendorID, 16);
+        print(String("   => Vendor ID: ", hexString));
+        free(hexString);
+
+        hexString = to_string(found_pci_devices[i].DeviceID, 16);
+        print(String("   => Device ID: ", hexString));
+        free(hexString);
+    }
+}
+
 const Command commands[] = {
     { "help", cmd_help },
     { "history", cmd_history },
@@ -74,5 +97,6 @@ const Command commands[] = {
     { "reboot", cmd_reboot },
     { "meminfo", cmd_memory_info },
     { "uptime", cmd_get_uptime },
+    { "pciinfo", cmd_pciinfo },
     { 0, 0 }
 };

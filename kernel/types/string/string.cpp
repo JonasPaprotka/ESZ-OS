@@ -25,7 +25,7 @@ uint64_t str_length(const char* str) {
 bool str_equal(const char* a, const char* b) {
     const uint64_t a_len = str_length(a);
     const uint64_t b_len = str_length(b);
-    
+
     if (a_len != b_len) return false;
 
     for (uint64_t i = 0; i < a_len; ++i) {
@@ -83,7 +83,7 @@ uint64_t str_count(const char* text, const char* searchText) {
     const uint64_t searchText_len = str_length(searchText);
     const uint64_t text_len = str_length(text);
     if (searchText_len > text_len) return 0;
-    
+
     uint64_t counterHits = 0;
     char comparison[searchText_len + 1];
 
@@ -193,7 +193,7 @@ char* str_combine(const char* a, const char* b) {
     for (uint64_t i = 0; i < len_b; i++) {
         returnString[i + len_a] = b[i];
     }
-    
+
     returnString[len_a + len_b] = 0;
     return returnString;
 }
@@ -244,6 +244,14 @@ char* to_string(const int64_t inputValue, const uint8_t basis) {
     return str_combine("-", to_string((uint64_t)(-(inputValue)), basis));
 }
 
+char* to_string(const uint32_t inputValue, const uint8_t basis) {
+    return to_string((uint64_t)inputValue, basis);
+}
+
+char* to_string(const uint16_t inputValue, const uint8_t basis) {
+    return to_string((uint64_t)inputValue, basis);
+}
+
 char* to_string(const uint64_t inputValue) {
     return to_string(inputValue, 10);
 }
@@ -291,7 +299,7 @@ char* str_move_right(const char* text, const uint64_t moveAmount) {
         ret[i] = ' ';
     }
     str_add(ret, text);
-    
+
     return ret;
 }
 

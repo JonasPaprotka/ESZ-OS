@@ -2,11 +2,12 @@
 
 ## v0.1.7
 
-- Planned
-    - PCI
-        - Basic parsing
-        - Info dump via new command
+- PCI
+    - Parse PCI Devices and BARs
+    - Added new command to dump PCI Device Informations
 - Added MIT License File
+- Seperator length is now printed 1/3 of max line chars
+- Fix memory leak on kernel panic info dump
 - Developer Infos
     - Fixed Typos
     - Improved and expanded io library
