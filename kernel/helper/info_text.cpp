@@ -37,6 +37,9 @@ void printInfoLine(const enum InfoTextType textType, const char* infoText) {
             textTagColor = Color::LightRed;
             textTagText = "[PANIC INFO]: ";
             break;
+        case InfoTextType::Debug:
+            textTagColor = Color::HotPink;
+            textTagText = "[DEBUG]: ";
     }
 
     print_inline(textTagText, textTagColor);

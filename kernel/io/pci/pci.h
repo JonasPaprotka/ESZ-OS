@@ -54,4 +54,6 @@ struct PCI_Device {
     uint8_t  MaxLat;
 } __attribute__((packed));
 
+void init_pci();
+
 #endif
