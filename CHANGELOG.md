@@ -7,7 +7,15 @@
         - Basic parsing
         - Info dump via new command
 - Added MIT License File
-- Fixed Typos
+- Developer Infos
+    - Fixed Typos
+    - Improved and expanded io library
+        - Fixed outb and inb not using correct stdints
+        - Added following new functions
+            - void outw(const uint16_t port, const uint16_t value);
+            - uint16_t inw(const uint16_t port);
+            - void outl(const uint16_t port, const uint32_t value);
+            - uint32_t inl(const uint16_t port);
 
 ## v0.1.6
 

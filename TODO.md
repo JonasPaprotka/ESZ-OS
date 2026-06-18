@@ -1,4 +1,6 @@
 # TODO
+- PCI
+- Filesystem FAT32
 - String library improvements
     - str_to_int, str_to_hex
     - str_index_of
@@ -22,7 +24,6 @@
 
 # Future
 - Unit Tests für lib and core functions
-- Filesystem FAT16, later FAT32
 - APIC
 - ACIP
 - Networking
