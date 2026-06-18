@@ -2,7 +2,11 @@
 
 ## v0.1.7
 
--
+- Planned
+    - PCI
+        - Basic parsing
+        - Info dump via new command
+- Added MIT License File
 
 ## v0.1.6
 
