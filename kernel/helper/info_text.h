@@ -14,6 +14,6 @@ enum class InfoTextType {
 };
 
 void printInfoLine(enum InfoTextType textType, const char* infoText);
-void printSeperator();
+void print_separator();
 
 #endif

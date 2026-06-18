@@ -66,7 +66,7 @@ extern "C" void keyboard_isr(); //33
 
 extern "C" void fault_handler(Registers* regs) {
     newline();
-    printSeperator();
+    print_separator();
     
     switch (regs->interrupt_number) {
         case 0:
@@ -177,7 +177,7 @@ extern "C" void fault_handler(Registers* regs) {
     printInfoLine(InfoTextType::PanicInfo, String("CS: ", to_string(regs->cs, 16)));
     printInfoLine(InfoTextType::PanicInfo, String("ERROR: ", to_string(regs->error_code, 16)));
 
-    printSeperator();
+    print_separator();
     halt();
 }
 

@@ -68,7 +68,7 @@ void handle_show_history() {
 }
 
 void printHeader() {
-    printSeperator();
+    print_separator();
     printInfoLine(InfoTextType::Success, "Kernel Loaded");
     newline();
     print("   #####  #####  #####");
@@ -78,7 +78,7 @@ void printHeader() {
     print("   #####  #####  #####");
     newline();
     cmd_sysinfo();
-    printSeperator();
+    print_separator();
 }
 
 void displayTerminalError(const char* Text) {

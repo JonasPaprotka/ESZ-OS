@@ -10,9 +10,9 @@ struct MemoryBlockHeader {
 
 void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter);
 
-void memory_fill(void* target, unsigned char value, const uint64_t amountOfBytesToFill);
-void memory_clear(void* target, const uint64_t amoutOfBytesToClear);
-void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfBytesToCopy);
+void memory_fill(void* target, unsigned char value, const uint64_t n);
+void memory_clear(void* target, const uint64_t n);
+void memory_copy(void* copyTo, const void* copyFrom, const uint64_t n);
 
 void memory_info_init();
 

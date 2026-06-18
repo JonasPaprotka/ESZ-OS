@@ -7,9 +7,9 @@ void clearScreen() {
         init_empty_screen_buffer();
     }
 
-    const int heigth = boot_info.height;
+    const int height = boot_info.height;
 
-    for (int y = 0; y < heigth; y++) {
+    for (int y = 0; y < height; y++) {
         for (int x = 0; x < ADJUSTED_WIDTH; x++) {
             boot_info.framebuffer[y * ADJUSTED_WIDTH + x] = 0;
         }

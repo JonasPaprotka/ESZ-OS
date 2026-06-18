@@ -7,6 +7,7 @@
         - Basic parsing
         - Info dump via new command
 - Added MIT License File
+- Fixed Typos
 
 ## v0.1.6
 
