@@ -196,7 +196,7 @@ void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
     }
 }
 
-void memory_fill(void* target, const unsigned char value, const uint64_t n) {
+void memory_fill(void* target, const uint8_t value, const uint64_t n) {
     // fill 8 bytes using uint64_t to make it faster
     uint64_t* dest64 = (uint64_t*) target;
     const uint64_t count64 = n / 8;
@@ -208,7 +208,7 @@ void memory_fill(void* target, const unsigned char value, const uint64_t n) {
     }
 
     // remaining bytes if not divideable by 8
-    unsigned char* dest8 = (unsigned char*) (dest64 + count64);
+    uint8_t* dest8 = (uint8_t*) (dest64 + count64);
     
     for (uint64_t i = 0; i < (n % 8); ++i) {
         dest8[i] = value;

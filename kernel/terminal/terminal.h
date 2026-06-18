@@ -15,6 +15,6 @@ void handle_input_buffer_deletion();
 void insert_char_at_cursor(const char c);
 
 void terminal_init();
-void terminal_on_key(unsigned char scancode);
+void terminal_on_key(uint8_t scancode);
 
 #endif

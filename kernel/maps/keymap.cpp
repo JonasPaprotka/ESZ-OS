@@ -13,7 +13,7 @@ const KeyboardLayout current_layout = LAYOUT_US;
 #endif
 
 
-uint16_t scancode_to_keycode(const unsigned char scancode) {
+uint16_t scancode_to_keycode(const uint8_t scancode) {
     if (scancode >= 0x3A) return KEY_UNKNOWN;
     int shift_idx = shift ? 1 : 0;
 

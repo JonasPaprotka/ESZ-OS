@@ -16,6 +16,7 @@
             - uint16_t inw(const uint16_t port);
             - void outl(const uint16_t port, const uint32_t value);
             - uint32_t inl(const uint16_t port);
+    - Other misc code cleanups
 
 ## v0.1.6
 
