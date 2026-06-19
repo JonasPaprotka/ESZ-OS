@@ -55,7 +55,7 @@ void init_bitmap_data() {
         if (entry->type == LIMINE_MEMMAP_USABLE) {
             pmm_free(entry->base, entry->length);
         }
-    } 
+    }
 }
 
 void get_free_location_for_bitmap() {
@@ -75,7 +75,7 @@ void get_free_location_for_bitmap() {
 
     memory_fill(pmm_bitmap, 0xFF, reqSize); // mark everything as filled
     init_bitmap_data();
-    
+
     uint64_t bitmapStartPage = (uint64_t)pmm_bitmap / pageSize;
     uint64_t bitmapPagesCount = divide_round_up(reqSize, pageSize);
     pmm_malloc_page_range(bitmapStartPage, bitmapPagesCount);
@@ -103,7 +103,7 @@ void print_memory_info() {
     printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
     printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
     printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
-    
+
     // RAM
     printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
     printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
@@ -183,7 +183,7 @@ void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {
 void* pmm_malloc_addr(const uint64_t byteAmount) {
     uint64_t phys_addr = pmm_malloc(byteAmount);
     if (phys_addr == 0) return nullptr;
-    return (void*)(phys_addr + hhdm_offset); 
+    return (void*)(phys_addr + hhdm_offset);
 }
 
 void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
@@ -209,7 +209,7 @@ void memory_fill(void* target, const uint8_t value, const uint64_t n) {
 
     // remaining bytes if not divideable by 8
     uint8_t* dest8 = (uint8_t*) (dest64 + count64);
-    
+
     for (uint64_t i = 0; i < (n % 8); ++i) {
         dest8[i] = value;
     }
@@ -325,18 +325,18 @@ void* malloc(const uint64_t size) {
             return nullptr;
         }
     }
-    
+
     uint64_t oldBlockLength = currBlockPtr->Length;
 
     currBlockPtr->Length = size;
     currBlockPtr->Used = true;
 
     void* returnAddr = ((char*) currBlockPtr + sizeof(MemoryBlockHeader));
-    
+
     if (oldBlockLength > size + sizeof(MemoryBlockHeader)) {
         MemoryBlockHeader* nextBlock = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
         const uint64_t nextBlockLength = oldBlockLength - size - sizeof(MemoryBlockHeader);
-        
+
         // skip splitting if to small - avoid like F-1 blocks
         if (nextBlockLength <= sizeof(MemoryBlockHeader)) {
             currBlockPtr->Length = oldBlockLength;
@@ -359,7 +359,7 @@ void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
             freedBlockPtr->Length += rightBlockPtr->Length + sizeof(MemoryBlockHeader);
         }
     }
-    
+
     MemoryBlockHeader* leftBlockPtr = get_prev_heap_block(freedBlockPtr);
     if (leftBlockPtr == nullptr) { return; }
 
@@ -390,18 +390,18 @@ void init_heap_alloc() {
 // --- INIT ---
 void memory_info_init() {
     printInfoLine(InfoTextType::Loading, "Loading Memory Info...");
-    hhdm_offset = hhdm_request.response->offset;    
+    hhdm_offset = hhdm_request.response->offset;
     get_memory_region_count();
-    
+
     printInfoLine(InfoTextType::Loading, "Loading PMM...");
     get_memory_regions();
     get_free_location_for_bitmap();
-    
+
     printInfoLine(InfoTextType::Loading, "Loading Heap Alloc...");
     init_heap_alloc();
     //--------------------------
-    
+
     printInfoLine(InfoTextType::Success, "Initialized Memory");
-    
+
     //pmm_malloc(4096 * 120000); // TEST HIGH UTILISATION!!!!
 }

@@ -204,5 +204,5 @@ isr_common:
     push r15
 
     ; c++ handoff
-    mov rdi, rsp 
+    mov rdi, rsp
     call fault_handler

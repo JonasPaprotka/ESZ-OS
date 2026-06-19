@@ -114,7 +114,7 @@ void draw_char(const char c, const int printAt_X, const int printAt_Y, const Col
     if (useScreenBuffer && !isRedrawing) {
         Line* line = get_screen_buffer_line(cursorAt_Y);
         Cell* cell = get_screen_buffer_cell(line, cursorAt_X);
-        
+
         cell->text = c;
         cell->color = color;
         cell->interactable = interactable;
@@ -131,7 +131,7 @@ void draw_char(const char c, const int printAt_X, const int printAt_Y, const Col
 
     for (int row = 0; row < FONT_H; row++) {
         uint8_t bits = font8x16[(uint8_t) c][row / FONT_SIZE];
-        
+
         for (int col = 0; col < FONT_W; col++) {
             boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
         }
@@ -238,7 +238,7 @@ void handle_scroll() {
 
             const int cellAmount = next_buff_line->amountOfCells;
             curr_buff_line->amountOfCells = cellAmount;
-            
+
             for (int cell = 0; cell < cellAmount; cell++) {
                 Cell* curr_buff_cell = get_screen_buffer_cell(curr_buff_line, cell);
                 Cell* next_line_buff_cell = get_screen_buffer_cell(next_buff_line, cell);
@@ -256,7 +256,7 @@ void handle_scroll() {
     }
 
     // SHIFT lines up
-    if (cursorAt_Y >= (int) (screenBufferPtr->startRenderLine + screenBufferPtr->visibleLines)) {   
+    if (cursorAt_Y >= (int) (screenBufferPtr->startRenderLine + screenBufferPtr->visibleLines)) {
         screenBufferPtr->startRenderLine++;
         redraw();
     }

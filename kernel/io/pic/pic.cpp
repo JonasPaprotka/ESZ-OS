@@ -8,7 +8,7 @@ void EIO_Finished_Interrupt() {
 void pic_init() {
     const uint8_t MASTER_CMD = 0x20; // 32
     const uint8_t MASTER_DATA = 0x21; // 33
-    
+
     const uint8_t SLAVE_CMD = 0xA0; // 160
     const uint8_t SLAVE_DATA = 0xA1; // 161
 

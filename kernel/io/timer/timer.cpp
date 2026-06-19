@@ -8,7 +8,7 @@ volatile uint64_t ticks = 0;
 
 extern "C" void timer_handler() {
     ticks = ticks + 1;
-    
+
     if (ticks * 1000 / PIT_TICK_HZ % CURSOR_BLINK_INTERVAL == 0) {
         cursor_visible = !cursor_visible;
         update_cursor_render();

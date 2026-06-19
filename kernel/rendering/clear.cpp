@@ -19,7 +19,7 @@ void clearScreen() {
 void clear_char(const int printAt_X, const int printAt_Y) {
     int renderY = printAt_Y;
     if (useScreenBuffer) renderY -= (int) screenBufferPtr->startRenderLine;
-    
+
     const int x = printAt_X * FONT_W;
     const int y = renderY * FONT_H;
 
