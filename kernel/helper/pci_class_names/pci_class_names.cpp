@@ -106,6 +106,81 @@ PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass)
                     break;
             }
             break;
+        case 0x4:
+            returnInfo.className = "Multimedia Controller";
+            switch (SubClass) {
+                case 0x0:
+                    returnInfo.subClassName = "Multimedia Video Controller";
+                    break;
+                case 0x1:
+                    returnInfo.subClassName = "Multimedia Audio Controller";
+                    break;
+                case 0x2:
+                        returnInfo.subClassName = "Computer Telephony Device";
+                        break;
+                case 0x3:
+                    returnInfo.subClassName = "Audio Device";
+                    break;
+                case 0x80:
+                    returnInfo.subClassName = "Other";
+                    break;
+            }
+            break;
+        case 0x5:
+            returnInfo.className = "Memory Controller";
+            switch (SubClass) {
+                case 0x0:
+                    returnInfo.subClassName = "RAM Controller";
+                    break;
+                case 0x1:
+                    returnInfo.subClassName = "Flash Controller";
+                    break;
+                case 0x80:
+                    returnInfo.subClassName = "Other";
+                    break;
+            }
+            break;
+        case 0x6:
+            returnInfo.className = "Multimedia Controller";
+            switch (SubClass) {
+                case 0x0:
+                    returnInfo.subClassName = "Host Bridge";
+                    break;
+                case 0x1:
+                    returnInfo.subClassName = "ISA Bridge";
+                    break;
+                case 0x2:
+                    returnInfo.subClassName = "EISA Bridge";
+                    break;
+                case 0x3:
+                    returnInfo.subClassName = "MCA Bridge";
+                    break;
+                case 0x4:
+                    returnInfo.subClassName = "PCI-to-PCI Bridge";
+                    break;
+                case 0x5:
+                    returnInfo.subClassName = "PCMCIA Bridge";
+                    break;
+                case 0x6:
+                    returnInfo.subClassName = "NuBus Bridge";
+                    break;
+                case 0x7:
+                    returnInfo.subClassName = "CardBus Bridge";
+                    break;
+                case 0x8:
+                    returnInfo.subClassName = "RACEway Bridge";
+                    break;
+                case 0x9:
+                    returnInfo.subClassName = "PCI-to-PCI Bridge";
+                    break;
+                case 0x0A:
+                    returnInfo.subClassName = "InfiniBand-to-PCI Host Bridge";
+                    break;
+                case 0x80:
+                    returnInfo.subClassName = "Other";
+                    break;
+            }
+            break;
         }
 
     return returnInfo;
