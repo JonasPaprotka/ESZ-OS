@@ -2,12 +2,13 @@
 #include "pic.h"
 #include "print.h"
 #include "terminal.h"
+#include <stdint.h>
 
 bool shift = false;
 bool isExtendedScancode = false;
 
 extern "C" void keyboard_handler() {
-    unsigned char scancode = inb(0x60);
+    uint8_t scancode = inb(0x60);
     outb(0x20, 0x20);
 
     if (scancode == 0x2A || scancode == 0x36) { shift = 1; return; } // shift down

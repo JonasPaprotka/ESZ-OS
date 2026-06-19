@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## v0.1.7
+
+- PCI
+    - Parse PCI Devices and BARs
+    - Added new command to dump PCI Device Informations "pciinfo" which supports "-c" arg to compress output
+- Added MIT License File
+- Seperator length is now printed 1/3 of max line chars
+- Fix memory leak on kernel panic info dump
+- Developer Infos
+    - Fixed Typos
+    - Improved and expanded io library
+        - Fixed outb and inb not using correct stdints
+        - Added following new functions
+            - void outw(const uint16_t port, const uint16_t value);
+            - uint16_t inw(const uint16_t port);
+            - void outl(const uint16_t port, const uint32_t value);
+            - uint32_t inl(const uint16_t port);
+    - Other misc code cleanups
+
 ## v0.1.6
 
 - Fixes

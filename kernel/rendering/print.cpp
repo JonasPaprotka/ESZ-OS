@@ -130,7 +130,7 @@ void draw_char(const char c, const int printAt_X, const int printAt_Y, const Col
     const int y = renderY * FONT_H;
 
     for (int row = 0; row < FONT_H; row++) {
-        uint8_t bits = font8x16[(unsigned char) c][row / FONT_SIZE];
+        uint8_t bits = font8x16[(uint8_t) c][row / FONT_SIZE];
         
         for (int col = 0; col < FONT_W; col++) {
             boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
