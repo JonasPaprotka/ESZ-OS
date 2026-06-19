@@ -89,10 +89,10 @@ void cmd_pciinfo(const char* args) {
         print_inline(" - ");
         print_inline(String("[PCI-", i, "]:"), Color::Yellow);
 
-        if (classInfo.className != "") {
+        if (classInfo.className[0] != 0) {
             print_inline(String(" (", classInfo.className, ")"));
         }
-        if (classInfo.subClassName != "") {
+        if (classInfo.subClassName[0] != 0) {
             print_inline(String(" (", classInfo.subClassName, ")"));
         }
 
