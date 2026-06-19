@@ -4,7 +4,7 @@
 
 - PCI
     - Parse PCI Devices and BARs
-    - Added new command to dump PCI Device Informations
+    - Added new command to dump PCI Device Informations "pciinfo" which supports "-c" arg to compress output
 - Added MIT License File
 - Seperator length is now printed 1/3 of max line chars
 - Fix memory leak on kernel panic info dump

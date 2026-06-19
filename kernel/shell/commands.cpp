@@ -66,25 +66,35 @@ void cmd_history(const char*) {
     }
 }
 
-void cmd_pciinfo(const char*) {
+void cmd_pciinfo(const char* args) {
     if (PCIDeviceAmount == 0) {
         printInfoLine(InfoTextType::Error, "No PCI devices were detected on boot");
         return;
     }
 
+    const bool compact = str_equal(args, "-c");
+
     printInfoLine(InfoTextType::Info, String(PCIDeviceAmount, " PCI Devices were detected on boot."));
 
-    char* hexString;
+    char* vendorHex;
+    char* deviceHex;
+
     for (uint32_t i = 0; i < PCIDeviceAmount; i++) {
-        print(String(" - [Device ", i, "]:"), Color::Yellow);
+        vendorHex = to_string(found_pci_devices[i].VendorID, 16);
+        deviceHex = to_string(found_pci_devices[i].DeviceID, 16);
 
-        hexString = to_string(found_pci_devices[i].VendorID, 16);
-        print(String("   => Vendor ID: ", hexString));
-        free(hexString);
+        if (compact) {
+            print_inline(String(" - [", i, "]: "), Color::Yellow);
+            print_inline(String("vID: ", vendorHex, " - dID: ", deviceHex));
+            newline();
+        } else {
+            print(String(" - [Device ", i, "]:"), Color::Yellow);
+            print(String("   => Vendor ID: ", vendorHex));
+            print(String("   => Device ID: ", deviceHex));
+        }
 
-        hexString = to_string(found_pci_devices[i].DeviceID, 16);
-        print(String("   => Device ID: ", hexString));
-        free(hexString);
+        free(vendorHex);
+        free(deviceHex);
     }
 }
 
