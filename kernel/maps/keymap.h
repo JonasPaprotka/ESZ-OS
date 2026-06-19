@@ -32,6 +32,6 @@ enum KeyCode : uint16_t {
 extern uint16_t us_keymap[2][0x3A];
 extern uint16_t de_keymap[2][0x3A];
 
-uint16_t scancode_to_keycode(const unsigned char scancode);
+uint16_t scancode_to_keycode(const uint8_t scancode);
 
 #endif

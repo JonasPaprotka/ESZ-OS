@@ -68,7 +68,7 @@ void handle_show_history() {
 }
 
 void printHeader() {
-    printSeperator();
+    print_separator();
     printInfoLine(InfoTextType::Success, "Kernel Loaded");
     newline();
     print("   #####  #####  #####");
@@ -78,7 +78,7 @@ void printHeader() {
     print("   #####  #####  #####");
     newline();
     cmd_sysinfo();
-    printSeperator();
+    print_separator();
 }
 
 void displayTerminalError(const char* Text) {
@@ -260,13 +260,13 @@ void insert_char_at_cursor(const char c) {
     update_cursor_render();
 }
 
-void handle_input_buffer_insertion(const unsigned char scancode) {
+void handle_input_buffer_insertion(const uint8_t scancode) {
     const char c = scancode_to_keycode(scancode);
     if (!c) return;
     insert_char_at_cursor(c);
 }
 
-void terminal_on_key(const unsigned char scancode) {
+void terminal_on_key(const uint8_t scancode) {
     uint16_t key = scancode_to_keycode(scancode);
     
     if (isExtendedScancode) {

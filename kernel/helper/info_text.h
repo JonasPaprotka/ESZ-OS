@@ -10,10 +10,11 @@ enum class InfoTextType {
     Success,
     Loading,
     KernelPanic,
-    PanicInfo
+    PanicInfo,
+    Debug
 };
 
 void printInfoLine(enum InfoTextType textType, const char* infoText);
-void printSeperator();
+void print_separator();
 
 #endif

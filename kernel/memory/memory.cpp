@@ -82,7 +82,7 @@ void get_free_location_for_bitmap() {
 }
 
 void print_memory_info() {
-    printSeperator();
+    print_separator();
 
     const uint64_t KiB = freeBytes / 1024;
     const uint64_t MiB = KiB / 1024;
@@ -133,7 +133,7 @@ void print_memory_info() {
     print("--- HEAP FRAGMENTATION VIEW ---");
     print_memory_fragmentation_graph(100, true);
 
-    printSeperator();
+    print_separator();
 }
 
 void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
@@ -196,10 +196,10 @@ void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
     }
 }
 
-void memory_fill(void* target, const unsigned char value, const uint64_t amountOfBytesToFill) {
+void memory_fill(void* target, const uint8_t value, const uint64_t n) {
     // fill 8 bytes using uint64_t to make it faster
     uint64_t* dest64 = (uint64_t*) target;
-    const uint64_t count64 = amountOfBytesToFill / 8;
+    const uint64_t count64 = n / 8;
 
     const uint64_t value64 = (uint64_t) value * 0x0101010101010101ULL; //[AI-Supported Code] clone 1 byte to 8
 
@@ -208,22 +208,22 @@ void memory_fill(void* target, const unsigned char value, const uint64_t amountO
     }
 
     // remaining bytes if not divideable by 8
-    unsigned char* dest8 = (unsigned char*) (dest64 + count64);
+    uint8_t* dest8 = (uint8_t*) (dest64 + count64);
     
-    for (uint64_t i = 0; i < (amountOfBytesToFill % 8); ++i) {
+    for (uint64_t i = 0; i < (n % 8); ++i) {
         dest8[i] = value;
     }
 }
 
-void memory_clear(void* target, const uint64_t amoutOfBytesToClear) {
-    memory_fill(target, 0, amoutOfBytesToClear);
+void memory_clear(void* target, const uint64_t n) {
+    memory_fill(target, 0, n);
 }
 
-void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfBytesToCopy) {
+void memory_copy(void* copyTo, const void* copyFrom, const uint64_t n) {
     // fill 8 bytes using uint64_t to make it faster
     uint64_t* dest64 = (uint64_t*) copyTo;
     const uint64_t* src64 = (const uint64_t*) copyFrom;
-    const uint64_t count64 = amountOfBytesToCopy / 8;
+    const uint64_t count64 = n / 8;
 
     for (uint64_t i = 0; i < count64; ++i) {
         dest64[i] = src64[i];
@@ -233,7 +233,7 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t amountOfByte
     unsigned char* dest8 = (unsigned char*) (dest64 + count64);
     const unsigned char* src8 = (const unsigned char*) (src64 + count64);
 
-    for (uint64_t i = 0; i < (amountOfBytesToCopy % 8); ++i) {
+    for (uint64_t i = 0; i < (n % 8); ++i) {
         dest8[i] = src8[i];
     }
 }
@@ -377,7 +377,7 @@ void free(const void* ptr) {
     try_defragment_page(header);
 }
 
-void inint_heap_alloc() {
+void init_heap_alloc() {
     MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) pmm_malloc_addr(initialHeapLength);
     initialHeapBlockPtr->Length = initialHeapLength - sizeof(MemoryBlockHeader);
     initialHeapBlockPtr->Used = false;
@@ -398,7 +398,7 @@ void memory_info_init() {
     get_free_location_for_bitmap();
     
     printInfoLine(InfoTextType::Loading, "Loading Heap Alloc...");
-    inint_heap_alloc();
+    init_heap_alloc();
     //--------------------------
     
     printInfoLine(InfoTextType::Success, "Initialized Memory");

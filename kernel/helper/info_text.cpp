@@ -37,6 +37,9 @@ void printInfoLine(const enum InfoTextType textType, const char* infoText) {
             textTagColor = Color::LightRed;
             textTagText = "[PANIC INFO]: ";
             break;
+        case InfoTextType::Debug:
+            textTagColor = Color::HotPink;
+            textTagText = "[DEBUG]: ";
     }
 
     print_inline(textTagText, textTagColor);
@@ -44,8 +47,8 @@ void printInfoLine(const enum InfoTextType textType, const char* infoText) {
     newline();
 }
 
-void printSeperator() {
-    char* s = str_repeat("-", 40);
+void print_separator() {
+    char* s = str_repeat("-", MAX_CHARS / 3);
     print_inline(s, Color::DarkGray);
     free(s);
     newline();
