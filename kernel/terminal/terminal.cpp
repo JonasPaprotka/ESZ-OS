@@ -33,7 +33,7 @@ void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]) {
         commandHistory[cmdHistCount - 1][0] = 0;
         cmdHistCount--;
     }
-    
+
     str_copy(commandHistory[cmdHistCount], command);
     cmdHistCount++;
 }
@@ -118,10 +118,10 @@ void newTerminalInputLine() {
 void replaceCurrentToken(const char* oldToken, const char* newToken) {
     while (lineInputCursorPos < lineInputLength && lineInputBuffer[lineInputCursorPos] != ' ')
         cursor_move_inline(true);
-    
+
     for (uint64_t i = 0; i < str_length(oldToken); i++)
         handle_input_buffer_deletion();
-    
+
     for (uint64_t i = 0; i < str_length(newToken); i++)
         insert_char_at_cursor(newToken[i]);
 }
@@ -142,7 +142,7 @@ void handleTabAutoCompletion() {
 
     uint64_t validTabCannidates = 0;
     Command cannidateList[maxCommandCounter];
-    
+
     // match input to list
     for (uint64_t i = 0; commands[i].name != 0; i++) {
         if (str_starts_with(commands[i].name, currentToken)) {
@@ -162,7 +162,7 @@ void handleTabAutoCompletion() {
         free(currentToken);
         return;
     };
-    
+
     free(currentToken);
 
     // > 1 -> show possibilities in newline and refill the input in another newline
@@ -268,16 +268,16 @@ void handle_input_buffer_insertion(const uint8_t scancode) {
 
 void terminal_on_key(const uint8_t scancode) {
     uint16_t key = scancode_to_keycode(scancode);
-    
+
     if (isExtendedScancode) {
         switch(scancode) {
             case 0x48: // ARROW UP
                 if (cmdHistCount == 0) break;
-                
+
                 if (goThroughHistoryCount < cmdHistCount) {
-                    goThroughHistoryCount++;   
+                    goThroughHistoryCount++;
                 } else break;
-                
+
                 handle_show_history();
                 break;
 
@@ -329,7 +329,7 @@ void terminal_on_key(const uint8_t scancode) {
 
 void terminal_init() {
     printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
-        
+
     printHeader();
     newTerminalInputLine();
 }

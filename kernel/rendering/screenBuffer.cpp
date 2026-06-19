@@ -41,7 +41,7 @@ void init_empty_screen_buffer() {
 
     const int allLines = screenBufferPtr->maxStoredLines;
     Cell* cellBlock = (Cell*)(screenBufferPtr->lines + allLines);
-    
+
     memory_clear(cellBlock, sizeof(Cell) * allLines * MAX_CHARS);
 
     for (int i = 0; i < allLines; i++) {

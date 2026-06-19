@@ -10,6 +10,7 @@
 #include "terminal.h"
 #include "timer.h"
 #include "pci.h"
+#include "pci_class_names.h"
 
 void cmd_get_uptime(const char*) {
     const uint64_t ms = get_ticks_in_ms();
@@ -83,12 +84,24 @@ void cmd_pciinfo(const char* args) {
         vendorHex = to_string(found_pci_devices[i].VendorID, 16);
         deviceHex = to_string(found_pci_devices[i].DeviceID, 16);
 
+        const PCIClassInfo classInfo = resolve_class_name(found_pci_devices[i].ClassCode, found_pci_devices[i].Subclass);
+
+        print_inline(" - ");
+        print_inline(String("[PCI-", i, "]:"), Color::Yellow);
+
+        if (classInfo.className[0] != 0) {
+            print_inline(String(" (", classInfo.className, ")"));
+        }
+        if (classInfo.subClassName[0] != 0) {
+            print_inline(String(" (", classInfo.subClassName, ")"));
+        }
+
         if (compact) {
-            print_inline(String(" - [", i, "]: "), Color::Yellow);
-            print_inline(String("vID: ", vendorHex, " - dID: ", deviceHex));
-            newline();
-        } else {
-            print(String(" - [Device ", i, "]:"), Color::Yellow);
+            print_inline(String(" vID: ", vendorHex, " - dID: ", deviceHex));
+        }
+        newline();
+
+        if (!compact) {
             print(String("   => Vendor ID: ", vendorHex));
             print(String("   => Device ID: ", deviceHex));
         }
