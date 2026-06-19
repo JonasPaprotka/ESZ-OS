@@ -68,7 +68,10 @@ void get_pci_devices() {
 
                 const uint32_t reg3 = pci_read(bus, device, funct, 0x04 * 3);
                 found_pci_devices[deviceCounter].CacheLineSize = (uint8_t)(reg3 & 0xFFFF);
-                found_pci_devices[deviceCounter].BIST = (uint8_t)(reg3 >> 8);
+                found_pci_devices[deviceCounter].BIST.CompetionCode = (uint8_t)((reg3 >> 8) & 0b11110000);
+                found_pci_devices[deviceCounter].BIST.Reserved = (uint8_t)((reg3 >> 8) & 0b11001111);
+                found_pci_devices[deviceCounter].BIST.Start_BIST = (uint8_t)((reg3 >> 8) & 0b10111111);
+                found_pci_devices[deviceCounter].BIST.BIST_Capable = (uint8_t)((reg3 >> 8) & 0b01111111);
                 found_pci_devices[deviceCounter].HeaderType = (uint8_t)(reg3 >> 16);
                 found_pci_devices[deviceCounter].LatencyTimer = (uint8_t)(reg3 >> 24);
 

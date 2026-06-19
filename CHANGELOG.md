@@ -2,7 +2,10 @@
 
 ## v0.1.8
 
--
+- Math libary improvements
+    - align_up(uint64_t addr, uint64_t align) -> uint64_t
+    - align_down(uint64_t addr, uint64_t align) -> uint64_t
+    - is_aligned(uint64_t addr, uint64_t align) -> bool
 
 ## v0.1.7
 

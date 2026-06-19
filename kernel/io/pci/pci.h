@@ -22,6 +22,14 @@ union PCI_BAR {
     PCI_IO_Space_BAR io;
 } __attribute__((packed));
 
+struct BIST_Register {
+    uint8_t CompetionCode : 4;
+    uint8_t Reserved : 2;
+    uint8_t Start_BIST : 1;
+    uint8_t BIST_Capable : 1;
+} __attribute__((packed));
+
+
 struct PCI_Device {
     uint16_t VendorID;
     uint16_t DeviceID;
@@ -36,7 +44,7 @@ struct PCI_Device {
     uint8_t  CacheLineSize;
     uint8_t  LatencyTimer;
     uint8_t  HeaderType;
-    uint8_t  BIST;
+    BIST_Register  BIST; // 8bits
 
     PCI_BAR BAR[6]; // 6*32 bits
 

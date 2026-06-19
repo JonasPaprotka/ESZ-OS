@@ -6,8 +6,8 @@
 #define ARCH_NAME "x86_64"
 
 // --- ONLY COMMENT IN ONE ---
-#define KEYBOARD_LAYOUT_US
-//#define KEYBOARD_LAYOUT_DE
+//#define KEYBOARD_LAYOUT_US
+#define KEYBOARD_LAYOUT_DE
 // ---------------------------
 
 #define CURSOR_HEIGHT 2
@@ -24,7 +24,7 @@
 #define PAGE_SIZE 4096
 #define INIT_HEAP_SIZE 4096 * 1024 * 4 // 16 MiB
 
-#define FONT_SIZE 1
+#define FONT_SIZE 2
 
 #define PIT_TICK_HZ 100 // timer percision in Hz
 

@@ -11,4 +11,8 @@ uint64_t abs(const int64_t n);
 int64_t clamp(const int64_t n, const int64_t min, const int64_t max);
 bool is_power_of_two(const int64_t n);
 
+bool is_aligned(const uint64_t addr, const uint64_t align);
+uint64_t align_up(const uint64_t addr, const uint64_t align);
+uint64_t align_down(const uint64_t addr, const uint64_t align);
+
 #endif
