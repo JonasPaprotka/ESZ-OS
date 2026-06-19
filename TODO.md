@@ -1,5 +1,4 @@
 # TODO
-- PCI
 - Filesystem FAT32
 - String library improvements
     - str_to_int, str_to_hex

@@ -1,7 +1,5 @@
 # ESZ-OS
 
-v0.1.7
-
 A hobby x86_64 kernel written in C++ and Assembly
 
 ## Disclaimer
@@ -62,5 +60,5 @@ You can also simulate more RAM with the given presets
 To release a new Version of ESZ-OS you need to be on the pulled commit on the main branch and tag it.
 ```zsh
 git tag <version>
-git push origin <version>
+git push origin tag <version>
 ```
