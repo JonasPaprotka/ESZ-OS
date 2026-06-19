@@ -58,17 +58,19 @@ void get_pci_devices() {
 
                 const uint32_t reg1 = pci_read(bus, device, funct, 0x04 * 1);
                 found_pci_devices[deviceCounter].Command = (uint16_t)(reg1 & 0xFFFF);
-                found_pci_devices[deviceCounter].Status  = (uint16_t)(reg1 >> 16);
+                found_pci_devices[deviceCounter].Status = (uint16_t)(reg1 >> 16);
 
                 const uint32_t reg2 = pci_read(bus, device, funct, 0x04 * 2);
                 found_pci_devices[deviceCounter].RevisionID = (uint8_t)(reg2 & 0xFF);
-                found_pci_devices[deviceCounter].ClassCode  = (uint8_t)(reg2 >> 24);
+                found_pci_devices[deviceCounter].ProgIF = (uint8_t)(reg2 >> 8);
+                found_pci_devices[deviceCounter].Subclass = (uint8_t)(reg2 >> 16);
+                found_pci_devices[deviceCounter].ClassCode = (uint8_t)(reg2 >> 24);
 
                 const uint32_t reg3 = pci_read(bus, device, funct, 0x04 * 3);
                 found_pci_devices[deviceCounter].CacheLineSize = (uint8_t)(reg3 & 0xFFFF);
-                found_pci_devices[deviceCounter].LatencyTimer = (uint8_t)(reg3 >> 24);
-                found_pci_devices[deviceCounter].HeaderType = (uint8_t)(reg3 >> 16);
                 found_pci_devices[deviceCounter].BIST = (uint8_t)(reg3 >> 8);
+                found_pci_devices[deviceCounter].HeaderType = (uint8_t)(reg3 >> 16);
+                found_pci_devices[deviceCounter].LatencyTimer = (uint8_t)(reg3 >> 24);
 
                 // reg4 - reg9
                 for (uint8_t i = 0; i < 6; i++) {
@@ -95,9 +97,9 @@ void get_pci_devices() {
 
                 const uint32_t reg15 = pci_read(bus, device, funct, 0x04 * 15);
                 found_pci_devices[deviceCounter].InterruptLine = (uint8_t)(reg15 & 0xFFFF);
-                found_pci_devices[deviceCounter].InterruptPin = (uint8_t)(reg15 >> 24);
-                found_pci_devices[deviceCounter].MinGnt = (uint8_t)(reg15 >> 16);
                 found_pci_devices[deviceCounter].MaxLat = (uint8_t)(reg15 >> 8);
+                found_pci_devices[deviceCounter].MinGnt = (uint8_t)(reg15 >> 16);
+                found_pci_devices[deviceCounter].InterruptPin = (uint8_t)(reg15 >> 24);
 
                 deviceCounter++;
             }
