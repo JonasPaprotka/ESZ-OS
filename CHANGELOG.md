@@ -6,6 +6,7 @@
     - align_up(uint64_t addr, uint64_t align) -> uint64_t
     - align_down(uint64_t addr, uint64_t align) -> uint64_t
     - is_aligned(uint64_t addr, uint64_t align) -> bool
+- PCI Class Name Resolvment for pciinfo command
 
 ## v0.1.7
 
