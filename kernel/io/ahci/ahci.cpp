@@ -10,6 +10,14 @@
 volatile AHCI_Registers* ahci;
 volatile AHCI_Ports* foundPortPtr = nullptr;
 
+void ata_string_byteswap(char* text, const uint32_t length) {
+    for (uint32_t i = 0; i < length; i += 2) {
+        char temp = text[i];
+        text[i] = text[i + 1];
+        text[i + 1] = temp;
+    }
+}
+
 void await_port_status_change(volatile AHCI_Ports* port, const bool active) {
     const uint8_t pollStatus = active;
     while (port->CMD.CR != pollStatus || port->CMD.FR != pollStatus) {
@@ -86,6 +94,13 @@ void ahci_identify_device(volatile AHCI_Ports* port) {
     IDENTIFY_Response* identifyData = (IDENTIFY_Response*)(dataBufferPhysAddr + hhdm_offset);
     identifyData->Reserved2[0] = 0;
     identifyData->Reserved3[0] = 0;
+
+    ata_string_byteswap(identifyData->SerialNumber, 20);
+    str_copy(identifyData->SerialNumber, str_trim_end(identifyData->SerialNumber));
+
+    ata_string_byteswap(identifyData->ModelName, 40);
+    str_copy(identifyData->ModelName, str_trim_end(identifyData->ModelName));
+
     printInfoLine(InfoTextType::Info, String("Model Name: ", identifyData->ModelName));
     printInfoLine(InfoTextType::Info, String("Serial Number: ", identifyData->SerialNumber));
     printInfoLine(InfoTextType::Info, String("Amount of Sectors: ", identifyData->AmountOfSectors_64bit));

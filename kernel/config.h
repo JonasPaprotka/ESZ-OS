@@ -8,8 +8,8 @@
 // ---------------
 
 // --- ONLY COMMENT IN ONE ---
-//#define KEYBOARD_LAYOUT_US
-#define KEYBOARD_LAYOUT_DE
+#define KEYBOARD_LAYOUT_US
+//#define KEYBOARD_LAYOUT_DE
 // ---------------------------
 
 // --- CURSOR CONFIG ---
@@ -18,7 +18,7 @@
 // ---------------------
 
 // --- FONT CONFIG ---
-#define FONT_SIZE 2
+#define FONT_SIZE 1
 // -------------------
 
 // --- VERSION TRACKER ---
