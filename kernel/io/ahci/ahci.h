@@ -75,4 +75,6 @@ struct AHCI_Registers { // 11x32 bits (44 bytes)
     AHCI_Ports Ports[32];
 } __attribute__((packed));
 
+void init_ahci();
+
 #endif

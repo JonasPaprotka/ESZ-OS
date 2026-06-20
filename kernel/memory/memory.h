@@ -22,6 +22,7 @@ void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showS
 
 uint64_t pmm_malloc(const uint64_t byteAmount);
 uint64_t pmm_malloc_page();
+uint64_t pmm_malloc_pages(const uint64_t pageAmount);
 void* pmm_malloc_addr(const uint64_t byteAmount);
 
 void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount);

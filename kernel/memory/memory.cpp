@@ -169,6 +169,10 @@ uint64_t pmm_malloc_page() {
     return pmm_malloc(PAGE_SIZE);
 }
 
+uint64_t pmm_malloc_pages(const uint64_t pageAmount) {
+    return pmm_malloc(PAGE_SIZE * pageAmount);
+}
+
 void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {
     freePageCounter = 0;
     usedPageCounter = 0;

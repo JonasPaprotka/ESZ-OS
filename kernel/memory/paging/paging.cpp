@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "memory.h"
 #include "config.h"
+#include "math.h"
 
 uint16_t get_PML4_Index(const uint64_t address) {
     return (address >> 39) & 0x1FF;
@@ -19,11 +20,11 @@ uint16_t get_PT_Index(const uint64_t address) {
     return (address >> 12) & 0x1FF;
 }
 
-uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx) {
+uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx, const uint64_t requiredSize) {
     if (prevTableAddr->entries[Idx].Present == 1) {
         return (prevTableAddr->entries[Idx].Address << 12);
     } else {
-        uint64_t currRouterTableAddress = pmm_malloc_page();
+        uint64_t currRouterTableAddress = pmm_malloc_pages(divide_round_up(requiredSize, PAGE_SIZE));
         memory_clear((uint64_t*)(currRouterTableAddress + hhdm_offset), PAGE_SIZE);
         prevTableAddr->entries[Idx].Present = 1;
         prevTableAddr->entries[Idx].ReadWrite = 1;
@@ -32,7 +33,7 @@ uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx) 
     }
 }
 
-void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags) {
+void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize) {
     // get start of tree (PML4)
     uint64_t cr3;
     __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
@@ -43,9 +44,9 @@ void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, con
     const uint16_t virtPTIdx = get_PT_Index(virtualAddress);
 
     PageTable* startPageTable = (PageTable*)(cr3 + hhdm_offset);
-    PageTable* pageTable1 = (PageTable*)(get_or_create_next_table(startPageTable, virtPML4Idx) + hhdm_offset);
-    PageTable* pageTable2 = (PageTable*)(get_or_create_next_table(pageTable1, virtPDPTIdx) + hhdm_offset);
-    PageTable* pageTable3 = (PageTable*)(get_or_create_next_table(pageTable2, virtPDIdx) + hhdm_offset);
+    PageTable* pageTable1 = (PageTable*)(get_or_create_next_table(startPageTable, virtPML4Idx, requiredSize) + hhdm_offset);
+    PageTable* pageTable2 = (PageTable*)(get_or_create_next_table(pageTable1, virtPDPTIdx, requiredSize) + hhdm_offset);
+    PageTable* pageTable3 = (PageTable*)(get_or_create_next_table(pageTable2, virtPDIdx, requiredSize) + hhdm_offset);
 
     // register on lowest tree level
     pageTable3->entries[virtPTIdx].Present = 1;
