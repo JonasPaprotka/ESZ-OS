@@ -4,6 +4,29 @@
 #include "ahci.h"
 #include "paging.h"
 #include "info_text.h"
+#include "timer.h"
+
+volatile AHCI_Registers* ahci;
+
+void await_port_status_change(volatile AHCI_Ports* port, const bool active) {
+    const uint8_t pollStatus = active;
+    while (port->CMD.CR != pollStatus || port->CMD.FR != pollStatus) {
+        sleep_ms(1);
+    }
+}
+
+void set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
+    if (activate) {
+        port->CMD.ST = 1;
+        port->CMD.FRE = 1;
+        await_port_status_change(port, true);
+        return;
+    }
+
+    port->CMD.ST = 0;
+    port->CMD.FRE = 0;
+    await_port_status_change(port, false);
+}
 
 volatile uint32_t* get_virtual_membar_address(const PCI_BAR bar) {
     return (uint32_t*)((uint32_t)(bar.mem.BaseAddress << 4) + VIRTUAL_OFFSET_MMIO);
@@ -31,17 +54,27 @@ void setup_primary_storage_device() {
         sizeof(AHCI_Registers)
     );
 
-    volatile AHCI_Registers* ahci = (volatile AHCI_Registers*) get_virtual_membar_address(find_primary_storage_device().BAR[5]);
+    ahci = (volatile AHCI_Registers*) get_virtual_membar_address(find_primary_storage_device().BAR[5]);
 
     uint8_t foundAtPort = 0;
+    volatile AHCI_Ports* foundPortPtr = nullptr;
     for (uint8_t i = 0; i < 32; i++) {
         if (ahci->Ports[i].SSTS.DET == 3) {
             foundAtPort = i;
+            foundPortPtr = &ahci->Ports[foundAtPort];
             break;
         }
     }
 
+    if (foundPortPtr == nullptr) {
+        printInfoLine(InfoTextType::Error, "No Primary SATA Storage Medium was found.");
+        return;
+    }
+
     printInfoLine(InfoTextType::Info, String("Found SATA Storage Medium at Port: ", foundAtPort));
+
+    // shutdown port
+    set_sata_port_status(foundPortPtr, false);
 }
 
 
