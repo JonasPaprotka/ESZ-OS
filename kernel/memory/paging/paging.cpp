@@ -21,7 +21,7 @@ uint16_t get_PT_Index(const uint64_t address) {
     return (address >> 12) & 0x1FF;
 }
 
-uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx, const uint64_t requiredSize) {
+uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx) {
     if (prevTableAddr->entries[Idx].Present == 1) {
         return (prevTableAddr->entries[Idx].Address << 12);
     } else {
@@ -45,9 +45,9 @@ void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, co
     const uint16_t virtPTIdx = get_PT_Index(virtualAddress);
 
     PageTable* startPageTable = (PageTable*)(cr3 + hhdm_offset);
-    PageTable* pageTable1 = (PageTable*)(get_or_create_next_table(startPageTable, virtPML4Idx, requiredSize) + hhdm_offset);
-    PageTable* pageTable2 = (PageTable*)(get_or_create_next_table(pageTable1, virtPDPTIdx, requiredSize) + hhdm_offset);
-    PageTable* pageTable3 = (PageTable*)(get_or_create_next_table(pageTable2, virtPDIdx, requiredSize) + hhdm_offset);
+    PageTable* pageTable1 = (PageTable*)(get_or_create_next_table(startPageTable, virtPML4Idx) + hhdm_offset);
+    PageTable* pageTable2 = (PageTable*)(get_or_create_next_table(pageTable1, virtPDPTIdx) + hhdm_offset);
+    PageTable* pageTable3 = (PageTable*)(get_or_create_next_table(pageTable2, virtPDIdx) + hhdm_offset);
 
     const uint64_t requiredPages = divide_round_up(requiredSize, PAGE_SIZE);
     for (uint64_t i = 0; i < requiredPages; i++) {

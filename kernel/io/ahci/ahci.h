@@ -3,6 +3,17 @@
 
 #include <stdint.h>
 
+struct IDENTIFY_Response {
+    uint8_t Reserved1[20]; // 20 bytes
+    char SerialNumber[20]; // 20 bytes
+    uint8_t Reserved2[14]; // 14 bytes
+    char ModelName[40]; // 40 bytes
+    uint8_t Reserved3[26]; // 26 bytes
+    uint32_t AmountOfSectors_32bit; // 4 bytes
+    uint8_t Reserved4[76]; // 76 bytes
+    uint64_t AmountOfSectors_64bit; // 8 bytes
+} __attribute__((packed));
+
 struct H2D_Register_FIS {
     uint8_t FISType;
     uint8_t PMPort : 4;
@@ -73,7 +84,8 @@ struct PCMD_Bits {
 } __attribute__((packed));
 
 struct AHCI_Command_Table {
-    H2D_Register_FIS CFIS[64 - sizeof(H2D_Register_FIS)]; // 64 bytes
+    H2D_Register_FIS CFIS;
+    uint8_t CFIS_Padding[64 - sizeof(H2D_Register_FIS)]; // 64 bytes
     uint8_t ACMD[16]; // 16 bytes
     uint8_t Reserved[48]; // 48 bytes
     PRDT_Bits PRDT[1];

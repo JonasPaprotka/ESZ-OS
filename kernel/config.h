@@ -8,8 +8,8 @@
 // ---------------
 
 // --- ONLY COMMENT IN ONE ---
-#define KEYBOARD_LAYOUT_US
-//#define KEYBOARD_LAYOUT_DE
+//#define KEYBOARD_LAYOUT_US
+#define KEYBOARD_LAYOUT_DE
 // ---------------------------
 
 // --- CURSOR CONFIG ---
@@ -18,13 +18,13 @@
 // ---------------------
 
 // --- FONT CONFIG ---
-#define FONT_SIZE 1
+#define FONT_SIZE 2
 // -------------------
 
 // --- VERSION TRACKER ---
 #define OS_VERSION_MAJOR 0
-#define OS_VERSION_MINOR 1
-#define OS_VERSION_PATCH 9
+#define OS_VERSION_MINOR 2
+#define OS_VERSION_PATCH 0
 // -----------------------
 
 // --- TERMINAL CONFIG ---
