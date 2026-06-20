@@ -131,6 +131,26 @@ PCI_Device find_primary_storage_device() {
     return emtpyDevice;
 }
 
+void setup_primary_storage_device() {
+    map_page(
+        (uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), // virt addr
+        get_physical_membar_address(find_primary_storage_device().BAR[5]), // phys addr
+        0b00010010  // writable and cache disabled
+    );
+
+    volatile AHCI_Registers* ahci = (volatile AHCI_Registers*) get_virtual_membar_address(find_primary_storage_device().BAR[5]);
+
+    uint8_t foundAtPort = 0;
+    for (uint8_t i = 0; i < 32; i++) {
+        if (ahci->Ports[i].SSTS.DET == 3) {
+            foundAtPort = i;
+            break;
+        }
+    }
+
+    printInfoLine(InfoTextType::Info, String("Found SATA Storage Medium at Port: ", foundAtPort));
+}
+
 void init_pci() {
     printInfoLine(InfoTextType::Loading, "Loading PCI Devices...");
     PCIDeviceAmount = count_pci_devices();
@@ -138,12 +158,6 @@ void init_pci() {
     get_pci_devices();
     printInfoLine(InfoTextType::Success, String("Loaded ", PCIDeviceAmount, " PCI Devices"));
 
-    map_page(
-        (uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), // virt addr
-        get_physical_membar_address(find_primary_storage_device().BAR[5]), // phys addr
-        0b00010010  // writable and cache disabled
-    );
-
-    // printInfoLine(InfoTextType::Debug, to_string((uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), 16));
-    volatile AHCI_Registers* ahci = (volatile AHCI_Registers*) get_virtual_membar_address(find_primary_storage_device().BAR[5]);
+    printInfoLine(InfoTextType::Loading, "Loading Primary Storage Device...");
+    setup_primary_storage_device();
 }
