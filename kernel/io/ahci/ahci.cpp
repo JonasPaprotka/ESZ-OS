@@ -24,7 +24,7 @@ PCI_Device find_primary_storage_device() {
 }
 
 void setup_primary_storage_device() {
-    map_page(
+    map_pages(
         (uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), // virt addr
         get_physical_membar_address(find_primary_storage_device().BAR[5]), // phys addr
         0b00010010,  // writable and cache disabled

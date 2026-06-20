@@ -33,7 +33,7 @@ uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx, 
     }
 }
 
-void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize) {
+void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize) {
     // get start of tree (PML4)
     uint64_t cr3;
     __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
@@ -63,4 +63,8 @@ void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, con
 
     // remove cached virtual address translation
     __asm__ volatile("invlpg (%0)" : : "r"(virtualAddress) : "memory");
+}
+
+void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags) {
+    map_pages(virtualAddress, physicalAddress, flags, PAGE_SIZE);
 }
