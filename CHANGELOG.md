@@ -2,7 +2,19 @@
 
 ## v0.2.0
 
--
+- AHCI Storage Driver
+    - SATA Port Detection on AHCI Controller
+    - Port Initialization
+    - IDENTIFY DEVICE Command Implementation
+        - Model Name
+        - Serial Number
+        - Sector Count Readout
+- Paging
+    - 4-Level Page Table Walker
+    - map_page()
+    - map_pages()
+    - Added VIRTUAL_OFFSET_MMIO to config.h
+- config.h cleanup for simpler editing
 
 ## v0.1.8
 
