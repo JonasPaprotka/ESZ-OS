@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "config.h"
 #include "math.h"
+#include "info_text.h"
 
 uint16_t get_PML4_Index(const uint64_t address) {
     return (address >> 39) & 0x1FF;
@@ -24,7 +25,7 @@ uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx, 
     if (prevTableAddr->entries[Idx].Present == 1) {
         return (prevTableAddr->entries[Idx].Address << 12);
     } else {
-        uint64_t currRouterTableAddress = pmm_malloc_pages(divide_round_up(requiredSize, PAGE_SIZE));
+        uint64_t currRouterTableAddress = pmm_malloc_page();
         memory_clear((uint64_t*)(currRouterTableAddress + hhdm_offset), PAGE_SIZE);
         prevTableAddr->entries[Idx].Present = 1;
         prevTableAddr->entries[Idx].ReadWrite = 1;
@@ -48,18 +49,27 @@ void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, co
     PageTable* pageTable2 = (PageTable*)(get_or_create_next_table(pageTable1, virtPDPTIdx, requiredSize) + hhdm_offset);
     PageTable* pageTable3 = (PageTable*)(get_or_create_next_table(pageTable2, virtPDIdx, requiredSize) + hhdm_offset);
 
-    // register on lowest tree level
-    pageTable3->entries[virtPTIdx].Present = 1;
+    const uint64_t requiredPages = divide_round_up(requiredSize, PAGE_SIZE);
+    for (uint64_t i = 0; i < requiredPages; i++) {
+        const uint16_t virtPTIdxAdjusted = virtPTIdx + i;
+        if (virtPTIdxAdjusted >= 512) {
+            printInfoLine(InfoTextType::Error, "map_pages: Paging Index is out of bounds");
+            break;
+        }
 
-    if (flags & 0b00000010) {
-        pageTable3->entries[virtPTIdx].ReadWrite = 1;
-    } else pageTable3->entries[virtPTIdx].ReadWrite = 0;
+        // register on lowest tree level
+        pageTable3->entries[virtPTIdxAdjusted].Present = 1;
 
-    if (flags & 0b00010000) {
-        pageTable3->entries[virtPTIdx].CacheDisabled = 1;
-    } else pageTable3->entries[virtPTIdx].CacheDisabled = 0;
+        if (flags & 0b00000010) {
+            pageTable3->entries[virtPTIdxAdjusted].ReadWrite = 1;
+        } else pageTable3->entries[virtPTIdxAdjusted].ReadWrite = 0;
 
-    pageTable3->entries[virtPTIdx].Address = (physicalAddress >> 12);
+        if (flags & 0b00010000) {
+            pageTable3->entries[virtPTIdxAdjusted].CacheDisabled = 1;
+        } else pageTable3->entries[virtPTIdxAdjusted].CacheDisabled = 0;
+
+        pageTable3->entries[virtPTIdxAdjusted].Address = ((physicalAddress + (i * PAGE_SIZE)) >> 12);
+    }
 
     // remove cached virtual address translation
     __asm__ volatile("invlpg (%0)" : : "r"(virtualAddress) : "memory");
