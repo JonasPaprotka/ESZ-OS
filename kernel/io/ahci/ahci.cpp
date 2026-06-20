@@ -96,10 +96,14 @@ void ahci_identify_device(volatile AHCI_Ports* port) {
     identifyData->Reserved3[0] = 0;
 
     ata_string_byteswap(identifyData->SerialNumber, 20);
-    str_copy(identifyData->SerialNumber, str_trim_end(identifyData->SerialNumber));
+    char* serialNumberValue = str_trim_end(identifyData->SerialNumber);
+    str_copy(identifyData->SerialNumber, serialNumberValue);
+    free(serialNumberValue);
 
     ata_string_byteswap(identifyData->ModelName, 40);
-    str_copy(identifyData->ModelName, str_trim_end(identifyData->ModelName));
+    char* modelNameValue = str_trim_end(identifyData->ModelName);
+    str_copy(identifyData->ModelName, modelNameValue);
+    free(modelNameValue);
 
     printInfoLine(InfoTextType::Info, String("Model Name: ", identifyData->ModelName));
     printInfoLine(InfoTextType::Info, String("Serial Number: ", identifyData->SerialNumber));
