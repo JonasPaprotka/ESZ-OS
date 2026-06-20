@@ -11,4 +11,4 @@ struct PCIClassInfo {
 
 PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass);
 
-#endif
+#endif // PCI_CLASS_NAMES_H

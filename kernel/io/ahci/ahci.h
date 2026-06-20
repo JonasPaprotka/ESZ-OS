@@ -3,6 +3,42 @@
 
 #include <stdint.h>
 
+struct H2D_Register_FIS {
+    uint8_t FISType;
+    uint8_t PMPort : 4;
+    uint8_t Reserved1 : 3;
+    uint8_t C : 1; // 1=Command Register Update
+    uint8_t Command;
+    uint8_t FeaturesLow;
+    uint8_t LBA0;
+    uint8_t LBA1;
+    uint8_t LBA2;
+    uint8_t Device;
+    uint8_t LBA3;
+    uint8_t LBA4;
+    uint8_t LBA5;
+    uint8_t FeaturesHigh;
+    uint8_t CountLow;
+    uint8_t CountHigh;
+    uint8_t ICC;
+    uint8_t Control;
+} __attribute__((packed));
+
+struct PRDT_Bits {
+    uint32_t DBA;
+    uint32_t DBAU;
+    uint32_t Reserved1;
+    uint32_t DBC : 22;
+    uint32_t Reserved2 : 9;
+    uint32_t I : 1;
+} __attribute__((packed));
+
+struct TFD_Bits {
+    uint32_t STS : 8;
+    uint32_t ERR : 8;
+    uint32_t Reserved : 16;
+} __attribute__((packed));
+
 struct SSTS_Bits {
     uint32_t DET : 4;
     uint32_t SPD : 4;
@@ -36,6 +72,31 @@ struct PCMD_Bits {
     uint32_t ICC : 4;
 } __attribute__((packed));
 
+struct AHCI_Command_Table {
+    H2D_Register_FIS CFIS[64 - sizeof(H2D_Register_FIS)]; // 64 bytes
+    uint8_t ACMD[16]; // 16 bytes
+    uint8_t Reserved[48]; // 48 bytes
+    PRDT_Bits PRDT[1];
+} __attribute__((packed));
+
+struct AHCI_Command_Header { // 32 bytes
+    uint32_t CFL : 5; // 5 bits
+    uint32_t A : 1; // 1 bit
+    uint32_t W : 1; // 1=Write / 0=Read - 1 bit
+    uint32_t P : 1; // 1 bit
+    uint32_t R : 1; // 1 bit
+    uint32_t B : 1; // 1 bit
+    uint32_t C : 1; // 1 bit
+    uint32_t Reserved1 : 1; // 1 bit
+    uint32_t PMP : 4; // 4 bits
+    uint32_t PRDTL : 16; // 16 bits
+    uint32_t PRDBC; // 32 bits
+    uint32_t CTBA; // 32 bits
+    uint32_t CTBAU; // 32 bits
+    uint32_t Reserved2[4]; // 4*32 bits
+} __attribute__((packed));
+
+
 struct AHCI_Ports { // 4352 bytes
     uint32_t CLB;
     uint32_t CLBU;
@@ -45,7 +106,7 @@ struct AHCI_Ports { // 4352 bytes
     uint32_t IE;
     PCMD_Bits CMD;
     uint32_t Reserved1;
-    uint32_t TFD;
+    TFD_Bits TFD;
     uint32_t SIG;
     SSTS_Bits SSTS;
     uint32_t SCTL;
@@ -77,4 +138,4 @@ struct AHCI_Registers { // 11x32 bits (44 bytes)
 
 void init_ahci();
 
-#endif
+#endif // AHCI_H

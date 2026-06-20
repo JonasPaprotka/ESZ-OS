@@ -53,4 +53,4 @@
     STRINGIFY(OS_VERSION_MINOR) "." \
     STRINGIFY(OS_VERSION_PATCH)
 
-#endif
+#endif // CONFIG_H

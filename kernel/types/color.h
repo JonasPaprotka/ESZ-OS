@@ -41,4 +41,4 @@ enum class Color : uint32_t {
     Transparent  = 0x00000000
 };
 
-#endif
+#endif // COLOR_H

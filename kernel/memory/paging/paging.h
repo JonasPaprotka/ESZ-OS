@@ -26,4 +26,4 @@ struct PageTable {
 void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize);
 void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags);
 
-#endif
+#endif // PAGING_H

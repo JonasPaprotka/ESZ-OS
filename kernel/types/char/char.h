@@ -10,4 +10,4 @@ bool is_whitespace(const char c);
 char to_upper(const char c);
 char to_lower(const char c);
 
-#endif
+#endif // CHAR_H

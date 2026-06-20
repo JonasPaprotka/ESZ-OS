@@ -12,4 +12,4 @@ void cmd_sysinfo(const char* = nullptr);
 
 extern const Command commands[];
 
-#endif
+#endif // COMMANDS_H

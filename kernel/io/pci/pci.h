@@ -68,4 +68,4 @@ extern uint32_t PCIDeviceAmount;
 
 void init_pci();
 
-#endif
+#endif // PCI_H

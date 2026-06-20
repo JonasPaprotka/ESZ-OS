@@ -33,4 +33,4 @@ void free(const void* ptr);
 
 void print_memory_info();
 
-#endif
+#endif // MEMORY_H

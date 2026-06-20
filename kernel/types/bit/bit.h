@@ -7,4 +7,4 @@ void bit_clear(unsigned char* bitmap, const int page);
 void bit_write(unsigned char* bitmap, const int page, const bool value);
 bool bit_read(unsigned char* bitmap, const int page);
 
-#endif
+#endif // BIT_H

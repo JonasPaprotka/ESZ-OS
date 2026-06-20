@@ -49,4 +49,4 @@ void redraw_line(const int line);
 
 void init_print();
 
-#endif
+#endif // PRINT_H
