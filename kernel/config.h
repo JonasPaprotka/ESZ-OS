@@ -28,6 +28,7 @@
 
 #define PIT_TICK_HZ 100 // timer percision in Hz
 
+#define VIRTUAL_OFFSET_MMIO 0xFFFFA00000000000
 
 // MAKROS
 #define STRINGIFY_IMPL(x) #x
