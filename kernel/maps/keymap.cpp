@@ -6,11 +6,11 @@
 
 #ifdef KEYBOARD_LAYOUT_DE
 const KeyboardLayout current_layout = LAYOUT_DE;
-#endif
+#endif // KEYBOARD_LAYOUT_DE
 
 #ifdef KEYBOARD_LAYOUT_US
 const KeyboardLayout current_layout = LAYOUT_US;
-#endif
+#endif // KEYBOARD_LAYOUT_US
 
 
 uint16_t scancode_to_keycode(const uint8_t scancode) {

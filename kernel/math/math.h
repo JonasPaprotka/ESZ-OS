@@ -15,4 +15,4 @@ bool is_aligned(const uint64_t addr, const uint64_t align);
 uint64_t align_up(const uint64_t addr, const uint64_t align);
 uint64_t align_down(const uint64_t addr, const uint64_t align);
 
-#endif
+#endif // MATH_H

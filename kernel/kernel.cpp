@@ -1,5 +1,4 @@
 #include <stdint.h>
-
 #include "print.h"
 #include "clear.h"
 #include "terminal.h"
@@ -12,6 +11,7 @@
 #include "keyboard.h"
 #include "screenBuffer.h"
 #include "pci.h"
+#include "ahci.h"
 
 void halt() {
     while(1) {
@@ -240,16 +240,13 @@ extern "C" void kernel_main() {
     pit_init();
     pic_init();
 
-    // flush pending scancodes - fixes FUCKING anoying unuseable keyboard bug
+    // flush pending scancodes
     while (inb(0x64) & 1) inb(0x60);
-
-    // TEST DIV BY 0 FAULT
-    //volatile int x = 0;
-    //int a = 6 / x;
 
     init_screen_buffer();
 
     init_pci();
+    init_ahci();
 
     terminal_init();
 

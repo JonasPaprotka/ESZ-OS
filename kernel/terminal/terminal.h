@@ -17,4 +17,4 @@ void insert_char_at_cursor(const char c);
 void terminal_init();
 void terminal_on_key(uint8_t scancode);
 
-#endif
+#endif // TERMINAL_H

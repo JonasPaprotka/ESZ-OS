@@ -4,6 +4,7 @@ KERNEL := bin/kernel.elf
 ISO := bin/eszos.iso
 ISO_ROOT := bin/iso_root
 LIMINE := limine
+DISK_IMG := bin/disk.img
 
 CXX := x86_64-elf-g++
 LD := x86_64-elf-ld
@@ -39,6 +40,8 @@ CPP_OBJ := $(CPP_SRC:%.cpp=bin/obj/%.cpp.o)
 ASM_OBJ := $(ASM_SRC:%.asm=bin/obj/%.asm.o)
 OBJ := $(CPP_OBJ) $(ASM_OBJ)
 
+QEMU_DISK_FLAGS := -drive file=$(DISK_IMG),if=none,id=disk0,format=raw -device ide-hd,drive=disk0,bus=ide.1
+
 .PHONY: all run clean
 
 all: $(ISO)
@@ -73,30 +76,34 @@ $(ISO): $(KERNEL) limine.conf
 	    $(ISO_ROOT) -o $(ISO)
 	$(LIMINE)/limine bios-install $(ISO)
 
+$(DISK_IMG):
+	@mkdir -p $(dir $@)
+	qemu-img create -f raw $(DISK_IMG) 64M
+
 # RUNS - DIFF RAM PRESETS
-run: $(ISO)
-	qemu-system-x86_64 -M q35 -m 512M -cdrom $(ISO) -boot d
+run: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 512M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-1: $(ISO)
-	qemu-system-x86_64 -M q35 -m 1024M -cdrom $(ISO) -boot d
+run-1: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 1024M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-2: $(ISO)
-	qemu-system-x86_64 -M q35 -m 2048M -cdrom $(ISO) -boot d
+run-2: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 2048M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-4: $(ISO)
-	qemu-system-x86_64 -M q35 -m 4096M -cdrom $(ISO) -boot d
+run-4: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 4096M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-8: $(ISO)
-	qemu-system-x86_64 -M q35 -m 8192M -cdrom $(ISO) -boot d
+run-8: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 8192M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-16: $(ISO)
-	qemu-system-x86_64 -M q35 -m 16384M -cdrom $(ISO) -boot d
+run-16: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 16384M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-32: $(ISO)
-	qemu-system-x86_64 -M q35 -m 32768M -cdrom $(ISO) -boot d
+run-32: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 32768M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
-run-64: $(ISO)
-	qemu-system-x86_64 -M q35 -m 65536M -cdrom $(ISO) -boot d
+run-64: $(ISO) $(DISK_IMG)
+	qemu-system-x86_64 -M q35 -m 65536M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
 clean:
 	rm -rf bin

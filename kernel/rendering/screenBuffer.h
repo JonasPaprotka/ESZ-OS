@@ -31,4 +31,4 @@ Cell* get_screen_buffer_cell(const Line* line, const int x);
 void init_screen_buffer();
 void init_empty_screen_buffer();
 
-#endif
+#endif // SCREEN_BUFFER_H

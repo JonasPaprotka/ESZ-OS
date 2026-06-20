@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
-struct PCI_Memory_Space_BAR_MMIO {
+struct PCI_Memory_Space_BAR_MMIO { // 32 bits
     uint32_t RegionType : 1; // 1 bit
     uint32_t MemoryType : 2; // 2 bits
     uint32_t Prefetchable : 1; // 1 bit
     uint32_t BaseAddress : 28; // 28 bits
 } __attribute__((packed));
 
-struct PCI_IO_Space_BAR {
+struct PCI_IO_Space_BAR { // 32 bits
     uint32_t RegionType : 1; // 1 bit
     uint32_t Reserved : 1; // 1 bit
     uint32_t BaseAddress : 30; // 30 bits
@@ -22,11 +22,11 @@ union PCI_BAR {
     PCI_IO_Space_BAR io;
 } __attribute__((packed));
 
-struct BIST_Register {
-    uint8_t CompetionCode : 4;
-    uint8_t Reserved : 2;
-    uint8_t Start_BIST : 1;
-    uint8_t BIST_Capable : 1;
+struct BIST_Register { // 8 bits
+    uint8_t CompetionCode : 4; // 4 bits
+    uint8_t Reserved : 2; // 2 bits
+    uint8_t Start_BIST : 1; // 1 bit
+    uint8_t BIST_Capable : 1; // 1 bit
 } __attribute__((packed));
 
 
@@ -68,4 +68,4 @@ extern uint32_t PCIDeviceAmount;
 
 void init_pci();
 
-#endif
+#endif // PCI_H

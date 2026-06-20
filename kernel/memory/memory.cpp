@@ -20,8 +20,6 @@ uint64_t hhdm_offset;
 
 unsigned char* pmm_bitmap;
 
-
-
 MemoryBlockHeader* heapStartPtr;
 MemoryBlockHeader* heapEndPtr;
 
@@ -165,6 +163,14 @@ uint64_t pmm_malloc(const uint64_t byteAmount) {
 
     printInfoLine(InfoTextType::Error, "pmm_malloc failed");
     return 0;
+}
+
+uint64_t pmm_malloc_page() {
+    return pmm_malloc(PAGE_SIZE);
+}
+
+uint64_t pmm_malloc_pages(const uint64_t pageAmount) {
+    return pmm_malloc(PAGE_SIZE * pageAmount);
 }
 
 void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {

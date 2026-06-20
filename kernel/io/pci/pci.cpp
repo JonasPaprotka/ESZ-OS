@@ -1,3 +1,4 @@
+#include "config.h"
 #include "pci.h"
 #include "info_text.h"
 #include "memory.h"
@@ -93,10 +94,6 @@ void get_pci_devices() {
 
                 const uint32_t reg13 = pci_read(bus, device, funct, 0x04 * 13);
                 found_pci_devices[deviceCounter].CapabilitiesPointer = (uint8_t)(reg13 & 0xFFFF);
-                // found_pci_devices[deviceCounter].Reserved
-
-                //const uint32_t reg14 = pci_read(bus, device, funct, 0x04 * 14);
-                // found_pci_devices[deviceCounter].Reserved
 
                 const uint32_t reg15 = pci_read(bus, device, funct, 0x04 * 15);
                 found_pci_devices[deviceCounter].InterruptLine = (uint8_t)(reg15 & 0xFFFF);

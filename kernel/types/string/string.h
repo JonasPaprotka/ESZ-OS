@@ -72,4 +72,4 @@ struct String {
     }
 };
 
-#endif
+#endif // STRING_H

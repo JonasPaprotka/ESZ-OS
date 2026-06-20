@@ -3,4 +3,4 @@
 
 void pit_init();
 
-#endif
+#endif // PIT_H
