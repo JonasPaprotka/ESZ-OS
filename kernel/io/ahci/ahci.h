@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 
+// --- COMMAND CODES ---
+const uint8_t IDENTIFY_DEVICE = 0xEC;
+const uint8_t READ_DMA_EXT = 0x25;
+const uint8_t WRITE_DMA_EXT = 0x35;
+const uint8_t FLUSH_EXT = 0xEA;
+// ---------------------
+
 struct IDENTIFY_Response {
     uint8_t Reserved1[20]; // 20 bytes
     char SerialNumber[20]; // 20 bytes
@@ -147,6 +154,11 @@ struct AHCI_Registers { // 11x32 bits (44 bytes)
     uint32_t Reserved[53];
     AHCI_Ports Ports[32];
 } __attribute__((packed));
+
+IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port);
+void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA, const uint16_t sectorQuantity, const void* RAM_InputPtr);
+void AHCU_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr);
+void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port);
 
 void init_ahci();
 

@@ -2,7 +2,11 @@
 
 ## v0.2.1
 
--
+- AHCI Storage Driver
+    - Updated: AHCI_IDENTIFY_DEVICE
+    - Added: AHCI_WRTIE_DMA_EXT
+    - Added: AHCU_READ_DMA_EXT
+    - Added: AHCI_FLUSH_CACHE_EXT
 
 ## v0.2.0
 
