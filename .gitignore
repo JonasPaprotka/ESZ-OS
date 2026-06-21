@@ -9,3 +9,4 @@ limine/
 limine.h
 
 *.code-workspace
+*img

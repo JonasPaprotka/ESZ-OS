@@ -106,4 +106,7 @@ run-64: $(ISO) $(DISK_IMG)
 	qemu-system-x86_64 -M q35 -m 65536M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
 
 clean:
-	rm -rf bin
+	rm -rf bin/obj bin/kernel.elf bin/eszos.iso bin/iso_root
+
+clean-disk:
+	rm -f $(DISK_IMG)

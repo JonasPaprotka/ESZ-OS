@@ -8,7 +8,7 @@
 PartitionInfo activePartition;
 
 PartitionInfo find_useable_storage_medium() {
-    uint8_t buffer[512];
+    uint8_t buffer[SECTOR_SIZE_BYTES];
     AHCI_READ_DMA_EXT(mainMassStorageDevice, 0, 1, buffer);
     PartitionInfo partitions[4];
     parse_mbr(buffer, partitions);
@@ -24,6 +24,10 @@ PartitionInfo find_useable_storage_medium() {
     }
 
     printInfoLine(InfoTextType::Error, "No FAT32 partition found");
+
+    PartitionInfo partition;
+    partition.Type = FilesystemType::Unknown;
+    return partition;
 }
 
 void init_storage() {
