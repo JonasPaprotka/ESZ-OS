@@ -1,4 +1,7 @@
 # TODO
+- Partition Table Format
+    - MBR (first due to it being simpler)
+    - GPT (later)
 - Filesystem FAT32
 - String library improvements
     - str_to_int, str_to_hex
@@ -19,7 +22,6 @@
     - Tab command completion for n>1 matches
 
 # Future
-- Unit Tests für lib and core functions
 - APIC
 - ACIP
 - Networking
@@ -35,5 +37,6 @@
 - After scrolling - fake chars can appear on cursor (from line above)
 
 # CONSIDER
+- Unit Tests für lib and core functions
 - Header file update to C++ specific verion (.h -> .hpp)
 - Padding for text rendering
