@@ -8,10 +8,8 @@
 #include "memory.h"
 #include "math.h"
 
-const uint32_t SECTOR_SIZE_BYTES = 512;
-
 volatile AHCI_Registers* ahci;
-volatile AHCI_Ports* foundPortPtr = nullptr;
+extern volatile AHCI_Ports* mainMassStorageDevice = nullptr;
 
 void Start_AHCI_Command(volatile AHCI_Ports* port) {
     port->CI |= (1 << 0);
@@ -220,7 +218,9 @@ void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port) {
     RunCommand(port);
 }
 
-void search_available_port() {
+volatile AHCI_Ports* search_available_port() {
+    volatile AHCI_Ports* port;
+
     map_pages(
         (uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), // virt addr
         get_physical_membar_address(find_primary_storage_device().BAR[5]), // phys addr
@@ -234,17 +234,19 @@ void search_available_port() {
     for (uint8_t i = 0; i < 32; i++) {
         if (ahci->Ports[i].SSTS.DET == 3 && ahci->Ports[i].SIG == 0x00000101) { // available and ATA
             foundAtPort = i;
-            foundPortPtr = &ahci->Ports[foundAtPort];
+            port = &ahci->Ports[foundAtPort];
             break;
         }
     }
 
-    if (foundPortPtr == nullptr) {
+    if (port == nullptr) {
         printInfoLine(InfoTextType::Error, "No Primary SATA Storage Medium was found.");
-        return;
+        return nullptr;
     }
 
     printInfoLine(InfoTextType::Info, String("Found SATA Storage Medium at Port: ", foundAtPort));
+
+    return port;
 }
 
 void preparePort(volatile AHCI_Ports* port) {
@@ -264,7 +266,7 @@ void preparePort(volatile AHCI_Ports* port) {
 void init_ahci() {
     printInfoLine(InfoTextType::Loading, "Loading Primary Storage Device...");
 
-    search_available_port();
-    preparePort(foundPortPtr);
-    AHCI_IDENTIFY_DEVICE(foundPortPtr);
+    mainMassStorageDevice = search_available_port();
+    preparePort(mainMassStorageDevice);
+    AHCI_IDENTIFY_DEVICE(mainMassStorageDevice);
 }

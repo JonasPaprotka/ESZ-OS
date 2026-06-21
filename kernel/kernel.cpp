@@ -10,8 +10,7 @@
 #include "io.h"
 #include "keyboard.h"
 #include "screenBuffer.h"
-#include "pci.h"
-#include "ahci.h"
+#include "storage.h"
 
 void halt() {
     while(1) {
@@ -245,8 +244,7 @@ extern "C" void kernel_main() {
 
     init_screen_buffer();
 
-    init_pci();
-    init_ahci();
+    init_storage();
 
     terminal_init();
 
