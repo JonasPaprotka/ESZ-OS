@@ -157,7 +157,7 @@ struct AHCI_Registers { // 11x32 bits (44 bytes)
 
 IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port);
 void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA, const uint16_t sectorQuantity, const void* RAM_InputPtr);
-void AHCU_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr);
+void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr);
 void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port);
 
 void init_ahci();

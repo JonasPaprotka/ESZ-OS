@@ -190,7 +190,7 @@ void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA,
     RunCommand(port);
 }
 
-void AHCU_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr) {
+void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr) {
     uint64_t commandTablePhysAddr = AllocateCommandTable();
     const uint32_t dataSize = sectorQuantity * SECTOR_SIZE_BYTES;
     uint64_t dataBufferPhysAddr = AllocateDataBuffer(dataSize);

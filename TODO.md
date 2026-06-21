@@ -35,6 +35,7 @@
 - str_replace hardcoded stack array of 1024 max findings
 - Multiline Terminal Commands are very broken
 - After scrolling - fake chars can appear on cursor (from line above)
+- On real hardware the primary SATA detection fails sometimes for some reason
 
 # CONSIDER
 - Unit Tests für lib and core functions
