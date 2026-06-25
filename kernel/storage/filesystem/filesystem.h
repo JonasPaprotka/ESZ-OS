@@ -8,6 +8,7 @@ struct FileEntry {
     uint32_t Size;
     bool IsDirectory;
     uint32_t FirstCluster;
+    bool Found;
 };
 
 #endif // FILESYSTEM_H

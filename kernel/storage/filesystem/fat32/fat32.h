@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+const uint32_t EOC_START = 0x0FFFFFF8;
+
 struct FAT_Time_Bits {
     uint16_t Seconds_Div2 : 5;
     uint16_t Minutes : 6;
@@ -31,6 +33,8 @@ struct FAT32_Context {
     uint32_t RootCluster;
     uint8_t SectorsPerCluster;
     uint16_t BytesPerSector;
+    uint64_t RootDirLBA;
+    uint64_t ClusterSizeInBytes;
 };
 
 struct LFN_Entry_Struct {
