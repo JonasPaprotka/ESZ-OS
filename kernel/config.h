@@ -43,6 +43,10 @@
 #define PIT_TICK_HZ 100 // timer percision in Hz
 // --------------------
 
+// --- PATH CONFIG ---
+#define MAX_PATH_DEPTH 64 // segments
+// -------------------
+
 // --- OTHER ---
 #define STRINGIFY_IMPL(x) #x
 #define STRINGIFY(x) STRINGIFY_IMPL(x)

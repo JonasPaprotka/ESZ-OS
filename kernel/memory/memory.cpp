@@ -244,7 +244,6 @@ void memory_copy(void* copyTo, const void* copyFrom, const uint64_t n) {
     }
 }
 
-
 ///////////////////////////////////
 // HEAP STUFF HERE
 

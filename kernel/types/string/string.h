@@ -36,6 +36,8 @@ char* str_trim(const char* text);
 char* str_to_upper(const char* text);
 char* str_to_lower(const char* text);
 
+void str_split(const char* text, const char splitChar, char* outSplits[], uint64_t &outSplitQty);
+
 struct String {
     char* data;
 

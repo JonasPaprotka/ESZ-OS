@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-struct FileEntry {
+struct Entry {
     char Name[64];
     uint32_t Size;
     bool IsDirectory;
