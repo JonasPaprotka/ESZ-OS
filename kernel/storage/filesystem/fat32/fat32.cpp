@@ -7,6 +7,7 @@
 #include "string.h"
 #include "utf16.h"
 #include "filesystem.h"
+#include "math.h"
 
 FAT32_Context context;
 
@@ -155,7 +156,8 @@ Entry find_file(const char* path) {
 uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
     uint32_t currCluster = startCluster;
     uint64_t bufferWriteOffset = 0;
-    uint8_t* outBuffer = (uint8_t*) malloc(size + 1);
+    const uint64_t numClusters = divide_round_up(size, context.ClusterSizeInBytes);
+    uint8_t* outBuffer = (uint8_t*) malloc(numClusters * context.ClusterSizeInBytes + 1);
 
     while (currCluster < EOC_START) {
         uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
@@ -172,17 +174,21 @@ uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
     return outBuffer;
 }
 
-void read_file(const char* fileName) {
-    Entry foundFile = find_file(fileName);
+uint8_t* read_file(const char* filePath) {
+    if (filePath == "") {
+        printInfoLine(InfoTextType::Error, "File path cannot be empty");
+        return nullptr;
+    }
+
+    Entry foundFile = find_file(filePath);
     if (!foundFile.Found) {
-        printInfoLine(InfoTextType::Error, String("File not found: ", fileName));
-        return;
+        printInfoLine(InfoTextType::Error, String("File not found: ", filePath));
+        return nullptr;
     }
 
     uint8_t* fileData = read_cluster_chain(foundFile.FirstCluster, foundFile.Size);
     fileData[foundFile.Size] = 0;
-
-    print((char*) fileData);
+    return fileData;
 }
 #pragma endregion READ
 
@@ -200,8 +206,5 @@ void init_fat32(const uint32_t Start_LBA) {
     context.BytesPerSector = bpb->BytesPerSector;
     context.RootDirLBA = context.DataRegionStartLBA + (bpb->RootBegin_ClusterNumber - 2) * bpb->SectorsPerCluster;
     context.ClusterSizeInBytes = context.SectorsPerCluster * context.BytesPerSector;
-
-    // read_file("hello.txt");
-    // read_file("folder/sub/deep/test.txt");
 }
 #pragma endregion INIT

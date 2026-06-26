@@ -11,6 +11,14 @@
 #include "timer.h"
 #include "pci.h"
 #include "pci_class_names.h"
+#include "fat32.h"
+
+void cmd_read_file(const char* args) {
+    uint8_t* fileData = read_file(args);
+    if (fileData == nullptr) return;
+    print((char*) fileData);
+    free(fileData);
+}
 
 void cmd_get_uptime(const char*) {
     const uint64_t ms = get_ticks_in_ms();
@@ -121,5 +129,6 @@ const Command commands[] = {
     { "meminfo", cmd_memory_info },
     { "uptime", cmd_get_uptime },
     { "pciinfo", cmd_pciinfo },
+    { "read-file", cmd_read_file },
     { 0, 0 }
 };
