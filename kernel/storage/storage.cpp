@@ -1,11 +1,16 @@
+#include <stdint.h>
 #include "pci.h"
 #include "ahci.h"
 #include "mbr.h"
 #include "info_text.h"
 #include "partitioning.h"
 #include "fat32.h"
+#include "storage.h"
 
 PartitionInfo activePartition;
+
+StorageDevice massStorageDevices[32];
+uint8_t amountOfMassStorageDevices = 0;
 
 PartitionInfo find_useable_storage_medium() {
     uint8_t buffer[SECTOR_SIZE_BYTES];
@@ -15,12 +20,9 @@ PartitionInfo find_useable_storage_medium() {
 
     for (int i = 0; i < 4; i++) {
         if (partitions[i].Type == FilesystemType::FAT32) {
-            // printInfoLine(InfoTextType::Info, String("FAT32 Partition found at index ", i));
             return partitions[i];
         }
     }
-
-    // printInfoLine(InfoTextType::Error, "No FAT32 partition found");
 
     PartitionInfo partition;
     partition.Type = FilesystemType::Unknown;

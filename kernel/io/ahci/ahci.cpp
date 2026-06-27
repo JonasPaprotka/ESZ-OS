@@ -16,10 +16,15 @@ void Start_AHCI_Command(volatile AHCI_Ports* port) {
     port->CI |= (1 << 0);
 }
 
-void Await_AHCI_Task_Finish(volatile AHCI_Ports* port) {
+bool Await_AHCI_Task_Finish(volatile AHCI_Ports* port) {
+    const uint64_t timeout = 3000; // 3 sec
+    uint64_t elapsed = 0;
+
     while (port->CI & (1 << 0)) {
         sleep_ms(1);
+        if (++elapsed >= timeout) return false; // timeout
     }
+    return true;
 }
 
 void ata_string_byteswap(char* text, const uint32_t length) {
@@ -30,24 +35,39 @@ void ata_string_byteswap(char* text, const uint32_t length) {
     }
 }
 
-void await_port_status_change(volatile AHCI_Ports* port, const bool active) {
+bool await_port_status_change(volatile AHCI_Ports* port, const bool active) {
+    const uint64_t timeout = 3000; // 3 sec
+    uint64_t elapsed = 0;
     const uint8_t pollStatus = active;
+
     while (port->CMD.CR != pollStatus || port->CMD.FR != pollStatus) {
         sleep_ms(1);
+        if (++elapsed >= timeout) return false; // timeout
     }
+    return true;
 }
 
-void set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
+bool await_drive_ready(volatile AHCI_Ports* port) {
+    const uint64_t timeout = 3000; // 3 sec
+    uint64_t elapsed = 0;
+
+    while (port->TFD.STS.BSY == 1 || port->TFD.STS.DRDY == 0) {
+        sleep_ms(1);
+        if (++elapsed >= timeout) return false; // timeout
+    }
+    return true;
+}
+
+bool set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
     if (activate) {
         port->CMD.ST = 1;
         port->CMD.FRE = 1;
-        await_port_status_change(port, true);
-        return;
+        return await_port_status_change(port, true);
     }
 
     port->CMD.ST = 0;
     port->CMD.FRE = 0;
-    await_port_status_change(port, false);
+    return await_port_status_change(port, false);
 }
 
 volatile uint32_t* get_virtual_membar_address(const PCI_BAR bar) {
@@ -144,9 +164,9 @@ void set_ahci_prdt(AHCI_Command_Table* commandTable, const uint64_t dataBufferPh
     commandTable->PRDT[0].DBC = dataSize - 1;
 }
 
-void RunCommand(volatile AHCI_Ports* port) {
+bool RunCommand(volatile AHCI_Ports* port) {
     Start_AHCI_Command(port);
-    Await_AHCI_Task_Finish(port);
+    return Await_AHCI_Task_Finish(port);
 }
 
 IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port) {
@@ -159,15 +179,9 @@ IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port) {
     // CONFIGURE OUTPUT
     set_ahci_prdt(commandTable, dataBufferPhysAddr, SECTOR_SIZE_BYTES);
 
-    RunCommand(port);
+    if (!RunCommand(port)) return nullptr;
 
-    IDENTIFY_Response* identifyData = Get_AHCI_IdentifyResponse(dataBufferPhysAddr);
-
-    // printInfoLine(InfoTextType::Info, String("Model Name: ", identifyData->ModelName));
-    // printInfoLine(InfoTextType::Info, String("Serial Number: ", identifyData->SerialNumber));
-    // printInfoLine(InfoTextType::Info, String("Amount of Sectors: ", identifyData->AmountOfSectors_64bit));
-
-    return identifyData;
+    return Get_AHCI_IdentifyResponse(dataBufferPhysAddr);
 }
 
 void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA, const uint16_t sectorQuantity, const void* RAM_InputPtr) {
@@ -220,57 +234,78 @@ void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port) {
     RunCommand(port);
 }
 
-volatile AHCI_Ports* search_available_port() {
-    volatile AHCI_Ports* port = {};
-
-    map_pages(
-        (uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), // virt addr
-        get_physical_membar_address(find_primary_storage_device().BAR[5]), // phys addr
-        0b00010010,  // writable and cache disabled
-        sizeof(AHCI_Registers)
-    );
-
-    ahci = (volatile AHCI_Registers*) get_virtual_membar_address(find_primary_storage_device().BAR[5]);
-
-    uint8_t foundAtPort = 0;
-    for (uint8_t i = 0; i < 32; i++) {
-        if (ahci->Ports[i].SSTS.DET == 3 && ahci->Ports[i].SIG == 0x00000101) { // available and ATA
-            foundAtPort = i;
-            port = &ahci->Ports[foundAtPort];
-            break;
-        }
-    }
-
-    if (port == nullptr) {
-        // printInfoLine(InfoTextType::Error, "No Primary SATA Storage Medium was found.");
-        return nullptr;
-    }
-
-    // printInfoLine(InfoTextType::Info, String("Found SATA Storage Medium at Port: ", foundAtPort));
-
-    return port;
-}
-
-void preparePort(volatile AHCI_Ports* port) {
-    set_sata_port_status(port, false); // shutdown port
+bool preparePort(volatile AHCI_Ports* port) {
+    // shutdown port
+    if (!set_sata_port_status(port, false)) return false;
 
     port->CLB = pmm_malloc_page(); // 1024 bytes needed
     memory_clear((void*)(port->CLB + hhdm_offset), PAGE_SIZE);
     port->CLBU = 0;
-
     port->FB = pmm_malloc_page(); // 256 bytes needed
     memory_clear((void*)(port->FB + hhdm_offset), PAGE_SIZE);
     port->FBU = 0;
 
-    set_sata_port_status(port, true); // start port
+    // start port
+    if (!set_sata_port_status(port, true)) return false;
+
+    return await_drive_ready(port);
+}
+
+bool await_port_reset(volatile AHCI_Ports* port) {
+    const uint64_t timeout = 3000;
+    uint64_t elapsed = 0;
+    while ((port->SSTS.DET != 3)) {
+        sleep_ms(1);
+        if (++elapsed >= timeout) return false;
+    }
+    return true;
+}
+
+bool reset_port_link(volatile AHCI_Ports* port) {
+    port->SCTL = (port->SCTL & ~0xF) | 0x1; // DET=1 - COMRESET
+    sleep_ms(10);
+    port->SCTL = (port->SCTL & ~0xF) | 0x0; // DET=0 - Free
+
+    return await_port_reset(port);
+}
+
+volatile AHCI_Ports* search_available_port() {
+    const PCI_Device storageDevice = find_primary_storage_device();
+
+    map_pages(
+        (uint64_t)get_virtual_membar_address(storageDevice.BAR[5]), // virt addr
+        get_physical_membar_address(storageDevice.BAR[5]), // phys addr
+        0b00010010,  // writable and cache disabled
+        sizeof(AHCI_Registers)
+    );
+
+    ahci = (volatile AHCI_Registers*) get_virtual_membar_address(storageDevice.BAR[5]);
+
+    for (uint8_t attempt = 0; attempt < 10; attempt++) {
+        for (uint8_t i = 0; i < 32; i++) {
+            if (!(ahci->PI & (1 << i))) continue;
+
+            if (ahci->Ports[i].SSTS.DET == 1) reset_port_link(&ahci->Ports[i]);
+            if (ahci->Ports[i].SSTS.DET != 3) continue;
+
+            volatile AHCI_Ports* candidate = &ahci->Ports[i];
+
+            if (!preparePort(candidate)) continue;
+            if (candidate->SIG != 0x00000101) continue;
+
+            return candidate;
+        }
+        sleep_ms(200);
+    }
+    return nullptr;
 }
 
 bool init_ahci() {
     mainMassStorageDevice = search_available_port();
     if (mainMassStorageDevice == nullptr) return false;
 
-    preparePort(mainMassStorageDevice);
     driveIdentifyData = AHCI_IDENTIFY_DEVICE(mainMassStorageDevice);
+    if (driveIdentifyData == nullptr) return false;
 
     return true;
 }
