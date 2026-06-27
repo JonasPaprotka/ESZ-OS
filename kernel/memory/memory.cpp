@@ -1,6 +1,6 @@
 #include "limine_boot.h"
 #include "config.h"
-
+#include "print_helper.h"
 #include "memory.h"
 #include "string.h"
 #include "info_text.h"
@@ -394,19 +394,11 @@ void init_heap_alloc() {
 
 // --- INIT ---
 void memory_info_init() {
-    printInfoLine(InfoTextType::Loading, "Loading Memory Info...");
     hhdm_offset = hhdm_request.response->offset;
     get_memory_region_count();
-
-    printInfoLine(InfoTextType::Loading, "Loading PMM...");
     get_memory_regions();
     get_free_location_for_bitmap();
-
-    printInfoLine(InfoTextType::Loading, "Loading Heap Alloc...");
     init_heap_alloc();
-    //--------------------------
-
-    printInfoLine(InfoTextType::Success, "Initialized Memory");
 
     //pmm_malloc(4096 * 120000); // TEST HIGH UTILISATION!!!!
 }

@@ -4,6 +4,8 @@
 - String library improvements
     - str_to_int, str_to_hex
     - str_index_of
+- Input handler for Questions (LIB)
+    - Do you want to reboot now? (Y/N):
 - Math libary improvements
     - log2_floor(uint64_t n) -> uint64_t
     - int64_t pow_int(const int64_t base, const int64_t exp)

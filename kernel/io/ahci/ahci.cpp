@@ -8,8 +8,9 @@
 #include "memory.h"
 #include "math.h"
 
+IDENTIFY_Response* driveIdentifyData = nullptr;
 volatile AHCI_Registers* ahci;
-extern volatile AHCI_Ports* mainMassStorageDevice = nullptr;
+volatile AHCI_Ports* mainMassStorageDevice = nullptr;
 
 void Start_AHCI_Command(volatile AHCI_Ports* port) {
     port->CI |= (1 << 0);
@@ -63,7 +64,8 @@ PCI_Device find_primary_storage_device() {
             return found_pci_devices[i];
         }
     }
-    PCI_Device emtpyDevice;
+
+    PCI_Device emtpyDevice = {};
     return emtpyDevice;
 }
 
@@ -161,9 +163,9 @@ IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port) {
 
     IDENTIFY_Response* identifyData = Get_AHCI_IdentifyResponse(dataBufferPhysAddr);
 
-    printInfoLine(InfoTextType::Info, String("Model Name: ", identifyData->ModelName));
-    printInfoLine(InfoTextType::Info, String("Serial Number: ", identifyData->SerialNumber));
-    printInfoLine(InfoTextType::Info, String("Amount of Sectors: ", identifyData->AmountOfSectors_64bit));
+    // printInfoLine(InfoTextType::Info, String("Model Name: ", identifyData->ModelName));
+    // printInfoLine(InfoTextType::Info, String("Serial Number: ", identifyData->SerialNumber));
+    // printInfoLine(InfoTextType::Info, String("Amount of Sectors: ", identifyData->AmountOfSectors_64bit));
 
     return identifyData;
 }
@@ -180,7 +182,7 @@ void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA,
     Fill_Sector_Quantity(commandTable, sectorQuantity);
 
     // FILL INPUT DATA
-    memory_copy(((void*) dataBufferPhysAddr + hhdm_offset), RAM_InputPtr, dataSize);
+    memory_copy((uint64_t*)(dataBufferPhysAddr + hhdm_offset), RAM_InputPtr, dataSize);
 
     // CONFIGURE INPUT
     set_ahci_prdt(commandTable, dataBufferPhysAddr, dataSize);
@@ -205,7 +207,7 @@ void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, c
     RunCommand(port);
 
     // GET DATA
-    memory_copy(RAM_OutputPtr, ((void*) dataBufferPhysAddr + hhdm_offset), dataSize);
+    memory_copy(RAM_OutputPtr, (void*)(dataBufferPhysAddr + hhdm_offset), dataSize);
 }
 
 void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port) {
@@ -213,13 +215,13 @@ void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port) {
 
     AHCI_Command_Header* commandList = SetCommandHeader(port, commandTablePhysAddr, false);
     commandList[0].PRDTL = 0;
-    AHCI_Command_Table* commandTable = BuildCommand(commandTablePhysAddr, FLUSH_EXT);
+    BuildCommand(commandTablePhysAddr, FLUSH_EXT);
 
     RunCommand(port);
 }
 
 volatile AHCI_Ports* search_available_port() {
-    volatile AHCI_Ports* port;
+    volatile AHCI_Ports* port = {};
 
     map_pages(
         (uint64_t)get_virtual_membar_address(find_primary_storage_device().BAR[5]), // virt addr
@@ -240,11 +242,11 @@ volatile AHCI_Ports* search_available_port() {
     }
 
     if (port == nullptr) {
-        printInfoLine(InfoTextType::Error, "No Primary SATA Storage Medium was found.");
+        // printInfoLine(InfoTextType::Error, "No Primary SATA Storage Medium was found.");
         return nullptr;
     }
 
-    printInfoLine(InfoTextType::Info, String("Found SATA Storage Medium at Port: ", foundAtPort));
+    // printInfoLine(InfoTextType::Info, String("Found SATA Storage Medium at Port: ", foundAtPort));
 
     return port;
 }
@@ -263,10 +265,12 @@ void preparePort(volatile AHCI_Ports* port) {
     set_sata_port_status(port, true); // start port
 }
 
-void init_ahci() {
-    printInfoLine(InfoTextType::Loading, "Loading Primary Storage Device...");
-
+bool init_ahci() {
     mainMassStorageDevice = search_available_port();
+    if (mainMassStorageDevice == nullptr) return false;
+
     preparePort(mainMassStorageDevice);
-    AHCI_IDENTIFY_DEVICE(mainMassStorageDevice);
+    driveIdentifyData = AHCI_IDENTIFY_DEVICE(mainMassStorageDevice);
+
+    return true;
 }

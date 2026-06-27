@@ -94,6 +94,6 @@ struct BPB {
 } __attribute__((packed));
 
 uint8_t* read_file(const char* fileName);
-void init_fat32(const uint32_t Start_LBA);
+bool init_fat32(const uint32_t Start_LBA);
 
 #endif // FAT32_H

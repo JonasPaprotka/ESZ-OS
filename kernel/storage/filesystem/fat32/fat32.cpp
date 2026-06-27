@@ -41,7 +41,7 @@ void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& o
     bool gotLongName = false;
     const uint32_t maxEntryCount = context.ClusterSizeInBytes / sizeof(Directory_Entry);
 
-    for (int i = 0; i < maxEntryCount; i++) {
+    for (uint32_t i = 0; i < maxEntryCount; i++) {
         if (entries[i].Name[0] == 0) break;
 
         const bool isEntryLFN = isLFN(entries[i].Attributes);
@@ -107,6 +107,12 @@ void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCou
     get_entries_in_dir((Directory_Entry*)tempBuffer, outEntries, outEntryCount);
 }
 
+static void free_path_sections(char* pathSections[], const uint64_t count) {
+    for (uint64_t i = 0; i <= count; i++) {
+        free(pathSections[i]);
+    }
+}
+
 Entry find_file(const char* path) {
     char* pathSections[MAX_PATH_DEPTH];
     uint64_t splitCount = 0;
@@ -129,6 +135,7 @@ Entry find_file(const char* path) {
         }
 
         if (!found) {
+            free_path_sections(pathSections, splitCount);
             Entry empty = {};
             empty.Found = false;
             return empty;
@@ -141,11 +148,13 @@ Entry find_file(const char* path) {
 
     for (uint32_t j = 0; j < entryCount; j++) {
         if (!entries[j].IsDirectory && str_equal(entries[j].Name, pathSections[splitCount])) {
+            free_path_sections(pathSections, splitCount);
             entries[j].Found = true;
             return entries[j];
         }
     }
 
+    free_path_sections(pathSections, splitCount);
     Entry empty = {};
     empty.Found = false;
     return empty;
@@ -175,7 +184,7 @@ uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
 }
 
 uint8_t* read_file(const char* filePath) {
-    if (filePath == "") {
+    if (filePath[0] == 0) {
         printInfoLine(InfoTextType::Error, "File path cannot be empty");
         return nullptr;
     }
@@ -193,7 +202,7 @@ uint8_t* read_file(const char* filePath) {
 #pragma endregion READ
 
 #pragma region INIT
-void init_fat32(const uint32_t Start_LBA) {
+bool init_fat32(const uint32_t Start_LBA) {
     uint8_t buffer[SECTOR_SIZE_BYTES];
     AHCI_READ_DMA_EXT(mainMassStorageDevice, Start_LBA, 1, buffer);
 
@@ -206,5 +215,7 @@ void init_fat32(const uint32_t Start_LBA) {
     context.BytesPerSector = bpb->BytesPerSector;
     context.RootDirLBA = context.DataRegionStartLBA + (bpb->RootBegin_ClusterNumber - 2) * bpb->SectorsPerCluster;
     context.ClusterSizeInBytes = context.SectorsPerCluster * context.BytesPerSector;
+
+    return true;
 }
 #pragma endregion INIT

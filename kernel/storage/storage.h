@@ -1,6 +1,10 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-void init_storage();
+#include "partitioning.h"
+
+extern PartitionInfo activePartition;
+
+bool init_filesystem();
 
 #endif // STORAGE_H

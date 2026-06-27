@@ -155,6 +155,7 @@ struct AHCI_Registers { // 11x32 bits (44 bytes)
     AHCI_Ports Ports[32];
 } __attribute__((packed));
 
+extern IDENTIFY_Response* driveIdentifyData;
 extern volatile AHCI_Ports* mainMassStorageDevice;
 const uint32_t SECTOR_SIZE_BYTES = 512;
 
@@ -163,6 +164,6 @@ void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA,
 void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr);
 void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port);
 
-void init_ahci();
+bool init_ahci();
 
 #endif // AHCI_H

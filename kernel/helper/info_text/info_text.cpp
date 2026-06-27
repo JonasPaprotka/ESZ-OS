@@ -46,10 +46,3 @@ void printInfoLine(const enum InfoTextType textType, const char* infoText) {
     print_inline(infoText);
     newline();
 }
-
-void print_separator() {
-    char* s = str_repeat("-", MAX_CHARS / 3);
-    print_inline(s, Color::DarkGray);
-    free(s);
-    newline();
-}

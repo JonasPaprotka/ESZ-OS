@@ -9,6 +9,7 @@
 #include "commands.h"
 #include "args.h"
 #include "screenBuffer.h"
+#include "print_helper.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
@@ -67,20 +68,6 @@ void handle_show_history() {
     print_chars(lineInputBuffer, true);
 }
 
-void printHeader() {
-    print_separator();
-    printInfoLine(InfoTextType::Success, "Kernel Loaded");
-    newline();
-    print("   #####  #####  #####");
-    print("   ##     ##        ##");
-    print("   #####  #####   ##  ");
-    print("   ##        ##  ##   ");
-    print("   #####  #####  #####");
-    newline();
-    cmd_sysinfo();
-    print_separator();
-}
-
 void displayTerminalError(const char* Text) {
     newline();
     printInfoLine(InfoTextType::Error, Text);
@@ -110,7 +97,8 @@ void processLineInputBuffer() {
 }
 
 void newTerminalInputLine() {
-    const char* linePrefix = "esz >> ";
+    const char* renderPath = "root/";
+    const char* linePrefix = String(renderPath, " >> ");
     print_inline(linePrefix);
     lineInputStart_X = cursorAt_X;
 }
@@ -328,8 +316,6 @@ void terminal_on_key(const uint8_t scancode) {
 }
 
 void terminal_init() {
-    printInfoLine(InfoTextType::Loading, "Initializing Terminal...");
-
-    printHeader();
+    printTerminalHeader();
     newTerminalInputLine();
 }

@@ -28,7 +28,7 @@ Line* get_screen_buffer_line(const int y);
 Cell* get_screen_buffer_cell(const int y, const int x);
 Cell* get_screen_buffer_cell(const Line* line, const int x);
 
-void init_screen_buffer();
-void init_empty_screen_buffer();
+bool init_empty_screen_buffer();
+bool init_screen_buffer();
 
 #endif // SCREEN_BUFFER_H

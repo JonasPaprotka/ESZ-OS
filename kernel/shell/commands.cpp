@@ -12,8 +12,59 @@
 #include "pci.h"
 #include "pci_class_names.h"
 #include "fat32.h"
+#include "print_helper.h"
+#include "ahci.h"
+#include "storage.h"
 
-void cmd_read_file(const char* args) {
+void cmd_driveinfo(const char*) {
+    if (driveIdentifyData == nullptr) {
+        printInfoLine(InfoTextType::Error, "No drive identify data available");
+        return;
+    }
+
+    const uint64_t totalGiB = (driveIdentifyData->AmountOfSectors_64bit * 512) / 1024 / 1024 / 1024;
+
+    print_separator();
+    print("--- DRIVE ---");
+    printInfoLine(InfoTextType::Info, String("Model:   ", driveIdentifyData->ModelName));
+    printInfoLine(InfoTextType::Info, String("Serial:  ", driveIdentifyData->SerialNumber));
+    printInfoLine(InfoTextType::Info, String("Sectors: ", driveIdentifyData->AmountOfSectors_64bit));
+    printInfoLine(InfoTextType::Info, String("Size:    ", totalGiB, " GiB"));
+
+    newline();
+    print("--- ACTIVE PARTITION ---");
+    printInfoLine(InfoTextType::Info, String("Start LBA:    ", activePartition.Start_LBA));
+    printInfoLine(InfoTextType::Info, String("Sector Count: ", activePartition.Sector_Count));
+
+    const uint64_t partGiB = ((uint64_t)activePartition.Sector_Count * 512) / 1024 / 1024 / 1024;
+    printInfoLine(InfoTextType::Info, String("Size:         ", partGiB, " GiB"));
+
+    const char* fsType = "Unknown";
+    switch (activePartition.Type) {
+        case FilesystemType::FAT32:
+            fsType = "FAT32";
+            break;
+        case FilesystemType::FAT16:
+            fsType = "FAT16";
+            break;
+        case FilesystemType::FAT12:
+            fsType = "FAT12";
+            break;
+        case FilesystemType::NTFS:
+            fsType = "NTFS";
+            break;
+        case FilesystemType::Ext:
+            fsType = "Ext";
+            break;
+        default:
+            break;
+    }
+    printInfoLine(InfoTextType::Info, String("Filesystem:   ", fsType));
+    printInfoLine(InfoTextType::Info, String("Bootable:     ", activePartition.Bootable ? "YES" : "NO"));
+    print_separator();
+}
+
+void cmd_read(const char* args) {
     uint8_t* fileData = read_file(args);
     if (fileData == nullptr) return;
     print((char*) fileData);
@@ -58,7 +109,7 @@ void cmd_echo(const char* args) {
 }
 
 void cmd_sysinfo(const char*) {
-    printInfoLine(InfoTextType::Info, String(OS_NAME, " - ", ARCH_NAME, " - (", OS_VERSION_STRING, ") by ", OS_AUTHOR));
+    printSysinfo();
 }
 
 void cmd_reboot(const char*) {
@@ -129,6 +180,7 @@ const Command commands[] = {
     { "meminfo", cmd_memory_info },
     { "uptime", cmd_get_uptime },
     { "pciinfo", cmd_pciinfo },
-    { "read-file", cmd_read_file },
+    { "read", cmd_read },
+    { "driveinfo", cmd_driveinfo },
     { 0, 0 }
 };
