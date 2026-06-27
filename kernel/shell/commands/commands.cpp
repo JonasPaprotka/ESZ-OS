@@ -25,14 +25,14 @@ void cmd_driveinfo(const char*) {
     const uint64_t totalGiB = (driveIdentifyData->AmountOfSectors_64bit * 512) / 1024 / 1024 / 1024;
 
     print_separator();
-    print("--- DRIVE ---");
+    print("----- DRIVE -----");
     printInfoLine(InfoTextType::Info, String("Model:   ", driveIdentifyData->ModelName));
     printInfoLine(InfoTextType::Info, String("Serial:  ", driveIdentifyData->SerialNumber));
     printInfoLine(InfoTextType::Info, String("Sectors: ", driveIdentifyData->AmountOfSectors_64bit));
     printInfoLine(InfoTextType::Info, String("Size:    ", totalGiB, " GiB"));
 
     newline();
-    print("--- ACTIVE PARTITION ---");
+    print("----- ACTIVE PARTITION -----");
     printInfoLine(InfoTextType::Info, String("Start LBA:    ", activePartition.Start_LBA));
     printInfoLine(InfoTextType::Info, String("Sector Count: ", activePartition.Sector_Count));
 
