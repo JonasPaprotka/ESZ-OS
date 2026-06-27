@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 struct Entry {
-    char Name[64];
+    char Name[256];
     uint32_t Size;
     bool IsDirectory;
     uint32_t FirstCluster;

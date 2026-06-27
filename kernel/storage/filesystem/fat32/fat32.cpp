@@ -102,9 +102,10 @@ void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& o
 
 #pragma region FIND
 void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCount) {
-    uint8_t tempBuffer[context.ClusterSizeInBytes];
+    uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
     AHCI_READ_DMA_EXT(mainMassStorageDevice, cluster_to_lba(cluster), context.SectorsPerCluster, tempBuffer);
     get_entries_in_dir((Directory_Entry*)tempBuffer, outEntries, outEntryCount);
+    free(tempBuffer);
 }
 
 static void free_path_sections(char* pathSections[], const uint64_t count) {
@@ -119,9 +120,12 @@ Entry find_file(const char* path) {
     str_split(path, '/', pathSections, splitCount);
 
     uint32_t currCluster = context.RootCluster;
+    const uint32_t maxEntries = context.ClusterSizeInBytes / sizeof(Directory_Entry);
 
     for (uint64_t i = 0; i < splitCount; i++) {
-        Entry entries[context.ClusterSizeInBytes / sizeof(Directory_Entry)];
+        Entry* entries = (Entry*) malloc(sizeof(Entry) * maxEntries);
+        memory_clear(entries, sizeof(Entry) * maxEntries);
+
         uint32_t entryCount = 0;
         read_dir_entries(currCluster, entries, entryCount);
 
@@ -134,6 +138,8 @@ Entry find_file(const char* path) {
             }
         }
 
+        free(entries);
+
         if (!found) {
             free_path_sections(pathSections, splitCount);
             Entry empty = {};
@@ -142,19 +148,25 @@ Entry find_file(const char* path) {
         }
     }
 
-    Entry entries[context.ClusterSizeInBytes / sizeof(Directory_Entry)];
+    Entry* entries = (Entry*) malloc(sizeof(Entry) * maxEntries);
+    memory_clear(entries, sizeof(Entry) * maxEntries);
+
     uint32_t entryCount = 0;
     read_dir_entries(currCluster, entries, entryCount);
 
     for (uint32_t j = 0; j < entryCount; j++) {
         if (!entries[j].IsDirectory && str_equal(entries[j].Name, pathSections[splitCount])) {
+            Entry result = entries[j];
+            result.Found = true;
+            free(entries);
             free_path_sections(pathSections, splitCount);
-            entries[j].Found = true;
-            return entries[j];
+            return result;
         }
     }
 
+    free(entries);
     free_path_sections(pathSections, splitCount);
+
     Entry empty = {};
     empty.Found = false;
     return empty;
