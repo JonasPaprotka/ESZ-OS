@@ -93,15 +93,17 @@ void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& o
             outEntries[outEntryCount].Size = entries[i].FileSize;
             outEntries[outEntryCount].IsDirectory = entries[i].Attributes.Directory;
             outEntries[outEntryCount].FirstCluster = ((uint32_t)entries[i].FirstClusterHigh << 16) | entries[i].FirstClusterLow;
-        }
 
-        if (!isEntryLFN) outEntryCount++;
+            outEntryCount++;
+        }
     }
 }
 #pragma endregion GET ENTRIES
 
 #pragma region FIND
 void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCount) {
+    if (cluster < 2 || cluster >= EOC_START) return;
+
     uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
     AHCI_READ_DMA_EXT(mainMassStorageDevice, cluster_to_lba(cluster), context.SectorsPerCluster, tempBuffer);
     get_entries_in_dir((Directory_Entry*)tempBuffer, outEntries, outEntryCount);
@@ -175,12 +177,14 @@ Entry find_file(const char* path) {
 
 #pragma region READ
 uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
+    if (startCluster < 2 || startCluster >= EOC_START) return nullptr;
+
     uint32_t currCluster = startCluster;
     uint64_t bufferWriteOffset = 0;
     const uint64_t numClusters = divide_round_up(size, context.ClusterSizeInBytes);
     uint8_t* outBuffer = (uint8_t*) malloc(numClusters * context.ClusterSizeInBytes + 1);
 
-    while (currCluster < EOC_START) {
+    while (currCluster >= 2 && currCluster < EOC_START) {
         uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
 
         // READ DATA

@@ -12,28 +12,32 @@ PartitionInfo activePartition;
 StorageDevice massStorageDevices[32];
 uint8_t amountOfMassStorageDevices = 0;
 
-PartitionInfo find_useable_storage_medium() {
+bool find_useable_storage_medium(PartitionInfo &outPartitionInfo) {
     uint8_t buffer[SECTOR_SIZE_BYTES];
     AHCI_READ_DMA_EXT(mainMassStorageDevice, 0, 1, buffer);
     PartitionInfo partitions[4];
-    parse_mbr(buffer, partitions);
 
-    for (int i = 0; i < 4; i++) {
+    if (!parse_mbr(buffer, partitions)) return false;
+
+    for (uint8_t i = 0; i < 4; i++) {
         if (partitions[i].Type == FilesystemType::FAT32) {
-            return partitions[i];
+            outPartitionInfo = partitions[i];
+            return true;
         }
     }
 
     PartitionInfo partition;
     partition.Type = FilesystemType::Unknown;
-    return partition;
+    outPartitionInfo = partition;
+    return false;
 }
 
 bool init_filesystem() {
     if (driveIdentifyData == nullptr) return false;
 
-    // SETUP PARTITIONS
-    activePartition = find_useable_storage_medium();
+    // --- SETUP PARTITIONS ---
+    if (!find_useable_storage_medium(activePartition)) return false;
+
     switch (activePartition.Type) {
         case FilesystemType::FAT32:
             return init_fat32(activePartition.Start_LBA);

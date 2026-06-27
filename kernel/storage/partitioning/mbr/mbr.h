@@ -25,6 +25,6 @@ struct Partition_Entry { // 16 byte
     uint32_t Sector_Amount; // partition size
 } __attribute__((packed));
 
-void parse_mbr(const uint8_t* sectorBuffer, PartitionInfo* outPartitions);
+bool parse_mbr(const uint8_t* sectorBuffer, PartitionInfo* outPartitions);
 
 #endif // MBR_H

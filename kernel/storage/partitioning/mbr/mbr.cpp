@@ -1,10 +1,17 @@
 #include "mbr.h"
 #include "partitioning.h"
 
-void parse_mbr(const uint8_t* sectorBuffer, PartitionInfo* outPartitions) {
+bool parse_mbr(const uint8_t* sectorBuffer, PartitionInfo* outPartitions) {
+
+    // MBR signature check 0xAA55
+    if (sectorBuffer[510] != 0x55 || sectorBuffer[511] != 0xAA) {
+        for (uint8_t i = 0; i < 4; i++) outPartitions[i].Type = FilesystemType::Empty;
+        return false;
+    }
+
     Partition_Entry* entries = (Partition_Entry*)(sectorBuffer + MBR_PARTITION_TABLE_OFFSET);
 
-    for (int i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++) {
         if (entries[i].Boot_Flag == 0x80) {
             outPartitions[i].Bootable = true;
         } else outPartitions[i].Bootable = false;
@@ -41,4 +48,6 @@ void parse_mbr(const uint8_t* sectorBuffer, PartitionInfo* outPartitions) {
                 break;
         }
     }
+
+    return true;
 }
