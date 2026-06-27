@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.2.1
+## v0.3.0
 
 - AHCI Storage Driver
     - Updated: AHCI_IDENTIFY_DEVICE
