@@ -13,7 +13,7 @@
 #pragma region GLOBALS
 uint64_t memoryRegionCount = 0;
 uint64_t pageCount = 0;
-uint64_t freeBytes = 0;
+uint64_t totalUsableBytes = 0;
 uint64_t highestAddress = 0;
 uint64_t hhdm_offset = 0;
 unsigned char* pmm_bitmap = nullptr;
@@ -33,7 +33,7 @@ void get_memory_regions() {
 
         if (entry->type == LIMINE_MEMMAP_USABLE) {
             uint64_t length = entry->length;
-            freeBytes += length;
+            totalUsableBytes += length;
             uint64_t currAddr = entry->base + length;
             if (currAddr > highestAddress) {
                 highestAddress = currAddr;
@@ -84,7 +84,7 @@ void get_free_location_for_bitmap() {
 void print_memory_info() {
     print_separator();
 
-    const uint64_t KiB = freeBytes / 1024;
+    const uint64_t KiB = totalUsableBytes / 1024;
     const uint64_t MiB = KiB / 1024;
     const uint64_t GiB = MiB / 1024;
 

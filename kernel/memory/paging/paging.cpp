@@ -54,7 +54,7 @@ void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, co
         const uint16_t virtPTIdxAdjusted = virtPTIdx + i;
         if (virtPTIdxAdjusted >= 512) {
             printInfoLine(InfoTextType::Error, "map_pages: Paging Index is out of bounds");
-            break;
+            break; //TODO update this
         }
 
         // register on lowest tree level
@@ -69,10 +69,10 @@ void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, co
         } else pageTable3->entries[virtPTIdxAdjusted].CacheDisabled = 0;
 
         pageTable3->entries[virtPTIdxAdjusted].Address = ((physicalAddress + (i * PAGE_SIZE)) >> 12);
-    }
 
-    // remove cached virtual address translation
-    __asm__ volatile("invlpg (%0)" : : "r"(virtualAddress) : "memory");
+        // remove cached virtual address translation
+        __asm__ volatile("invlpg (%0)" : : "r"((virtualAddress + (i * PAGE_SIZE))) : "memory");
+    }
 }
 
 void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags) {
