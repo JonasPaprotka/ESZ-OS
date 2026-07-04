@@ -199,8 +199,8 @@ char* str_combine(const char* a, const char* b) {
 }
 
 
-char* to_string(const uint64_t inputValue, const uint8_t basis) {
-    if (inputValue == 0 || basis == 0 || basis == 1) {
+char* to_string(const uint64_t inputValue, const uint8_t base) {
+    if (inputValue == 0 || base == 0 || base == 1) {
         return malloc_empty_str();
     }
 
@@ -208,7 +208,7 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     uint64_t calcValue = inputValue;
 
     while (calcValue != 0) {
-        calcValue /= basis;
+        calcValue /= base;
         strLength++;
     }
 
@@ -218,13 +218,13 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     calcValue = inputValue;
     strLength = 0;
     while (calcValue != 0) {
-        uint64_t newValue = calcValue % basis;
+        uint64_t newValue = calcValue % base;
         if (newValue < 10) {
             composedString[strLength] = newValue + '0'; // make ascii
         } else {
             composedString[strLength] = 'a' + (newValue - 10); // make ascii
         }
-        calcValue /= basis;
+        calcValue /= base;
         strLength++;
     }
 
@@ -239,17 +239,17 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     return returnString;
 }
 
-char* to_string(const int64_t inputValue, const uint8_t basis) {
-    if (inputValue >= 0) return to_string((uint64_t)inputValue, basis);
-    return str_combine("-", to_string((uint64_t)(-(inputValue)), basis));
+char* to_string(const int64_t inputValue, const uint8_t base) {
+    if (inputValue >= 0) return to_string((uint64_t)inputValue, base);
+    return str_combine("-", to_string((uint64_t)(-(inputValue)), base));
 }
 
-char* to_string(const uint32_t inputValue, const uint8_t basis) {
-    return to_string((uint64_t)inputValue, basis);
+char* to_string(const uint32_t inputValue, const uint8_t base) {
+    return to_string((uint64_t)inputValue, base);
 }
 
-char* to_string(const uint16_t inputValue, const uint8_t basis) {
-    return to_string((uint64_t)inputValue, basis);
+char* to_string(const uint16_t inputValue, const uint8_t base) {
+    return to_string((uint64_t)inputValue, base);
 }
 
 char* to_string(const uint64_t inputValue) {

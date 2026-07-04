@@ -15,6 +15,7 @@
 #include "print_helper.h"
 #include "ahci.h"
 #include "storage.h"
+#include "integer.h"
 
 void cmd_driveinfo(const char*) {
     if (driveIdentifyData == nullptr) {
@@ -62,6 +63,26 @@ void cmd_driveinfo(const char*) {
     printInfoLine(InfoTextType::Info, String("Filesystem:   ", fsType));
     printInfoLine(InfoTextType::Info, String("Bootable:     ", activePartition.Bootable ? "YES" : "NO"));
     print_separator();
+}
+
+void cmd_dumpsector(const char* args) {
+    if (args[0] == 0) {
+        printInfoLine(InfoTextType::Error, "Missing Argument: Sector Number");
+        return;
+    }
+
+    uint8_t buffer[SECTOR_SIZE_BYTES];
+    AHCI_READ_DMA_EXT(mainMassStorageDevice, to_int(args), 1, buffer);
+
+    printInfoLine(InfoTextType::Info, String(" --- SECTOR ", args, " DATA --- "));
+    for (uint64_t i = 0; i < SECTOR_SIZE_BYTES; i++) {
+        const char* valueHex = to_string((uint64_t) buffer[i], 16);
+        print_inline(valueHex);
+        print_inline(" ");
+        free(valueHex);
+    }
+
+    newline();
 }
 
 void cmd_read(const char* args) {
@@ -182,5 +203,6 @@ const Command commands[] = {
     { "pciinfo", cmd_pciinfo },
     { "read", cmd_read },
     { "driveinfo", cmd_driveinfo },
+    { "dumpsector", cmd_dumpsector },
     { 0, 0 }
 };

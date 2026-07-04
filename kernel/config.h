@@ -8,8 +8,8 @@
 // ---------------
 
 // --- ONLY COMMENT IN ONE ---
-#define KEYBOARD_LAYOUT_US
-//#define KEYBOARD_LAYOUT_DE
+//#define KEYBOARD_LAYOUT_US
+#define KEYBOARD_LAYOUT_DE
 // ---------------------------
 
 // --- CURSOR CONFIG ---
@@ -37,6 +37,7 @@
 #define PAGE_SIZE 4096
 #define INIT_HEAP_SIZE 4096 * 1024 * 4 // 16 MiB
 #define VIRTUAL_OFFSET_MMIO 0xFFFFA00000000000
+#define VIRTUAL_OFFSET_VMEM 0xFFFFB00000000000
 // ---------------------
 
 // --- TIMER CONFIG ---
