@@ -189,19 +189,21 @@ struct AHCI_Registers {
 } __attribute__((packed));
 #pragma endregion AHCI REGISTERS
 
+struct ReadyPort {
+    volatile AHCI_Ports* PortPointer;
+    uint8_t PortIndex;
+};
 
 #pragma region GLOBALS
 const uint32_t SECTOR_SIZE_BYTES = 512;
 
-extern IDENTIFY_Response* driveIdentifyData;
-extern volatile AHCI_Ports*  mainMassStorageDevice;
+bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount);
+bool init_ahci();
 
 IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port);
 void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA, const uint16_t sectorQuantity, const void* RAM_InputPtr);
 void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr);
 void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port);
-
-bool init_ahci();
 #pragma endregion GLOBALS
 
 #endif // AHCI_H

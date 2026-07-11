@@ -18,30 +18,30 @@
 #include "integer.h"
 
 void cmd_driveinfo(const char*) {
-    if (driveIdentifyData == nullptr) {
+    if (selectedStorageDevice->Identified == false) {
         printInfoLine(InfoTextType::Error, "No drive identify data available");
         return;
     }
 
-    const uint64_t totalGiB = (driveIdentifyData->AmountOfSectors_64bit * 512) / 1024 / 1024 / 1024;
+    const uint64_t totalGiB = (selectedStorageDevice->IdentificationInformation.AmountOfSectors_64bit * 512) / 1024 / 1024 / 1024;
 
     print_separator();
     print("----- DRIVE -----");
-    printInfoLine(InfoTextType::Info, String("Model:   ", driveIdentifyData->ModelName));
-    printInfoLine(InfoTextType::Info, String("Serial:  ", driveIdentifyData->SerialNumber));
-    printInfoLine(InfoTextType::Info, String("Sectors: ", driveIdentifyData->AmountOfSectors_64bit));
+    printInfoLine(InfoTextType::Info, String("Model:   ", selectedStorageDevice->IdentificationInformation.ModelName));
+    printInfoLine(InfoTextType::Info, String("Serial:  ", selectedStorageDevice->IdentificationInformation.SerialNumber));
+    printInfoLine(InfoTextType::Info, String("Sectors: ", selectedStorageDevice->IdentificationInformation.AmountOfSectors_64bit));
     printInfoLine(InfoTextType::Info, String("Size:    ", totalGiB, " GiB"));
 
     newline();
     print("----- ACTIVE PARTITION -----");
-    printInfoLine(InfoTextType::Info, String("Start LBA:    ", activePartition.Start_LBA));
-    printInfoLine(InfoTextType::Info, String("Sector Count: ", activePartition.Sector_Count));
+    printInfoLine(InfoTextType::Info, String("Start LBA:    ", selectedPartition->Start_LBA));
+    printInfoLine(InfoTextType::Info, String("Sector Count: ", selectedPartition->Sector_Count));
 
-    const uint64_t partGiB = ((uint64_t)activePartition.Sector_Count * 512) / 1024 / 1024 / 1024;
+    const uint64_t partGiB = ((uint64_t) selectedPartition->Sector_Count * 512) / 1024 / 1024 / 1024;
     printInfoLine(InfoTextType::Info, String("Size:         ", partGiB, " GiB"));
 
     const char* fsType = "Unknown";
-    switch (activePartition.Type) {
+    switch (selectedPartition->Type) {
         case FilesystemType::FAT32:
             fsType = "FAT32";
             break;
@@ -61,7 +61,7 @@ void cmd_driveinfo(const char*) {
             break;
     }
     printInfoLine(InfoTextType::Info, String("Filesystem:   ", fsType));
-    printInfoLine(InfoTextType::Info, String("Bootable:     ", activePartition.Bootable ? "YES" : "NO"));
+    printInfoLine(InfoTextType::Info, String("Bootable:     ", selectedPartition->Bootable ? "YES" : "NO"));
     print_separator();
 }
 
@@ -72,7 +72,7 @@ void cmd_dumpsector(const char* args) {
     }
 
     uint8_t buffer[SECTOR_SIZE_BYTES];
-    AHCI_READ_DMA_EXT(mainMassStorageDevice, to_int(args), 1, buffer);
+    AHCI_READ_DMA_EXT(selectedStorageDevice->Port, to_int(args), 1, buffer);
 
     printInfoLine(InfoTextType::Info, String(" --- SECTOR ", args, " DATA --- "));
     for (uint64_t i = 0; i < SECTOR_SIZE_BYTES; i++) {

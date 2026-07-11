@@ -16,9 +16,7 @@
 #include "ahci.h"
 
 void halt() {
-    while(1) {
-        __asm__ volatile("hlt");
-    }
+    while(1) __asm__ volatile("hlt");
 }
 
 struct Registers {
@@ -268,7 +266,7 @@ static void init_drive_layer() {
 }
 
 static void init_filesystem_layer() {
-    printLoadingStart("FAT32 Volume");
+    printLoadingStart("Filesystem");
     printLoadingStatus(init_filesystem());
 }
 

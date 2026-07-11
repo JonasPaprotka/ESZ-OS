@@ -19,12 +19,21 @@ struct StorageDevice {
     // STATUS
     bool Ready;
     uint8_t SpeedGen; //1=1.5Gb/s 2=3Gb/s 3=6Gb/s
+
+    // IDENTIFICATION
+    bool Identified;
+    IDENTIFY_Response IdentificationInformation;
+
+    // PARTITIONS
+    PartitionInfo Partitions[4]; //TODO GPT would require 128 - MBR only 4
+    uint8_t PartitionCount;
 };
 
+extern StorageDevice StorageDevices[32];
+extern uint8_t StorageDeviceAmount;
 
-extern PartitionInfo activePartition;
-extern StorageDevice massStorageDevices[32];
-extern uint8_t amountOfMassStorageDevices;
+extern StorageDevice* selectedStorageDevice;
+extern PartitionInfo* selectedPartition;
 
 bool init_filesystem();
 

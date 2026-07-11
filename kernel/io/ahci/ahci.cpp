@@ -8,9 +8,8 @@
 #include "memory.h"
 #include "math.h"
 
-IDENTIFY_Response* driveIdentifyData = nullptr;
-volatile AHCI_Registers* ahci;
-volatile AHCI_Ports* mainMassStorageDevice = nullptr;
+PCI_Device* ahci_controller;
+PCI_BAR BAR_IDX_5;
 
 void Start_AHCI_Command(volatile AHCI_Ports* port) {
     port->CI |= (1 << 0);
@@ -78,15 +77,13 @@ uint64_t get_physical_membar_address(const PCI_BAR bar) {
     return (uint32_t)(bar.mem.BaseAddress << 4);
 }
 
-PCI_Device find_primary_storage_device() {
+PCI_Device* find_ahci_controller() {
     for (uint32_t i = 0; i < PCIDeviceAmount; i++) {
         if ((found_pci_devices[i].ClassCode == 0x1) && (found_pci_devices[i].Subclass == 0x6)) {
-            return found_pci_devices[i];
+            return &found_pci_devices[i];
         }
     }
-
-    PCI_Device emtpyDevice = {};
-    return emtpyDevice;
+    return nullptr;
 }
 
 uint64_t AllocateCommandTable() {
@@ -269,43 +266,40 @@ bool reset_port_link(volatile AHCI_Ports* port) {
     return await_port_reset(port);
 }
 
-volatile AHCI_Ports* search_available_port() {
-    const PCI_Device storageDevice = find_primary_storage_device();
-
+bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount) {
     map_pages(
-        (uint64_t)get_virtual_membar_address(storageDevice.BAR[5]), // virt addr
-        get_physical_membar_address(storageDevice.BAR[5]), // phys addr
+        (uint64_t)get_virtual_membar_address(BAR_IDX_5), // virt addr
+        get_physical_membar_address(BAR_IDX_5), // phys addr
         0b00010010,  // writable and cache disabled
         sizeof(AHCI_Registers)
     );
 
-    ahci = (volatile AHCI_Registers*) get_virtual_membar_address(storageDevice.BAR[5]);
+    volatile AHCI_Registers* ahciVirtualRegisters = (volatile AHCI_Registers*) get_virtual_membar_address(BAR_IDX_5);
 
-    for (uint8_t attempt = 0; attempt < 10; attempt++) {
-        for (uint8_t i = 0; i < 32; i++) {
-            if (!(ahci->PI & (1 << i))) continue;
+    for (uint8_t i = 0; i < 32; i++) {
+        if (!(ahciVirtualRegisters->PI & (1 << i))) continue;
 
-            if (ahci->Ports[i].SSTS.DET == 1) reset_port_link(&ahci->Ports[i]);
-            if (ahci->Ports[i].SSTS.DET != 3) continue;
+        if (ahciVirtualRegisters->Ports[i].SSTS.DET == 1) reset_port_link(&ahciVirtualRegisters->Ports[i]);
+        if (ahciVirtualRegisters->Ports[i].SSTS.DET != 3) continue;
 
-            volatile AHCI_Ports* candidate = &ahci->Ports[i];
+        volatile AHCI_Ports* candidate = &ahciVirtualRegisters->Ports[i];
 
-            if (!preparePort(candidate)) continue;
-            if (candidate->SIG != 0x00000101) continue;
+        if (!preparePort(candidate)) continue;
+        if (candidate->SIG != 0x00000101) continue; // only normal SATA
 
-            return candidate;
-        }
-        sleep_ms(200);
+        outReadyPorts[outReadyPortCount].PortPointer = candidate;
+        outReadyPorts[outReadyPortCount].PortIndex = i;
+        outReadyPortCount++;
     }
-    return nullptr;
+
+    return outReadyPortCount > 0;
 }
 
 bool init_ahci() {
-    mainMassStorageDevice = search_available_port();
-    if (mainMassStorageDevice == nullptr) return false;
-
-    driveIdentifyData = AHCI_IDENTIFY_DEVICE(mainMassStorageDevice);
-    if (driveIdentifyData == nullptr) return false;
+    // TODO fix for multiple ahci controllers
+    ahci_controller = find_ahci_controller();
+    if (ahci_controller == nullptr) return false;
+    BAR_IDX_5 = ahci_controller->BAR[5];
 
     return true;
 }

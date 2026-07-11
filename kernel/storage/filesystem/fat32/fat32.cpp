@@ -8,6 +8,7 @@
 #include "utf16.h"
 #include "filesystem.h"
 #include "math.h"
+#include "storage.h"
 
 FAT32_Context context;
 
@@ -29,7 +30,7 @@ uint32_t get_next_cluster(const uint32_t cluster) {
     const uint64_t fatSector = get_fat_sector_to_read(cluster);
     const uint64_t offsetInSector = (cluster * 4) % context.BytesPerSector;
 
-    AHCI_READ_DMA_EXT(mainMassStorageDevice, fatSector, 1, buffer);
+    AHCI_READ_DMA_EXT(selectedStorageDevice->Port, fatSector, 1, buffer);
 
     uint32_t* fatAsArray = (uint32_t*) buffer;
     return fatAsArray[offsetInSector / 4] & 0x0FFFFFFF;
@@ -105,7 +106,7 @@ void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCou
     if (cluster < 2 || cluster >= EOC_START) return;
 
     uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
-    AHCI_READ_DMA_EXT(mainMassStorageDevice, cluster_to_lba(cluster), context.SectorsPerCluster, tempBuffer);
+    AHCI_READ_DMA_EXT(selectedStorageDevice->Port, cluster_to_lba(cluster), context.SectorsPerCluster, tempBuffer);
     get_entries_in_dir((Directory_Entry*)tempBuffer, outEntries, outEntryCount);
     free(tempBuffer);
 }
@@ -188,7 +189,7 @@ uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
         uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
 
         // READ DATA
-        AHCI_READ_DMA_EXT(mainMassStorageDevice, cluster_to_lba(currCluster), context.SectorsPerCluster, tempBuffer);
+        AHCI_READ_DMA_EXT(selectedStorageDevice->Port, cluster_to_lba(currCluster), context.SectorsPerCluster, tempBuffer);
         memory_copy(outBuffer + bufferWriteOffset, tempBuffer, context.ClusterSizeInBytes);
 
         bufferWriteOffset += context.ClusterSizeInBytes;
@@ -220,7 +221,7 @@ uint8_t* read_file(const char* filePath) {
 #pragma region INIT
 bool init_fat32(const uint32_t Start_LBA) {
     uint8_t buffer[SECTOR_SIZE_BYTES];
-    AHCI_READ_DMA_EXT(mainMassStorageDevice, Start_LBA, 1, buffer);
+    AHCI_READ_DMA_EXT(selectedStorageDevice->Port, Start_LBA, 1, buffer);
 
     BPB* bpb = (BPB*)buffer;
 
