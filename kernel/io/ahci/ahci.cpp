@@ -11,6 +11,7 @@
 PCI_Device* ahci_controller;
 PCI_BAR BAR_IDX_5;
 
+
 void Start_AHCI_Command(volatile AHCI_Ports* port) {
     port->CI |= (1 << 0);
 }
@@ -34,12 +35,22 @@ void ata_string_byteswap(char* text, const uint32_t length) {
     }
 }
 
-bool await_port_status_change(volatile AHCI_Ports* port, const bool active) {
+bool await_fis_receive_engine(volatile AHCI_Ports* port, const uint32_t awaitStatus) {
     const uint64_t timeout = 3000; // 3 sec
     uint64_t elapsed = 0;
-    const uint8_t pollStatus = active;
 
-    while (port->CMD.CR != pollStatus || port->CMD.FR != pollStatus) {
+    while (port->CMD.FR != awaitStatus) {
+        sleep_ms(1);
+        if (++elapsed >= timeout) return false; // timeout
+    }
+    return true;
+}
+
+bool await_command_list_engine(volatile AHCI_Ports* port, const uint32_t awaitStatus) {
+    const uint64_t timeout = 3000; // 3 sec
+    uint64_t elapsed = 0;
+
+    while (port->CMD.CR != awaitStatus) {
         sleep_ms(1);
         if (++elapsed >= timeout) return false; // timeout
     }
@@ -59,14 +70,24 @@ bool await_drive_ready(volatile AHCI_Ports* port) {
 
 bool set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
     if (activate) {
-        port->CMD.ST = 1;
         port->CMD.FRE = 1;
-        return await_port_status_change(port, true);
+        if (!await_fis_receive_engine(port, 1)) return false;
+
+        if (!await_drive_ready(port)) return false;
+
+        port->CMD.ST = 1;
+        if (!await_command_list_engine(port, 1)) return false;
+
+        return true;
     }
 
     port->CMD.ST = 0;
+    if (!await_command_list_engine(port, 0)) return false;
+
     port->CMD.FRE = 0;
-    return await_port_status_change(port, false);
+    if (!await_fis_receive_engine(port, 0)) return false;
+
+    return true;
 }
 
 volatile uint32_t* get_virtual_membar_address(const PCI_BAR bar) {
@@ -243,9 +264,7 @@ bool preparePort(volatile AHCI_Ports* port) {
     port->FBU = 0;
 
     // start port
-    if (!set_sata_port_status(port, true)) return false;
-
-    return await_drive_ready(port);
+    return set_sata_port_status(port, true);
 }
 
 bool await_port_reset(volatile AHCI_Ports* port) {
@@ -263,7 +282,13 @@ bool reset_port_link(volatile AHCI_Ports* port) {
     sleep_ms(10);
     port->SCTL = (port->SCTL & ~0xF) | 0x0; // DET=0 - Free
 
-    return await_port_reset(port);
+    if (!await_port_reset(port)) return false;
+
+    // clear RW1C error registers
+    port->SERR = port->SERR;
+    port->IS = port->IS;
+
+    return true;
 }
 
 bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount) {
@@ -278,9 +303,6 @@ bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount) {
 
     for (uint8_t i = 0; i < 32; i++) {
         if (!(ahciVirtualRegisters->PI & (1 << i))) continue;
-
-        if (ahciVirtualRegisters->Ports[i].SSTS.DET == 1) reset_port_link(&ahciVirtualRegisters->Ports[i]);
-        if (ahciVirtualRegisters->Ports[i].SSTS.DET != 3) continue;
 
         volatile AHCI_Ports* candidate = &ahciVirtualRegisters->Ports[i];
 
