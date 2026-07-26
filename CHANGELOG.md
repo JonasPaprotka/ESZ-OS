@@ -2,12 +2,32 @@
 
 ## v0.3.0
 
-- Updated Limine Bootloader to 12.5.2
+- Filesystem
+    - FAT32 Driver - read files and directories (8.3 and Long File Names)
+    - MBR Partition Parsing
+    - Abstracted storage/filesystem driver layer
+    - New commands: ls, cd, pwd, read, driveinfo, dumpsector
+    - Terminal now shows current working directory
 - AHCI Storage Driver
     - Updated: AHCI_IDENTIFY_DEVICE
-    - Added: AHCI_WRTIE_DMA_EXT
     - Added: AHCI_READ_DMA_EXT
     - Added: AHCI_FLUSH_CACHE_EXT
+    - Multi Port support
+    - Fixed SATA detection failing on real hardware
+- Updated Limine Bootloader to 12.5.2
+- Kernel boot now shows a loading status per stage
+- Fixed map_pages not invalidating TLB entries for all mapped pages
+- Fixed align_up for non power of two alignments
+- Fixed rendering glitches when overwriting lines / restoring cursor
+- Developer Infos
+    - Makefile rework
+    - Added integer library
+        - to_int(const char* text, const uint64_t base) -> int64_t
+    - Added utf16 library
+    - Added print helper library
+    - Improved string library
+        - str_split(const char* text, const char splitChar, char* outSplits[], uint64_t &outSplitQty)
+        - str_cut_end_malloc(const char* Text, const uint64_t n) -> char*
 
 ## v0.2.0
 
