@@ -1,6 +1,7 @@
 #include <stdint.h>
 
-int64_t divide_round_up(const int64_t a, const int64_t b) {
+uint64_t divide_round_up(const uint64_t a, const uint64_t b) {
+    if (b == 0) return 0;
     return (a + b - 1) / b;
 }
 
@@ -35,8 +36,10 @@ bool is_aligned(const uint64_t addr, const uint64_t align) {
 
 // e.g. 5000, 4096 -> 8192
 uint64_t align_up(const uint64_t addr, const uint64_t align) {
-    if (is_aligned(addr, align)) return addr;
-    return (addr + align) - (addr & align);
+    if (align == 0) return addr;
+    uint64_t remainder = addr % align;
+    if (remainder == 0) return addr;
+    return addr + (align - remainder);
 }
 
 // e.g. 5000, 4096 -> 4096

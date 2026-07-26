@@ -1,13 +1,14 @@
-# File updated with AI / AI Assited
+# File updated with AI / AI Assisted
 
-KERNEL := bin/kernel.elf
-ISO := bin/eszos.iso
+KERNEL   := bin/kernel.elf
+ISO      := bin/eszos.iso
 ISO_ROOT := bin/iso_root
-LIMINE := limine
+LIMINE   := limine
 DISK_IMG := bin/disk.img
+ROOTFS   := rootfs
 
 CXX := x86_64-elf-g++
-LD := x86_64-elf-ld
+LD  := x86_64-elf-ld
 ASM := nasm
 
 KERNEL_INC_DIRS := $(shell find kernel -type d)
@@ -23,11 +24,12 @@ CXXFLAGS := \
     -fno-pie -fno-pic \
     -fno-exceptions -fno-rtti \
     -Wall -Wextra \
-	-pipe \
-	-O2 \
+    -pipe \
+    -O2 \
+    -g \
     $(INC_FLAGS)
 
-ASMFLAGS := -f elf64
+ASMFLAGS := -f elf64 -g -F dwarf
 
 LDFLAGS := \
     -m elf_x86_64 -nostdlib -static \
@@ -40,9 +42,40 @@ CPP_OBJ := $(CPP_SRC:%.cpp=bin/obj/%.cpp.o)
 ASM_OBJ := $(ASM_SRC:%.asm=bin/obj/%.asm.o)
 OBJ := $(CPP_OBJ) $(ASM_OBJ)
 
-QEMU_DISK_FLAGS := -drive file=$(DISK_IMG),if=none,id=disk0,format=raw -device ide-hd,drive=disk0,bus=ide.1
+QEMU := qemu-system-x86_64
 
-.PHONY: all run clean
+MEM ?= 4G
+SMP ?= 2
+CPU ?= Westmere
+
+HOST_OS := $(shell uname -s)
+ifeq ($(HOST_OS),Darwin)
+    ACCEL := hvf:tcg
+else
+    ACCEL := kvm:tcg
+endif
+
+QEMU_BASE := \
+    -machine q35,accel=$(ACCEL) \
+    -cpu $(CPU) \
+    -smp $(SMP) \
+    -m $(MEM) \
+    -serial stdio
+
+AHCI_DISK := \
+    -device ich9-ahci,id=ahci \
+    -drive file=$(DISK_IMG),if=none,id=disk0,format=raw \
+    -device ide-hd,drive=disk0,bus=ahci.0
+
+IDE_DISK := \
+    -drive file=$(DISK_IMG),if=none,id=disk0,format=raw \
+    -device ide-hd,drive=disk0,bus=ide.1
+
+DISK_SIZE   ?= 1G # bump toward 32G+ for big-volume FAT32 cluster sizes
+PART_OFFSET := 2048s
+FAT_LABEL   := ESZOS
+
+.PHONY: all run run-ide run-debug debug disk disk-files clean clean-disk
 
 all: $(ISO)
 
@@ -76,34 +109,50 @@ $(ISO): $(KERNEL) limine.conf
 	    $(ISO_ROOT) -o $(ISO)
 	$(LIMINE)/limine bios-install $(ISO)
 
+# ---- Disk image ------
+# Needs parted + mtools (mformat/mcopy)
 $(DISK_IMG):
 	@mkdir -p $(dir $@)
-	qemu-img create -f raw $(DISK_IMG) 64M
+	qemu-img create -f raw $(DISK_IMG) $(DISK_SIZE)
+	python3 -c "\
+import struct; \
+f = open('$(DISK_IMG)', 'r+b'); \
+mbr = bytearray(512); \
+lba_start = 2048; \
+lba_size = $(shell echo $$(($(shell echo $(DISK_SIZE) | sed 's/G//')*1024*1024*2 - 2048))); \
+entry = struct.pack('<BBBBBBBBII', 0x80, 0xFE,0xFF,0xFF, 0x0C, 0xFE,0xFF,0xFF, lba_start, lba_size); \
+mbr[446:462] = entry; \
+mbr[510:512] = bytes([0x55,0xAA]); \
+f.write(mbr); \
+f.close()"
+	mformat -i $(DISK_IMG)@@$(PART_OFFSET) -F -v $(FAT_LABEL) ::
+	@if [ -d $(ROOTFS) ]; then \
+	    echo "  copying $(ROOTFS)/ into image"; \
+	    mcopy -s -o -i $(DISK_IMG)@@$(PART_OFFSET) $(ROOTFS)/* :: ; \
+	fi
 
-# RUNS - DIFF RAM PRESETS
+disk-files:
+	mcopy -s -o -i $(DISK_IMG)@@$(PART_OFFSET) $(ROOTFS)/* ::
+
+disk: clean-disk $(DISK_IMG)
+
+# ---- Run targets ---------------------------------------------------------
 run: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 512M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
+	$(QEMU) $(QEMU_BASE) $(AHCI_DISK) -cdrom $(ISO) -boot d
 
-run-1: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 1024M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
+run-ide: $(ISO) $(DISK_IMG)
+	$(QEMU) $(QEMU_BASE) $(IDE_DISK) -cdrom $(ISO) -boot d
 
-run-2: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 2048M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
+run-debug: $(ISO) $(DISK_IMG)
+	$(QEMU) $(QEMU_BASE) $(AHCI_DISK) -cdrom $(ISO) -boot d \
+	    -no-reboot -no-shutdown -d int,cpu_reset -D bin/qemu.log
 
-run-4: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 4096M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
+debug: $(ISO) $(DISK_IMG)
+	$(QEMU) $(QEMU_BASE) $(AHCI_DISK) -cdrom $(ISO) -boot d -S -s
 
-run-8: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 8192M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
-
-run-16: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 16384M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
-
-run-32: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 32768M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
-
-run-64: $(ISO) $(DISK_IMG)
-	qemu-system-x86_64 -M q35 -m 65536M -cdrom $(ISO) -boot d $(QEMU_DISK_FLAGS)
-
+# ---- Cleanup -------------------------------------------------------------
 clean:
-	rm -rf bin
+	rm -rf bin/obj bin/kernel.elf bin/eszos.iso bin/iso_root bin/qemu.log
+
+clean-disk:
+	rm -f $(DISK_IMG)
