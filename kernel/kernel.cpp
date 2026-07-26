@@ -10,13 +10,13 @@
 #include "io.h"
 #include "keyboard.h"
 #include "screenBuffer.h"
+#include "filesystem.h"
+#include "print_helper.h"
 #include "pci.h"
 #include "ahci.h"
 
 void halt() {
-    while(1) {
-        __asm__ volatile("hlt");
-    }
+    while(1) __asm__ volatile("hlt");
 }
 
 struct Registers {
@@ -189,7 +189,7 @@ extern "C" void fault_handler(Registers* regs) {
     halt();
 }
 
-void populate_idt_entries() {
+static void populate_idt_entries() {
     idt_set_entry(0, (uint64_t) isr_stub_0);
     idt_set_entry(1, (uint64_t) isr_stub_1);
     idt_set_entry(2, (uint64_t) isr_stub_2);
@@ -227,29 +227,64 @@ void populate_idt_entries() {
     idt_set_entry(33, (uint64_t) keyboard_isr);
 }
 
-// --- MAIN KERNEL ---
-extern "C" void kernel_main() {
+
+#pragma region KERNEL BOOT
+static void init_rendering_early() {
     clearScreen();
     init_print();
+}
 
+static void init_interrupts() {
+    printLoadingStart("Interrupts");
     idt_init();
     populate_idt_entries();
-
-    memory_info_init();
-
     pit_init();
     pic_init();
-
-    // flush pending scancodes
     while (inb(0x64) & 1) inb(0x60);
+    printLoadingStatus(true);
+}
 
-    init_screen_buffer();
+static void init_memory() {
+    printLoadingStart("Memory");
+    memory_info_init();
+    printLoadingStatus(true);
+}
 
-    init_pci();
-    init_ahci();
+static void init_rendering_full() {
+    printLoadingStart("Screen Buffer");
+    printLoadingStatus(init_screen_buffer());
+}
 
+static void init_pci_layer() {
+    printLoadingStart("PCI Bus Enumeration");
+    printLoadingStatus(init_pci());
+}
+
+static void init_drive_layer() {
+    printLoadingStart("AHCI Controller");
+    printLoadingStatus(init_ahci());
+}
+
+static void init_filesystem_layer() {
+    printLoadingStart("Filesystem");
+    printLoadingStatus(init_filesystem());
+}
+
+static void init_shell() {
     terminal_init();
+}
+
+extern "C" void kernel_main() {
+    init_rendering_early();
+    init_interrupts();
+    init_memory();
+    init_rendering_full();
+    init_pci_layer();
+    init_drive_layer();
+    init_filesystem_layer();
+    init_shell();
 
     __asm__ volatile("sti");
     halt();
 }
+#pragma endregion KERNEL BOOT

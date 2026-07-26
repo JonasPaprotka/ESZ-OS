@@ -18,15 +18,16 @@ uint64_t str_count(const char* text, const char* searchText);
 bool str_starts_with(const char* text, const char* searchText);
 bool str_ends_with(const char* text, const char* searchText);
 void str_replace(char* text, const char* searchText, const char* replacedBy);
-char* to_string(const uint64_t inputValue, const uint8_t basis);
-char* to_string(const int64_t inputValue, const uint8_t basis);
-char* to_string(const uint32_t inputValue, const uint8_t basis);
-char* to_string(const uint16_t inputValue, const uint8_t basis);
+char* to_string(const uint64_t inputValue, const uint8_t base);
+char* to_string(const int64_t inputValue, const uint8_t base);
+char* to_string(const uint32_t inputValue, const uint8_t base);
+char* to_string(const uint16_t inputValue, const uint8_t base);
 char* to_string(const uint64_t inputValue);
 char* to_string(const int64_t inputValue);
 char* to_string(const int32_t inputValue);
 char* to_string(const uint32_t inputValue);
 void str_cut_end(char* Text, const uint64_t n);
+char* str_cut_end_malloc(const char* Text, const uint64_t n);
 char* str_cut_start(const char* text, const uint64_t n);
 char* str_move_right(const char* text, const uint64_t moveAmount);
 
@@ -35,6 +36,8 @@ char* str_trim_end(const char* text);
 char* str_trim(const char* text);
 char* str_to_upper(const char* text);
 char* str_to_lower(const char* text);
+
+void str_split(const char* text, const char splitChar, char* outSplits[], uint64_t &outSplitQty);
 
 struct String {
     char* data;

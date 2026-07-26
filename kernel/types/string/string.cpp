@@ -199,8 +199,8 @@ char* str_combine(const char* a, const char* b) {
 }
 
 
-char* to_string(const uint64_t inputValue, const uint8_t basis) {
-    if (inputValue == 0 || basis == 0 || basis == 1) {
+char* to_string(const uint64_t inputValue, const uint8_t base) {
+    if (inputValue == 0 || base == 0 || base == 1) {
         return malloc_empty_str();
     }
 
@@ -208,7 +208,7 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     uint64_t calcValue = inputValue;
 
     while (calcValue != 0) {
-        calcValue /= basis;
+        calcValue /= base;
         strLength++;
     }
 
@@ -218,13 +218,13 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     calcValue = inputValue;
     strLength = 0;
     while (calcValue != 0) {
-        uint64_t newValue = calcValue % basis;
+        uint64_t newValue = calcValue % base;
         if (newValue < 10) {
             composedString[strLength] = newValue + '0'; // make ascii
         } else {
             composedString[strLength] = 'a' + (newValue - 10); // make ascii
         }
-        calcValue /= basis;
+        calcValue /= base;
         strLength++;
     }
 
@@ -239,17 +239,17 @@ char* to_string(const uint64_t inputValue, const uint8_t basis) {
     return returnString;
 }
 
-char* to_string(const int64_t inputValue, const uint8_t basis) {
-    if (inputValue >= 0) return to_string((uint64_t)inputValue, basis);
-    return str_combine("-", to_string((uint64_t)(-(inputValue)), basis));
+char* to_string(const int64_t inputValue, const uint8_t base) {
+    if (inputValue >= 0) return to_string((uint64_t)inputValue, base);
+    return str_combine("-", to_string((uint64_t)(-(inputValue)), base));
 }
 
-char* to_string(const uint32_t inputValue, const uint8_t basis) {
-    return to_string((uint64_t)inputValue, basis);
+char* to_string(const uint32_t inputValue, const uint8_t base) {
+    return to_string((uint64_t)inputValue, base);
 }
 
-char* to_string(const uint16_t inputValue, const uint8_t basis) {
-    return to_string((uint64_t)inputValue, basis);
+char* to_string(const uint16_t inputValue, const uint8_t base) {
+    return to_string((uint64_t)inputValue, base);
 }
 
 char* to_string(const uint64_t inputValue) {
@@ -277,6 +277,21 @@ void str_cut_end(char* Text, const uint64_t n) {
     }
 
     Text[text_length - n] = 0;
+}
+
+char* str_cut_end_malloc(const char* Text, const uint64_t n) {
+    uint64_t text_length = str_length(Text);
+    char* returnString = malloc_str(text_length + 1);
+    str_copy(returnString, Text);
+
+    if (n >= text_length) {
+        returnString[0] = 0;
+        return returnString;
+    }
+
+    returnString[text_length - n] = 0;
+
+    return returnString;
 }
 
 char* str_cut_start(const char* text, const uint64_t n) {
@@ -379,4 +394,45 @@ char* str_to_lower(const char* text) {
     }
 
     return returnString;
+}
+
+void str_split(const char* text, const char splitChar, char* outSplits[], uint64_t &outSplitQty) {
+    const uint64_t text_len = str_length(text);
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        if (text[i] != splitChar) continue;
+        if (i != text_len - 1) outSplitQty++;
+    }
+
+    if (outSplitQty == 0) {
+        outSplits[0] = malloc_str(text_len + 1);
+        str_copy(outSplits[0], text);
+        return;
+    }
+
+    char* currSplit = malloc_str(text_len + 1);
+    uint64_t currSplitNo = 0;
+    uint64_t charsInCurrSplit = 0;
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        if (text[i] != splitChar) {
+            str_add(currSplit, text[i]);
+            charsInCurrSplit++;
+            continue;
+        }
+
+        outSplits[currSplitNo] = malloc_str(charsInCurrSplit + 1);
+        str_copy(outSplits[currSplitNo], currSplit);
+        currSplit[0] = 0;
+
+        currSplitNo++;
+        charsInCurrSplit = 0;
+    }
+
+    if (charsInCurrSplit > 0) {
+        outSplits[currSplitNo] = malloc_str(charsInCurrSplit + 1);
+        str_copy(outSplits[currSplitNo], currSplit);
+    }
+
+    free(currSplit);
 }

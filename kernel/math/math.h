@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-int64_t divide_round_up(const int64_t a, const int64_t b);
+uint64_t divide_round_up(const uint64_t a, const uint64_t b);
 int64_t min(const int64_t a, const int64_t b);
 int64_t max(const int64_t a, const int64_t b);
 

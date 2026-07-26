@@ -66,6 +66,6 @@ struct PCI_Device {
 extern PCI_Device* found_pci_devices;
 extern uint32_t PCIDeviceAmount;
 
-void init_pci();
+bool init_pci();
 
 #endif // PCI_H
