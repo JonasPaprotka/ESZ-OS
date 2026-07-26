@@ -2,7 +2,7 @@
 
 ## v0.3.0
 
-- Updated Limine Bootloader to 12.4.0
+- Updated Limine Bootloader to 12.5.2
 - AHCI Storage Driver
     - Updated: AHCI_IDENTIFY_DEVICE
     - Added: AHCI_WRTIE_DMA_EXT
