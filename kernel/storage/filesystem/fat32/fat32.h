@@ -2,6 +2,7 @@
 #define FAT32_H
 
 #include <stdint.h>
+#include "filesystem.h"
 
 const uint32_t EOC_START = 0x0FFFFFF8;
 
@@ -93,7 +94,6 @@ struct BPB {
     char FilesystemType[8];
 } __attribute__((packed));
 
-uint8_t* read_file(const char* fileName);
-bool init_fat32(const uint32_t Start_LBA);
+extern FilesystemDriver FAT32_Driver;
 
 #endif // FAT32_H

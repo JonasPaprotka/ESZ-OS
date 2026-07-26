@@ -10,6 +10,7 @@
 #include "args.h"
 #include "screenBuffer.h"
 #include "print_helper.h"
+#include "filesystem.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
@@ -97,7 +98,7 @@ void processLineInputBuffer() {
 }
 
 void newTerminalInputLine() {
-    const char* renderPath = "root/";
+    const char* renderPath = currentPath;
     const char* linePrefix = String(renderPath, " >> ");
     print_inline(linePrefix);
     lineInputStart_X = cursorAt_X;

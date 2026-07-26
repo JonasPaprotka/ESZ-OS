@@ -16,6 +16,19 @@
 #include "ahci.h"
 #include "storage.h"
 #include "integer.h"
+#include "filesystem.h"
+
+void cmd_cd(const char* args) {
+    filesystem_change_directory(args);
+}
+
+void cmd_ls(const char*) {
+    filesystem_list();
+}
+
+void cmd_pwd(const char*) {
+    filesystem_print_working_directory();
+}
 
 void cmd_driveinfo(const char*) {
     if (selectedStorageDevice->Identified == false) {
@@ -86,10 +99,15 @@ void cmd_dumpsector(const char* args) {
 }
 
 void cmd_read(const char* args) {
-    uint8_t* fileData = read_file(args);
-    if (fileData == nullptr) return;
-    print((char*) fileData);
-    free(fileData);
+    const char* filePath = str_combine(currentPath, args);
+    Entry e = activeDriver->find_entry(filePath);
+    if (!e.Found || e.IsDirectory) {
+        printInfoLine(InfoTextType::Error, String("File: '", filePath, "' was not found"));
+        return;
+    }
+    uint8_t* data = activeDriver->read(e);
+    print((char*) data);
+    free(data);
 }
 
 void cmd_get_uptime(const char*) {
@@ -204,5 +222,8 @@ const Command commands[] = {
     { "read", cmd_read },
     { "driveinfo", cmd_driveinfo },
     { "dumpsector", cmd_dumpsector },
+    { "cd", cmd_cd },
+    { "ls", cmd_ls },
+    { "pwd", cmd_pwd },
     { 0, 0 }
 };

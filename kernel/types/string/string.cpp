@@ -279,6 +279,21 @@ void str_cut_end(char* Text, const uint64_t n) {
     Text[text_length - n] = 0;
 }
 
+char* str_cut_end_malloc(const char* Text, const uint64_t n) {
+    uint64_t text_length = str_length(Text);
+    char* returnString = malloc_str(text_length + 1);
+    str_copy(returnString, Text);
+
+    if (n >= text_length) {
+        returnString[0] = 0;
+        return returnString;
+    }
+
+    returnString[text_length - n] = 0;
+
+    return returnString;
+}
+
 char* str_cut_start(const char* text, const uint64_t n) {
     const uint64_t text_len = str_length(text);
 

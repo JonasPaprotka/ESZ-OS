@@ -45,6 +45,7 @@
 // --------------------
 
 // --- PATH CONFIG ---
+#define MAX_PATH_LENGTH 4096 // chars
 #define MAX_PATH_DEPTH 64 // segments
 // -------------------
 

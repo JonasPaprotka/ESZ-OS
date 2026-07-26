@@ -7,6 +7,8 @@
 #include "storage.h"
 #include "ahci.h"
 
+FilesystemDriver* activeDriver = nullptr;
+
 StorageDevice StorageDevices[32];
 uint8_t StorageDeviceAmount = 0;
 
@@ -72,13 +74,21 @@ bool search_suitable_storage_partition() {
     return false;
 }
 
-bool init_filesystem() {
+bool init_storage() {
     setup_storage_devices();
     if (StorageDeviceAmount == 0) return false;
 
     if (!search_suitable_storage_partition()) return false;
 
-    if (!init_fat32(selectedPartition->Start_LBA)) return false;
+    switch (selectedPartition->Type) {
+        case FilesystemType::FAT32:
+            activeDriver = &FAT32_Driver;
+            break;
+        default:
+            return false;
+    }
+
+    if (!activeDriver->init(selectedPartition->Start_LBA)) return false;
 
     return true;
 }

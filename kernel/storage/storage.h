@@ -29,12 +29,14 @@ struct StorageDevice {
     uint8_t PartitionCount;
 };
 
+extern FilesystemDriver* activeDriver;
+
 extern StorageDevice StorageDevices[32];
 extern uint8_t StorageDeviceAmount;
 
 extern StorageDevice* selectedStorageDevice;
 extern PartitionInfo* selectedPartition;
 
-bool init_filesystem();
+bool init_storage();
 
 #endif // STORAGE_H
