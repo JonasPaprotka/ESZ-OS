@@ -1,4 +1,5 @@
 # TODO
+- Tab autocomplete fielname, and paths
 - Filesystem FAT32
     - Write
 - String library improvements
@@ -19,6 +20,7 @@
     - Cleanup / Improvements
 - UX
     - Tab command completion for n>1 matches
+- Better Error handling and messages
 
 # Future
 - APIC
