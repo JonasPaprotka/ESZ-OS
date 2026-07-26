@@ -9,3 +9,7 @@ limine/
 limine.h
 
 *.code-workspace
+*img
+
+test_files/
+rootfs/

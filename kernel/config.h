@@ -23,7 +23,7 @@
 
 // --- VERSION TRACKER ---
 #define OS_VERSION_MAJOR 0
-#define OS_VERSION_MINOR 2
+#define OS_VERSION_MINOR 3
 #define OS_VERSION_PATCH 0
 // -----------------------
 
@@ -37,11 +37,17 @@
 #define PAGE_SIZE 4096
 #define INIT_HEAP_SIZE 4096 * 1024 * 4 // 16 MiB
 #define VIRTUAL_OFFSET_MMIO 0xFFFFA00000000000
+#define VIRTUAL_OFFSET_VMEM 0xFFFFB00000000000
 // ---------------------
 
 // --- TIMER CONFIG ---
 #define PIT_TICK_HZ 100 // timer percision in Hz
 // --------------------
+
+// --- PATH CONFIG ---
+#define MAX_PATH_LENGTH 4096 // chars
+#define MAX_PATH_DEPTH 64 // segments
+// -------------------
 
 // --- OTHER ---
 #define STRINGIFY_IMPL(x) #x

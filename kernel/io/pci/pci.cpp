@@ -107,10 +107,10 @@ void get_pci_devices() {
     }
 }
 
-void init_pci() {
-    printInfoLine(InfoTextType::Loading, "Loading PCI Devices...");
+bool init_pci() {
     PCIDeviceAmount = count_pci_devices();
     found_pci_devices = (PCI_Device*) malloc(sizeof(PCI_Device) * PCIDeviceAmount);
     get_pci_devices();
-    printInfoLine(InfoTextType::Success, String("Loaded ", PCIDeviceAmount, " PCI Devices"));
+
+    return PCIDeviceAmount > 0;
 }

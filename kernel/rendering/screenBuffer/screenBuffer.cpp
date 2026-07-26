@@ -18,7 +18,7 @@ Cell* get_screen_buffer_cell(const Line* line, const int x) {
     return &line->cells[x];
 }
 
-void init_empty_screen_buffer() {
+bool init_empty_screen_buffer() {
     const unsigned int storedRenderLineHistory = SCROLL_HISTORY_LINES;
 
     if (screenBufferPtr) {
@@ -31,6 +31,8 @@ void init_empty_screen_buffer() {
         (sizeof(Line) * (MAX_LINES + storedRenderLineHistory)) +
         (sizeof(Cell) * (MAX_LINES + storedRenderLineHistory) * MAX_CHARS)
     );
+
+    if (screenBufferPtr == nullptr) return false;
 
     screenBufferPtr->lines = (Line*) (screenBufferPtr + 1);
     screenBufferPtr->amountOfLines = cursorAt_Y;
@@ -48,13 +50,16 @@ void init_empty_screen_buffer() {
         screenBufferPtr->lines[i].cells = cellBlock + i * MAX_CHARS;
         screenBufferPtr->lines[i].amountOfCells = 0;
     }
+
+    return true;
 }
 
-void init_screen_buffer() {
-    printInfoLine(InfoTextType::Loading, "Loading Screen Buffer...");
-    init_empty_screen_buffer();
+bool init_screen_buffer() {
+    if (!init_empty_screen_buffer()) return false;
     useScreenBuffer = true;
 
     cursorRendered_X = cursorAt_X;
     cursorRendered_Y = cursorAt_Y;
+
+    return true;
 }
