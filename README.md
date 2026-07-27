@@ -79,15 +79,22 @@ make clean && make run
 
 ## Makefile
 
-You can also simulate more RAM with these Makefile presets
- - run -> 512 MB
- - run-1 -> 1024 MB
- - run-2 -> 2048 MB
- - run-4 -> 4096 MB
- - run-8 -> 8192 MB
- - run-16 -> 16384 MB
- - run-32 -> 32768 MB
- - run-64 -> 65536 MB
+Targets
+ - run -> boot the ISO in QEMU
+ - run-ide -> same but with an IDE disk
+ - run-debug -> logs interrupts and CPU resets to bin/qemu.log
+ - debug -> starts halted with a gdb stub on :1234
+ - disk -> rebuild the FAT32 disk image
+ - disk-files -> copy rootfs/ into the existing image
+ - clean / clean-disk
+
+You can override the QEMU settings on the command line
+
+```zsh
+make run MEM=8G # RAM (default 4G)
+make run SMP=4 # CPU cores (default 2)
+make disk DISK_SIZE=32G # disk image size (default 8G)
+```
 
 The Makefile was heavily edited with AI due to my lack of intrest of learning Makefile - i will revisit it again and make it better... or worse, but human.
 
