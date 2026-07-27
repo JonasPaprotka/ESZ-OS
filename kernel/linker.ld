@@ -1,5 +1,3 @@
-/* ESZ-OS Linker Script - 64-bit Higher Half (Limine) */
-
 OUTPUT_FORMAT(elf64-x86-64)
 ENTRY(kmain)
 
@@ -11,11 +9,10 @@ PHDRS {
 }
 
 SECTIONS {
-    /* Kernel ins Higher Half (Konvention für 64-bit Kernel) */
+    /* Kernel into the higher half */
     . = 0xffffffff80000000;
 
-    /* Limine Requests MÜSSEN ganz am Anfang stehen,
-       damit der Bootloader sie scannt */
+    /* Limine requests must come first so the bootloader scans them */
     .limine_requests : {
         KEEP(*(.limine_requests_start))
         KEEP(*(.limine_requests))

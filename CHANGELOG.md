@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.3.1
+
+- Repository
+    - Going Public
+    - Updated README and TODO elements
+        - Moved Issues to GitHub
+
 ## v0.3.0
 
 - Filesystem

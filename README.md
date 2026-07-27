@@ -2,17 +2,49 @@
 
 A hobby x86_64 kernel written in C++ and Assembly
 
+![ESZ-OS shell](docs/images/heroScreenshot.png)
+
+## What works right now
+
+- Boots on QEMU and real hardware
+- Framebuffer text rendering
+- Physical memory manager and a kernel heap allocator
+- PS/2 keyboard (US and DE layout)
+- PCI bus enumeration
+- AHCI/SATA driver (IDENTIFY, READ DMA EXT, FLUSH CACHE EXT)
+- MBR partition parsing
+- FAT32 (currently read only)
+- Shell with command history, cursor editing and tab completion (compeltion not yet for filesystem)
+    - help, echo, clear, sysinfo, meminfo, uptime, history, reboot, pciinfo (-c), driveinfo, dumpsector, ls, cd, pwd, read
+
 ## Disclaimer
 
-- Im new to low level and C++ - this is not ideal for this project if you can imagine
-- For some code parts AI was used as a help - All of them are marked as AI Supported via code comment (i will revisit every single one of them again and rewrite it - probably make it worse but at the end code should 100% be human generated - even if it sucks)
+- Im new to low level and C++ - this is not ideal for this project (if you can imagine)
+- The main usage of AI was for teaching, not coding. If something was written by AI e.g. the Makefile, it is labeled with a code comment
 
-## Development / Testing Requirements
+# "Install" the OS
 
-- macOS (tested), Linux should work
-- QEMU for testing
+Currently you can run the OS on real hardware but not fully install it yet. SATA is supported, yes but FAT32 only supports read in the current version (v0.3.0). This might change soon.
 
-# Install
+Every version gets build and published as a **.iso** file you can download and use your iso-USB burner tool of your choice e.g. RUFUS or balenaEtcher - depends on your current running OS.
+
+Honestly the current state of the OS is very useless, which will remain in this state for a long period of time.
+
+# Development
+
+- macOS works (tested)
+- Linux should work
+- Windows should work
+
+## Configuration
+
+Configuration of this OS happens inside the `config.h` file. There you can set your font size, keyboard layout, the cursor blink interval and much more.
+
+## DEV-Sandbox Usage
+
+### macOS
+
+#### Install
 
 ```zsh
 brew install x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
@@ -25,7 +57,7 @@ make -C limine
 make clean && make
 ```
 
-# Update
+#### Update
 
 ```zsh
 brew upgrade x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
@@ -39,13 +71,15 @@ curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootlo
 make clean
 ```
 
-# Test
+#### Test
 
 ```zsh
 make clean && make run
 ```
 
-You can also simulate more RAM with the given presets
+## Makefile
+
+You can also simulate more RAM with these Makefile presets
  - run -> 512 MB
  - run-1 -> 1024 MB
  - run-2 -> 2048 MB
@@ -55,9 +89,26 @@ You can also simulate more RAM with the given presets
  - run-32 -> 32768 MB
  - run-64 -> 65536 MB
 
-# Release new Version
+The Makefile was heavily edited with AI due to my lack of intrest of learning Makefile - i will revisit it again and make it better... or worse, but human.
 
-To release a new Version of ESZ-OS you need to be on the pulled commit on the main branch and tag it.
+## Third Party
+
+### Limine Bootloader
+
+ESZ-OS boots via [Limine](https://github.com/limine-bootloader/limine), which is licensed under BSD-2-Clause. The published **.iso** ships Limine binaries.
+
+```
+Copyright (C) 2019-2026 Mintsuki and contributors.
+```
+
+## Versioning
+
+### New Version
+
+To release a new Version of ESZ-OS you need to be on the pulled commit on the main branch and tag it. The Pipeline will automatically build the Release, add the changelog and publish it alongside with the .iso file.
+
+Only the Maintainers of the Repository are able to release a new version.
+
 ```zsh
 git tag <version>
 git push origin tag <version>
