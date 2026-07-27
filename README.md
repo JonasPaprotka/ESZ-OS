@@ -14,20 +14,18 @@ A hobby x86_64 kernel written in C++ and Assembly
 - AHCI/SATA driver (IDENTIFY, READ DMA EXT, FLUSH CACHE EXT)
 - MBR partition parsing
 - FAT32 (currently read only)
-- Shell with command history, cursor editing and tab completion (compeltion not yet for filesystem)
+- Shell with command history, cursor editing and tab completion (completion not yet for filesystem)
     - help, echo, clear, sysinfo, meminfo, uptime, history, reboot, pciinfo (-c), driveinfo, dumpsector, ls, cd, pwd, read
 
 ## Disclaimer
 
-- Im new to low level and C++ - this is not ideal for this project (if you can imagine)
+- I'm new to low level and C++ - this is not ideal for this project (if you can imagine)
 - The main usage of AI was for teaching, not coding. If something was written by AI e.g. the Makefile, it is labeled with a code comment
 
 # "Install" the OS
 
 Currently you can run the OS on real hardware but not fully install it yet. SATA is supported, yes but FAT32 only supports read in the current version (v0.3.0). This might change soon.
-
-Every version gets build and published as a **.iso** file you can download and use your iso-USB burner tool of your choice e.g. RUFUS or balenaEtcher - depends on your current running OS.
-
+Every version gets built and published as a **.iso** file you can download and use your iso-USB burner tool of your choice e.g. RUFUS or balenaEtcher - depends on your current running OS.
 Honestly the current state of the OS is very useless, which will remain in this state for a long period of time.
 
 # Development
@@ -96,7 +94,7 @@ make run SMP=4 # CPU cores (default 2)
 make disk DISK_SIZE=32G # disk image size (default 8G)
 ```
 
-The Makefile was heavily edited with AI due to my lack of intrest of learning Makefile - i will revisit it again and make it better... or worse, but human.
+The Makefile was heavily edited with AI due to my lack of interest in learning Makefile - I will revisit it again and make it better... or worse, but human.
 
 ## Third Party
 
@@ -112,9 +110,8 @@ Copyright (C) 2019-2026 Mintsuki and contributors.
 
 ### New Version
 
-To release a new Version of ESZ-OS you need to be on the pulled commit on the main branch and tag it. The Pipeline will automatically build the Release, add the changelog and publish it alongside with the .iso file.
-
-Only the Maintainers of the Repository are able to release a new version.
+To release a new version of ESZ-OS you need to be on the pulled commit on the main branch and tag it. The pipeline will automatically build the release, add the changelog and publish it alongside the .iso file.
+Only the maintainers of the repository are able to release a new version.
 
 ```zsh
 git tag <version>
