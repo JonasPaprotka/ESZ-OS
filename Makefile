@@ -71,7 +71,7 @@ IDE_DISK := \
     -drive file=$(DISK_IMG),if=none,id=disk0,format=raw \
     -device ide-hd,drive=disk0,bus=ide.1
 
-DISK_SIZE   ?= 1G # bump toward 32G+ for big-volume FAT32 cluster sizes
+DISK_SIZE   ?= 8G
 PART_OFFSET := 2048s
 FAT_LABEL   := ESZOS
 
