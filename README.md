@@ -117,3 +117,7 @@ Only the maintainers of the repository are able to release a new version.
 git tag <version>
 git push origin tag <version>
 ```
+
+## Tests
+
+After switching your C++ configuration to the test version, you can run `make -C tests` to run the tests manually.

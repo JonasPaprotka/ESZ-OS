@@ -16,3 +16,6 @@ permissions:
 jobs:
   build:
     uses: ./.github/workflows/build.yml
+
+  tests:
+    uses: ./.github/workflows/tests.yml

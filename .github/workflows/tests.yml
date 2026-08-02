@@ -1,0 +1,20 @@
+name: Tests
+
+on:
+  workflow_call:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Cache doctest
+        uses: actions/cache@v6
+        with:
+          path: tests/vendor
+          key: doctest-${{ vars.DOCTEST_VERSION || '2.5.3' }}
+
+      - name: Run Tests
+        run: make -C tests DOCTEST_VERSION=${{ vars.DOCTEST_VERSION || '2.5.3' }}
