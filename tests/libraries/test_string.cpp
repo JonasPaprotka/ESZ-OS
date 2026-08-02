@@ -333,3 +333,73 @@ TEST_CASE("str_ends_with") {
         CHECK(str_ends_with(text, "ExampleTest") == false);
     }
 }
+
+TEST_CASE("str_replace") {
+    char text[128];
+
+    SUBCASE("empty string") {
+        text[0] = 0;
+        str_replace(text, "", "REPLACED");
+        CHECK(str_equal(text, "REPLACED"));
+    }
+
+    SUBCASE("longer replace text") {
+        str_copy(text, "Lorem ipsum");
+        str_replace(text, "Lorem ipsum sit", "REPLACED");
+        CHECK(str_equal(text, "Lorem ipsum"));
+    }
+
+    SUBCASE("same length") {
+        str_copy(text, "Lorem ipsum dolor sit amet.");
+        str_replace(text, "dolor", "IPSUM");
+        CHECK(str_equal(text, "Lorem ipsum IPSUM sit amet."));
+    }
+
+    SUBCASE("normal case") {
+        str_copy(text, "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.");
+        str_replace(text, "sit amet", "Replaced BY ME");
+        CHECK(str_equal(text, "Lorem ipsum dolor Replaced BY ME. Lorem ipsum dolor Replaced BY ME."));
+    }
+
+    SUBCASE("capitalisation") {
+        str_copy(text, "Lorem ipsum dolor sit amet.");
+        str_replace(text, "Lorem", "REPLACED");
+        CHECK(str_equal(text, "REPLACED ipsum dolor sit amet."));
+
+        str_copy(text, "Lorem ipsum dolor sit amet.");
+        str_replace(text, "lorem", "REPLACED");
+        CHECK(str_equal(text, "Lorem ipsum dolor sit amet."));
+
+        str_copy(text, "lorem ipsum dolor sit amet.");
+        str_replace(text, "Lorem", "REPLACED");
+        CHECK(str_equal(text, "lorem ipsum dolor sit amet."));
+    }
+}
+
+TEST_CASE("str_repeat") {
+    CHECK(str_equal(str_repeat("-", 10), "----------") == true);
+    CHECK(str_equal(str_repeat("-#", 10), "-#-#-#-#-#-#-#-#-#-#") == true);
+    CHECK(str_equal(str_repeat(" ", 10), "          ") == true);
+    CHECK(str_equal(str_repeat("A", 1), "A") == true);
+    CHECK(str_equal(str_repeat("A", 0), "") == true);
+}
+
+TEST_CASE("str_to_lower") {
+    CHECK(str_equal(str_to_lower("abc"), "abc") == true);
+    CHECK(str_equal(str_to_lower("ABC"), "abc") == true);
+    CHECK(str_equal(str_to_lower("ABC abc"), "abc abc") == true);
+    CHECK(str_equal(str_to_lower("Abc"), "abc") == true);
+    CHECK(str_equal(str_to_lower("123A!#_B?0C"), "123a!#_b?0c") == true);
+    CHECK(str_equal(str_to_lower(" "), " ") == true);
+    CHECK(str_equal(str_to_lower(""), "") == true);
+}
+
+TEST_CASE("str_to_upper") {
+    CHECK(str_equal(str_to_upper("abc"), "ABC") == true);
+    CHECK(str_equal(str_to_upper("ABC"), "ABC") == true);
+    CHECK(str_equal(str_to_upper("ABC abc"), "ABC ABC") == true);
+    CHECK(str_equal(str_to_upper("Abc"), "ABC") == true);
+    CHECK(str_equal(str_to_upper("123a!#_b?0c"), "123A!#_B?0C") == true);
+    CHECK(str_equal(str_to_upper(" "), " ") == true);
+    CHECK(str_equal(str_to_upper(""), "") == true);
+}
