@@ -7,36 +7,73 @@ DOCTEST := vendor/doctest.h
 
 KERNEL := ../kernel
 BUILD  := build
-BIN    := $(BUILD)/tests
 
-INC := -iquote vendor -iquote support -iquote $(KERNEL)/types/string -iquote $(KERNEL)/types/char
+KERNEL_MODULES := string char
+
+KERNEL_SRC := $(foreach m,$(KERNEL_MODULES),$(shell find $(KERNEL) -name '$(m).cpp'))
+
+TEST_SRC := $(shell find . -name 'test_*.cpp' -not -path './$(BUILD)/*')
+
+KERNEL_OBJ := $(patsubst $(KERNEL)/%.cpp,$(BUILD)/kobj/%.o,$(KERNEL_SRC))
+TEST_OBJ   := $(patsubst ./%.cpp,$(BUILD)/tobj/%.o,$(TEST_SRC))
+TEST_BIN   := $(patsubst ./%.cpp,$(BUILD)/bin/%,$(TEST_SRC))
+COV_BIN    := $(patsubst ./%.cpp,$(BUILD)/cov/%,$(TEST_SRC))
+
+INC := -iquote vendor -iquote support $(addprefix -iquote ,$(shell find $(KERNEL) -type d))
 
 CXXFLAGS ?= -std=c++17 -Wall -Wextra -g -O0
+COVFLAGS := -fprofile-instr-generate -fcoverage-mapping
+DEPFLAGS := -MMD -MP
 
-SRC := libraries/test_string.cpp \
-       $(KERNEL)/types/string/string.cpp \
-       $(KERNEL)/types/char/char.cpp
+.PHONY: test coverage list clean distclean
 
-.PHONY: test coverage clean
+test: $(TEST_BIN)
+	@fail=0; \
+	for b in $(TEST_BIN); do \
+	    echo "===== $$b"; \
+	    ./$$b || fail=1; \
+	done; \
+	exit $$fail
 
-test: $(BIN)
-	./$(BIN)
+$(BUILD)/bin/%: $(BUILD)/tobj/%.o $(KERNEL_OBJ)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-$(BIN): $(SRC) $(DOCTEST)
-	@mkdir -p $(BUILD)
-	$(CXX) $(CXXFLAGS) $(INC) $(SRC) -o $@
+$(BUILD)/tobj/%.o: %.cpp $(DOCTEST)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INC) -c $< -o $@
+
+$(BUILD)/kobj/%.o: $(KERNEL)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INC) -c $< -o $@
 
 $(DOCTEST):
 	@mkdir -p $(dir $@)
 	curl -L -o $@ https://raw.githubusercontent.com/doctest/doctest/v$(DOCTEST_VERSION)/doctest/doctest.h
 
-coverage: $(SRC) $(DOCTEST)
-	@mkdir -p $(BUILD)
-	$(CXX) $(CXXFLAGS) -fprofile-instr-generate -fcoverage-mapping $(INC) $(SRC) -o $(BIN)
-	-LLVM_PROFILE_FILE=$(BUILD)/tests.profraw ./$(BIN)
-	xcrun llvm-profdata merge -sparse $(BUILD)/tests.profraw -o $(BUILD)/tests.profdata
-	xcrun llvm-cov export ./$(BIN) -instr-profile=$(BUILD)/tests.profdata -format=lcov \
-	    $(KERNEL)/types/string/string.cpp $(KERNEL)/types/char/char.cpp > $(BUILD)/lcov.info
+coverage: $(DOCTEST)
+	@mkdir -p $(BUILD)/cov
+	@rm -f $(BUILD)/cov/*.profraw
+	@for src in $(TEST_SRC); do \
+	    bin=$(BUILD)/cov/$${src#./}; bin=$${bin%.cpp}; \
+	    mkdir -p $$(dirname $$bin); \
+	    $(CXX) $(CXXFLAGS) $(COVFLAGS) $(INC) $$src $(KERNEL_SRC) -o $$bin || exit 1; \
+	    LLVM_PROFILE_FILE=$$bin.profraw ./$$bin || true; \
+	done
+	xcrun llvm-profdata merge -sparse $$(find $(BUILD)/cov -name '*.profraw') -o $(BUILD)/tests.profdata
+	xcrun llvm-cov export $(firstword $(COV_BIN)) \
+	    $(addprefix -object ,$(wordlist 2,999,$(COV_BIN))) \
+	    -instr-profile=$(BUILD)/tests.profdata -format=lcov \
+	    $(KERNEL_SRC) > $(BUILD)/lcov.info
+
+list:
+	@echo "tests:"; for t in $(TEST_SRC); do echo "  $$t"; done
+	@echo "kernel sources:"; for s in $(KERNEL_SRC); do echo "  $$s"; done
 
 clean:
-	rm -rf $(BUILD) vendor
+	rm -rf $(BUILD)
+
+distclean: clean
+	rm -rf vendor
+
+-include $(TEST_OBJ:.o=.d) $(KERNEL_OBJ:.o=.d)

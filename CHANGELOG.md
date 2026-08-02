@@ -6,6 +6,9 @@
     - Going Public
     - Updated README and TODO elements
         - Moved Issues to GitHub
+- Added the first test cases
+    - Many String Functions
+    - General Memory tests
 
 ## v0.3.0
 
