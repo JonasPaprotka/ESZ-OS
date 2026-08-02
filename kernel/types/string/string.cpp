@@ -108,11 +108,13 @@ bool str_starts_with(const char* text, const char* searchText) {
 }
 
 bool str_ends_with(const char* text, const char* searchText) {
+    const uint64_t text_len = str_length(text);
     const uint64_t searchText_len = str_length(searchText);
-    if (searchText_len > str_length(text)) return false;
+    if (searchText_len > text_len) return false;
 
-    for (uint64_t i = searchText_len; i > 0; --i) {
-        if (text[i] != searchText[i]) return false;
+    const uint64_t offset = text_len - searchText_len;
+    for (uint64_t i = 0; i < searchText_len; i++) {
+        if (text[offset + i] != searchText[i]) return false;
     }
     return true;
 }

@@ -23,6 +23,19 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "ESZ-OS Tests",
+            "includePath": [
+                "${workspaceFolder}/tests/vendor",
+                "${workspaceFolder}/tests/support",
+                "${workspaceFolder}/kernel/types/string",
+                "${workspaceFolder}/kernel/types/char"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-x64"
         }
     ],
     "version": 4

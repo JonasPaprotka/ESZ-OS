@@ -13,3 +13,6 @@ limine.h
 
 test_files/
 rootfs/
+
+tests/build/
+tests/vendor/
