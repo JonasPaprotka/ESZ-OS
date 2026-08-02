@@ -141,7 +141,7 @@ PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass)
             }
             break;
         case 0x6:
-            returnInfo.className = "Multimedia Controller";
+            returnInfo.className = "Bridge Device";
             switch (SubClass) {
                 case 0x0:
                     returnInfo.subClassName = "Host Bridge";
@@ -373,7 +373,7 @@ PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass)
             returnInfo.className = "Intelligent Controller";
             switch (SubClass) {
                 case 0x0:
-                    returnInfo.subClassName = "I20";
+                    returnInfo.subClassName = "I2O";
                     break;
             }
             break;
@@ -398,7 +398,7 @@ PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass)
             returnInfo.className = "Encryption Controller";
             switch (SubClass) {
                 case 0x0:
-                    returnInfo.subClassName = "Network and Computing Encrpytion/Decryption";
+                    returnInfo.subClassName = "Network and Computing Encryption/Decryption";
                     break;
                 case 0x10:
                     returnInfo.subClassName = "Entertainment Encryption/Decryption";
