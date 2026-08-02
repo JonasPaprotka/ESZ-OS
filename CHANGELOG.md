@@ -12,6 +12,8 @@
 - Fixed Issues
     - str_ends_with was not working correctly. It was fixed
     - bit_ functions used int parameters instead of uint64_t
+    - fixed ls command printing the volume label
+    - fixed pciinfo name copy paste mistake and typos
 
 ## v0.3.0
 
