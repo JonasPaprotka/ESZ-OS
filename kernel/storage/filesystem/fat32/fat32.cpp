@@ -50,6 +50,8 @@ void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& o
 
         const bool isEntryLFN = isLFN(entries[i].Attributes);
 
+        if (!isEntryLFN and entries[i].Attributes.VolumeID) continue;
+
         if (isEntryLFN) {
             LFN_Entry_Struct* lfn = (LFN_Entry_Struct*)&entries[i];
 
