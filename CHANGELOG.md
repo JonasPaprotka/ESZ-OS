@@ -9,6 +9,8 @@
 - Added the first test cases
     - Many String Functions
     - General Memory tests
+- Fixed Issues
+    - str_ends_with was not working correctly. It was fixed
 
 ## v0.3.0
 
