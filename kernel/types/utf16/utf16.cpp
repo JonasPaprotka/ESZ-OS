@@ -1,5 +1,5 @@
+#include "utf16.h"
 #include "string.h"
-#include <stdint.h>
 
 char utf16_char_to_ascii(const char c[2]) {
     return c[0];

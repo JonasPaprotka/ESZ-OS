@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "bit.h"
 
 void bit_set(unsigned char* bitmap, const uint64_t page) {
     bitmap[page / 8] |= (1 << (page % 8));

@@ -1,10 +1,10 @@
+#include "pmm.h"
 #include "config.h"
-#include "math.h"
-#include "memory.h"
-#include "bit.h"
-#include "info_text.h"
 #include "limine_boot.h"
 #include "bitmap.h"
+#include "bit.h"
+#include "math.h"
+#include "info_text.h"
 
 unsigned char *pmm_bitmap = nullptr;
 

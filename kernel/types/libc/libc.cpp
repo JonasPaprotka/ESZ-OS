@@ -1,5 +1,5 @@
+#include "libc.h"
 #include "memory.h"
-#include <stdint.h>
 
 extern "C" void* memcpy(void* dest, const void* src, uint64_t n) {
     memory_copy(dest, src, n);

@@ -1,5 +1,5 @@
+#include "bitmap.h"
 #include "config.h"
-#include <stdint.h>
 #include "limine_boot.h"
 #include "pmm.h"
 #include "math.h"

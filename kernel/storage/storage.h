@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "partitioning.h"
+#include "filesystem.h"
 #include "ahci.h"
 
 struct StorageDevice {

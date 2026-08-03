@@ -1,6 +1,11 @@
+#include "print_helper.h"
 #include "config.h"
+#include "color.h"
 #include "print.h"
 #include "info_text.h"
+#include "memory.h"
+#include "heap.h"
+#include "string.h"
 
 void print_separator() {
     char* s = str_repeat("-", MAX_CHARS / 2);

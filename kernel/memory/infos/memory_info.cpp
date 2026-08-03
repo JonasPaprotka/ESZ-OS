@@ -1,11 +1,12 @@
+#include "memory_info.h"
 #include "config.h"
 #include "memory.h"
+#include "heap.h"
+#include "pmm.h"
 #include "print.h"
+#include "print_helper.h"
 #include "info_text.h"
 #include "string.h"
-#include "pmm.h"
-#include "heap.h"
-#include "print_helper.h"
 
 #pragma region MEMORY FRAG. GAPH
 void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showSize) {

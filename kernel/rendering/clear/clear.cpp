@@ -1,3 +1,4 @@
+#include "clear.h"
 #include "limine_boot.h"
 #include "print.h"
 #include "screenBuffer.h"

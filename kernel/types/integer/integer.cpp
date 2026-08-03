@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "integer.h"
 #include "string.h"
 
 

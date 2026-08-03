@@ -1,10 +1,9 @@
-#include "config.h"
-#include <stdint.h>
 #include "filesystem.h"
-#include "string.h"
+#include "color.h"
 #include "print.h"
 #include "storage.h"
-#include "info_text.h"
+#include "heap.h"
+#include "string.h"
 
 char currentPath[MAX_PATH_LENGTH + 1];
 

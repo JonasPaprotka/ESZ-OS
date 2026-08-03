@@ -1,3 +1,4 @@
+#include "pit.h"
 #include "config.h"
 #include "io.h"
 

@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "memory.h"
 
 void memory_fill(void* target, const uint8_t value, const uint64_t n) {
     // fill 8 bytes using uint64_t to make it faster

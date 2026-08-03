@@ -1,7 +1,6 @@
 // File Updated with AI / Assisted by AI
-#include "config.h"
-#include <stdint.h>
 #include "keymap.h"
+#include "config.h"
 #include "keyboard.h"
 
 #ifdef KEYBOARD_LAYOUT_DE

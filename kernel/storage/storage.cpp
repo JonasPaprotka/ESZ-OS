@@ -1,11 +1,6 @@
-#include <stdint.h>
-#include "pci.h"
-#include "mbr.h"
-#include "info_text.h"
-#include "partitioning.h"
-#include "fat32.h"
 #include "storage.h"
-#include "ahci.h"
+#include "mbr.h"
+#include "fat32.h"
 
 FilesystemDriver* activeDriver = nullptr;
 

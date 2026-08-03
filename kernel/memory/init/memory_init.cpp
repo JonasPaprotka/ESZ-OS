@@ -1,7 +1,8 @@
-#include "heap.h"
+#include "memory_init.h"
 #include "limine_boot.h"
-#include "pmm.h"
 #include "bitmap.h"
+#include "pmm.h"
+#include "heap.h"
 
 void memory_init() {
     hhdm_offset = hhdm_request.response->offset;

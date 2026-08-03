@@ -1,6 +1,8 @@
 #ifndef PRINT_HELPER_H
 #define PRINT_HELPER_H
 
+#include <stdint.h>
+
 void print_separator();
 void printSysinfo();
 void printTerminalHeader();

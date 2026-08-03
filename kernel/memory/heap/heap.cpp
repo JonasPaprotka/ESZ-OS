@@ -1,8 +1,7 @@
+#include "heap.h"
 #include "config.h"
-#include "memory.h"
 #include "info_text.h"
 #include "pmm.h"
-#include "heap.h"
 
 MemoryBlockHeader* heapStartPtr = nullptr;
 MemoryBlockHeader* heapEndPtr = nullptr;
