@@ -1,6 +1,8 @@
 # File updated with AI / AI Assisted
 
-CXX ?= c++
+ifeq ($(origin CXX),default)
+CXX := c++
+endif
 
 DOCTEST_VERSION ?= 2.5.3
 DOCTEST := vendor/doctest.h
@@ -8,7 +10,10 @@ DOCTEST := vendor/doctest.h
 KERNEL := ../kernel
 BUILD  := build
 
-KERNEL_MODULES := string char
+##########
+# Not addable: keymap paging args commands pci pit timer idt pic keyboard terminal filesystem storage screenBuffer print clear info_text print_helper heap bitmap pmm
+KERNEL_MODULES := string char memory math bit integer utf16 pci_class_names mbr
+##########
 
 KERNEL_SRC := $(foreach m,$(KERNEL_MODULES),$(shell find $(KERNEL) -name '$(m).cpp'))
 
