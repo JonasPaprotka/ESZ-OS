@@ -2,7 +2,7 @@
 
 A hobby x86_64 kernel written in C++ and Assembly
 
-![ESZ-OS shell](docs/images/heroScreenshot.png)
+![ESZ-OS](docs/images/hero.gif)
 
 ## What works right now
 
