@@ -3,6 +3,7 @@
 #include "limine.h"
 #include "limine_boot.h"
 
+uint64_t hhdm_offset = 0;
 
 // REQUESTS
 __attribute__((used, section(".limine_requests")))

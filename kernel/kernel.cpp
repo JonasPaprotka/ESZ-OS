@@ -3,7 +3,7 @@
 #include "clear.h"
 #include "terminal.h"
 #include "info_text.h"
-#include "memory.h"
+#include "heap.h"
 #include "pic.h"
 #include "pit.h"
 #include "idt.h"
@@ -14,6 +14,7 @@
 #include "print_helper.h"
 #include "pci.h"
 #include "ahci.h"
+#include "memory_init.h"
 
 void halt() {
     while(1) __asm__ volatile("hlt");
@@ -246,7 +247,7 @@ static void init_interrupts() {
 
 static void init_memory() {
     printLoadingStart("Memory");
-    memory_info_init();
+    memory_init();
     printLoadingStatus(true);
 }
 

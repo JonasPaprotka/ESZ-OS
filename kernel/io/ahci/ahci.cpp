@@ -5,8 +5,10 @@
 #include "paging.h"
 #include "info_text.h"
 #include "timer.h"
-#include "memory.h"
+#include "limine_boot.h"
+#include "pmm.h"
 #include "math.h"
+#include "heap.h"
 
 PCI_Device* ahci_controller;
 PCI_BAR BAR_IDX_5;

@@ -1,6 +1,6 @@
 #include "config.h"
 #include "screenBuffer.h"
-#include "memory.h"
+#include "heap.h"
 #include "print.h"
 #include "info_text.h"
 

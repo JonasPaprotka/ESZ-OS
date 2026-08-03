@@ -1,5 +1,5 @@
 #include "string.h"
-#include "memory.h"
+#include "heap.h"
 #include <stdint.h>
 #include "char.h"
 

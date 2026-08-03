@@ -4,7 +4,7 @@
 #include "commands.h"
 #include "terminal.h"
 #include "io.h"
-#include "memory.h"
+#include "heap.h"
 #include "clear.h"
 #include "info_text.h"
 #include "terminal.h"
@@ -17,6 +17,7 @@
 #include "storage.h"
 #include "integer.h"
 #include "filesystem.h"
+#include "memory_info.h"
 
 void cmd_cd(const char* args) {
     filesystem_change_directory(args);

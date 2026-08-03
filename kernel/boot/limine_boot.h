@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "limine.h"
 
+extern uint64_t hhdm_offset;
+
 struct BootInfo {
     volatile uint32_t* framebuffer;
     uint64_t width;

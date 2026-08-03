@@ -1,7 +1,7 @@
 #include "config.h"
 #include "pci.h"
 #include "info_text.h"
-#include "memory.h"
+#include "heap.h"
 #include "io.h"
 #include "string.h"
 

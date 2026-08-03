@@ -4,6 +4,8 @@
 #include "config.h"
 #include "math.h"
 #include "info_text.h"
+#include "limine_boot.h"
+#include "pmm.h"
 
 uint16_t get_PML4_Index(const uint64_t address) {
     return (address >> 39) & 0x1FF;
