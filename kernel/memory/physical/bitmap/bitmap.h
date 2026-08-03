@@ -3,9 +3,7 @@
 
 extern uint64_t pageCount;
 
-void get_memory_region_count();
-void get_memory_regions();
-void init_bitmap_data();
 void get_free_location_for_bitmap();
+void init_bitmap_data();
 
 #endif // BITMAP_H

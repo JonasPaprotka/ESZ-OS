@@ -16,3 +16,5 @@ rootfs/
 
 tests/build/
 tests/vendor/
+
+compile_commands.json

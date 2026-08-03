@@ -8,6 +8,9 @@ extern uint64_t memoryRegionCount;
 extern uint64_t totalUsableBytes;
 extern uint64_t highestAddress;
 
+void get_memory_region_count();
+void get_memory_regions();
+
 void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter);
 uint64_t pmm_malloc(const uint64_t byteAmount);
 uint64_t pmm_malloc_page();
