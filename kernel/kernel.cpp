@@ -64,7 +64,7 @@ extern "C" void isr_stub_30();
 extern "C" void isr_stub_31();
 
 extern "C" void timer_isr(); // 32
-extern "C" void keyboard_isr(); //33
+extern "C" void keyboard_isr(); // 33
 
 extern "C" void fault_handler(Registers* regs) {
     newline();
