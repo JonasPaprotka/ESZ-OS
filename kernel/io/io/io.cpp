@@ -35,3 +35,7 @@ uint32_t inl(const uint16_t port) {
     __asm__("inl %1, %0" : "=a"(value) : "Nd"(port));
     return value;
 }
+
+void halt() {
+    while(1) __asm__ volatile("hlt");
+}
