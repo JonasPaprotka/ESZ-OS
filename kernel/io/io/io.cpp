@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "io.h"
 
 // out-byte (8bit)
 void outb(const uint16_t port, const uint8_t value) {

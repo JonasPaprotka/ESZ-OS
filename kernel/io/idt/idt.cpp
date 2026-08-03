@@ -1,7 +1,6 @@
 // File Updated with AI / Assisted by AI
 
 #include "idt.h"
-#include <stdint.h>
 
 struct IDTEntry {
     uint16_t base_low;

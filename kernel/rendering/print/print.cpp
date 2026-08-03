@@ -1,17 +1,14 @@
-#include "limine_boot.h"
-#include "config.h"
-
 #define FONT8x16_IMPLEMENTATION
 
-#include "font8x16.h"
 #include "print.h"
-#include "string.h"
-#include "color.h"
 #include <stdint.h>
+#include "config.h"
+#include "limine_boot.h"
+#include "font8x16.h"
 #include "clear.h"
 #include "screenBuffer.h"
-#include "math.h"
 #include "terminal.h"
+#include "string.h"
 
 int cursorAt_X;
 int cursorAt_Y;

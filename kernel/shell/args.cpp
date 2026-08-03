@@ -1,7 +1,7 @@
-#include "config.h"
+#include "args.h"
 #include "print.h"
-#include "info_text.h"
 #include "commands.h"
+#include "string.h"
 
 const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64_t inputBufferLength, const char inputBuffer[TERMINAL_BUFFER_SIZE]) {
     int tokenStartsAt = 0;

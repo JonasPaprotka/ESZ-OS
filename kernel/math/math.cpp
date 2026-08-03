@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "math.h"
 
 uint64_t divide_round_up(const uint64_t a, const uint64_t b) {
     if (b == 0) return 0;

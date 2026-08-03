@@ -1,7 +1,7 @@
 #include "string.h"
-#include "memory.h"
-#include <stdint.h>
 #include "char.h"
+#include "memory.h"
+#include "heap.h"
 
 char* malloc_str(const uint64_t size) {
     char* string = (char*) malloc(size);

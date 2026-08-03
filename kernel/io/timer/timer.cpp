@@ -1,6 +1,5 @@
+#include "timer.h"
 #include "config.h"
-#include <stdint.h>
-#include "io.h"
 #include "pic.h"
 #include "print.h"
 

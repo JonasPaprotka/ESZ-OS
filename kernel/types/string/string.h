@@ -2,7 +2,7 @@
 #define STRING_H
 
 #include <stdint.h>
-#include "memory.h"
+#include "heap.h"
 
 char* malloc_str(const uint64_t size);
 char* malloc_empty_str();

@@ -1,5 +1,6 @@
-#include "io.h"
+#include "pic.h"
 #include <stdint.h>
+#include "io.h"
 
 void EIO_Finished_Interrupt() {
     outb(0x20, 0x20);

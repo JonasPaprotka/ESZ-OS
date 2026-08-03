@@ -2,7 +2,6 @@
 #define PCI_CLASS_NAMES_H
 
 #include <stdint.h>
-#include "string.h"
 
 struct PCIClassInfo {
     const char* className;

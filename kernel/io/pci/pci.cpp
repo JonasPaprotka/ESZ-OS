@@ -1,9 +1,6 @@
-#include "config.h"
 #include "pci.h"
-#include "info_text.h"
-#include "memory.h"
 #include "io.h"
-#include "string.h"
+#include "heap.h"
 
 PCI_Device* found_pci_devices;
 uint32_t PCIDeviceAmount = 0;

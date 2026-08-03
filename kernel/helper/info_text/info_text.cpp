@@ -1,8 +1,6 @@
 #include "info_text.h"
-#include "string.h"
 #include "color.h"
 #include "print.h"
-#include "memory.h"
 
 void printInfoLine(const enum InfoTextType textType, const char* infoText) {
     Color textTagColor = Color::White;

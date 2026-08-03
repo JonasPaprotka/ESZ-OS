@@ -1,19 +1,21 @@
 #include <stdint.h>
+#include "color.h"
 #include "print.h"
 #include "clear.h"
+#include "screenBuffer.h"
 #include "terminal.h"
 #include "info_text.h"
-#include "memory.h"
+#include "print_helper.h"
+#include "idt.h"
 #include "pic.h"
 #include "pit.h"
-#include "idt.h"
 #include "io.h"
-#include "keyboard.h"
-#include "screenBuffer.h"
-#include "filesystem.h"
-#include "print_helper.h"
 #include "pci.h"
 #include "ahci.h"
+#include "memory_init.h"
+#include "heap.h"
+#include "string.h"
+#include "filesystem.h"
 
 void halt() {
     while(1) __asm__ volatile("hlt");
@@ -62,7 +64,7 @@ extern "C" void isr_stub_30();
 extern "C" void isr_stub_31();
 
 extern "C" void timer_isr(); // 32
-extern "C" void keyboard_isr(); //33
+extern "C" void keyboard_isr(); // 33
 
 extern "C" void fault_handler(Registers* regs) {
     newline();
@@ -246,7 +248,7 @@ static void init_interrupts() {
 
 static void init_memory() {
     printLoadingStart("Memory");
-    memory_info_init();
+    memory_init();
     printLoadingStatus(true);
 }
 

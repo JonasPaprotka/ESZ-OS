@@ -1,14 +1,12 @@
-#include "config.h"
 #include "fat32.h"
-#include <stdint.h>
-#include "info_text.h"
+#include "config.h"
 #include "ahci.h"
-#include "print.h"
+#include "storage.h"
+#include "math.h"
+#include "memory.h"
+#include "heap.h"
 #include "string.h"
 #include "utf16.h"
-#include "filesystem.h"
-#include "math.h"
-#include "storage.h"
 
 FAT32_Context context;
 

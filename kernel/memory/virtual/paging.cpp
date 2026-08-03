@@ -1,8 +1,9 @@
 #include "paging.h"
-#include <stdint.h>
-#include "memory.h"
 #include "config.h"
+#include "limine_boot.h"
+#include "pmm.h"
 #include "math.h"
+#include "memory.h"
 #include "info_text.h"
 
 uint16_t get_PML4_Index(const uint64_t address) {

@@ -1,8 +1,7 @@
-#include "io.h"
-#include "pic.h"
-#include "print.h"
-#include "terminal.h"
+#include "keyboard.h"
 #include <stdint.h>
+#include "io.h"
+#include "terminal.h"
 
 bool shift = false;
 bool isExtendedScancode = false;

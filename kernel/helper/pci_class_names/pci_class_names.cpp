@@ -1,5 +1,3 @@
-#include <stdint.h>
-#include "string.h"
 #include "pci_class_names.h"
 
 PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass) {
