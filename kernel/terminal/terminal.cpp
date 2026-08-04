@@ -1,5 +1,4 @@
 #include "terminal.h"
-#include "color.h"
 #include "print.h"
 #include "print_helper.h"
 #include "screenBuffer.h"
@@ -7,10 +6,10 @@
 #include "keyboard.h"
 #include "keymap.h"
 #include "args.h"
-#include "commands.h"
 #include "filesystem.h"
-#include "heap.h"
 #include "string.h"
+#include "cmd_history.h"
+#include "autocomplete.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];

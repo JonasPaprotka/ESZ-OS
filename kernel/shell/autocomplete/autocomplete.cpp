@@ -3,6 +3,8 @@
 #include "commands.h"
 #include "string.h"
 #include "print.h"
+#include "terminal.h"
+#include "args.h"
 
 void handleTabAutoCompletion() {
     if (lineInputLength == 0) return;
