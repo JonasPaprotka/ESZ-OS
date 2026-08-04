@@ -1,5 +1,4 @@
 #include "terminal.h"
-#include "color.h"
 #include "print.h"
 #include "print_helper.h"
 #include "screenBuffer.h"
@@ -7,37 +6,20 @@
 #include "keyboard.h"
 #include "keymap.h"
 #include "args.h"
-#include "commands.h"
 #include "filesystem.h"
-#include "heap.h"
 #include "string.h"
+#include "cmd_history.h"
+#include "autocomplete.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
 unsigned int lineInputCursorPos;
 unsigned int lineInputStart_X;
 
-char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
-uint64_t cmdHistCount = 0;
-uint64_t goThroughHistoryCount = 0;
-
 void reset_line_input() {
     lineInputLength = 0;
     lineInputCursorPos = 0;
     lineInputBuffer[0] = 0;
-}
-
-void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]) {
-    if (cmdHistCount >= MAX_COMMAND_HISTORY) {
-        for (uint64_t i = 0; i < cmdHistCount - 1; i++) {
-            str_copy(commandHistory[i], commandHistory[i + 1]);
-        }
-        commandHistory[cmdHistCount - 1][0] = 0;
-        cmdHistCount--;
-    }
-
-    str_copy(commandHistory[cmdHistCount], command);
-    cmdHistCount++;
 }
 
 void clear_input_on_screen() {
@@ -59,14 +41,6 @@ void clear_input_on_screen() {
     cursorAt_X = lineInputStart_X;
     lineInputCursorPos = 0;
     update_cursor_render();
-}
-
-void handle_show_history() {
-    clear_input_on_screen();
-    str_copy(lineInputBuffer, commandHistory[cmdHistCount - goThroughHistoryCount]);
-    lineInputLength = str_length(lineInputBuffer);
-    lineInputCursorPos = lineInputLength;
-    print_chars(lineInputBuffer, true);
 }
 
 void displayTerminalError(const char* Text) {
@@ -113,65 +87,6 @@ void replaceCurrentToken(const char* oldToken, const char* newToken) {
 
     for (uint64_t i = 0; i < str_length(newToken); i++)
         insert_char_at_cursor(newToken[i]);
-}
-
-void handleTabAutoCompletion() {
-    if (lineInputLength == 0) return;
-
-    uint64_t maxCommandCounter = 0;
-    for (uint64_t i = 0; commands[i].name != 0; i++) {
-        maxCommandCounter++;
-    }
-
-    const char* currentToken = getCurrTokenFromBuffer(lineInputCursorPos, lineInputLength, lineInputBuffer);
-    if (currentToken[0] == 0) {
-        free(currentToken);
-        return;
-    }
-
-    uint64_t validTabCannidates = 0;
-    Command cannidateList[maxCommandCounter];
-
-    // match input to list
-    for (uint64_t i = 0; commands[i].name != 0; i++) {
-        if (str_starts_with(commands[i].name, currentToken)) {
-            cannidateList[validTabCannidates] = commands[i];
-            validTabCannidates++;
-        }
-    }
-
-    if (validTabCannidates == 0) {
-        free(currentToken);
-        return;
-    }
-
-    // == 1 -> autocomplete directly
-    if (validTabCannidates == 1) {
-        replaceCurrentToken(currentToken, cannidateList[0].name);
-        free(currentToken);
-        return;
-    };
-
-    free(currentToken);
-
-    // > 1 -> show possibilities in newline and refill the input in another newline
-    // more tabs -> rotate through
-    if (validTabCannidates > 1) {
-        newline();
-        for(uint64_t i = 0; i < validTabCannidates; i++) {
-            print_chars(cannidateList[i].name, false);
-            if (i != validTabCannidates - 1) print_chars(" | ", false);
-        }
-
-        newline();
-        newTerminalInputLine();
-        print_chars(lineInputBuffer, true);
-        lineInputCursorPos = lineInputLength;
-
-        //TODO rotation
-
-        return;
-    }
 }
 
 void cursor_move_inline(const bool move_right) {

@@ -4,7 +4,7 @@
 #include "print_helper.h"
 #include "clear.h"
 #include "info_text.h"
-#include "terminal.h"
+#include "cmd_history.h"
 #include "io.h"
 #include "timer.h"
 #include "pci.h"
