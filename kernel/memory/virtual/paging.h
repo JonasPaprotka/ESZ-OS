@@ -30,6 +30,6 @@ bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, con
 bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize);
 
 bool free_page(const uint64_t virtualAddress);
-bool free_pages(const uint64_t virtualAddress, const uint64_t pages);
+bool free_pages(const uint64_t virtualAddress, const uint64_t requiredSize);
 
 #endif // PAGING_H

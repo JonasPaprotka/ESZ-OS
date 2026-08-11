@@ -127,13 +127,17 @@ bool free_page(const uint64_t virtualAddress) {
     PageTableEntry* pt3_PTI = page_walk(virtualAddress);
     if (pt3_PTI == nullptr) return false;
     *pt3_PTI = {};
+
+    drop_page_from_TLC(virtualAddress);
+
     return true;
 }
 
-bool free_pages(const uint64_t virtualAddress, const uint64_t pages) {
+bool free_pages(const uint64_t virtualAddress, const uint64_t requiredSize) {
+    const uint64_t requiredPages = divide_round_up(requiredSize, PAGE_SIZE);
     bool success = true;
 
-    for (uint64_t i = 0; i < pages; i++) {
+    for (uint64_t i = 0; i < requiredPages; i++) {
         if (!free_page(virtualAddress + (i * PAGE_SIZE))) success = false;
     }
 
