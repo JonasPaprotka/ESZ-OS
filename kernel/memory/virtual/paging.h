@@ -29,4 +29,7 @@ struct PageTable {
 bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags);
 bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize);
 
+bool free_page(const uint64_t virtualAddress);
+bool free_pages(const uint64_t virtualAddress, const uint64_t pages);
+
 #endif // PAGING_H
