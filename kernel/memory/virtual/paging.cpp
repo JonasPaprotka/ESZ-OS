@@ -27,11 +27,40 @@ uint16_t get_PT_Index(const uint64_t address) {
     return (address >> PAGE_SHIFT) & TABLE_IDX_MASK;
 }
 
+uint64_t get_start_of_tree() {
+    uint64_t cr3;
+    __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+    return cr3;
+}
+void drop_page_from_TLC(const uint64_t pageVirtualAddr) {
+    __asm__ volatile("invlpg (%0)" : : "r"(pageVirtualAddr) : "memory");
+}
+
+void handle_read_write_flag(const uint8_t flags, PageTableEntry& pt3_PTI) {
+    if (flags & PAGE_FLAG_WRITE) {
+        pt3_PTI.ReadWrite = 1;
+        return;
+    }
+
+    pt3_PTI.ReadWrite = 0;
+}
+
+void handle_cache_disable_flag(const uint8_t flags, PageTableEntry& pt3_PTI) {
+    if (flags & PAGE_FLAG_CACHE_DISABLE) {
+        pt3_PTI.CacheDisabled = 1;
+        return;
+    }
+
+    pt3_PTI.CacheDisabled = 0;
+}
+
 uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx) {
     if (prevTableAddr->entries[Idx].Present == 1)
         return (prevTableAddr->entries[Idx].Address << PAGE_SHIFT); // page number -> phys. address
 
     uint64_t currRouterTableAddress = pmm_malloc_page();
+    if (currRouterTableAddress == 0) return 0;
+
     memory_clear((uint64_t*)(currRouterTableAddress + hhdm_offset), PAGE_SIZE);
 
     prevTableAddr->entries[Idx].Present = 1;
@@ -42,48 +71,49 @@ uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx) 
     return currRouterTableAddress;
 }
 
-void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize) {
-    // get start of tree (PML4)
-    uint64_t cr3;
-    __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
-
+bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags) {
     const uint16_t virtPML4Idx = get_PML4_Index(virtualAddress);
     const uint16_t virtPDPTIdx = get_PDPT_Index(virtualAddress);
     const uint16_t virtPDIdx = get_PD_Index(virtualAddress);
     const uint16_t virtPTIdx = get_PT_Index(virtualAddress);
 
-    PageTable* startPageTable = (PageTable*)(cr3 + hhdm_offset);
-    PageTable* pageTable1 = (PageTable*)(get_or_create_next_table(startPageTable, virtPML4Idx) + hhdm_offset);
-    PageTable* pageTable2 = (PageTable*)(get_or_create_next_table(pageTable1, virtPDPTIdx) + hhdm_offset);
-    PageTable* pageTable3 = (PageTable*)(get_or_create_next_table(pageTable2, virtPDIdx) + hhdm_offset);
+    PageTable* startPageTable = (PageTable*)(get_start_of_tree() + hhdm_offset);
 
-    const uint64_t requiredPages = divide_round_up(requiredSize, PAGE_SIZE);
-    for (uint64_t i = 0; i < requiredPages; i++) {
-        const uint16_t virtPTIdxAdjusted = virtPTIdx + i;
+    uint64_t nextTableAddr = get_or_create_next_table(startPageTable, virtPML4Idx);
+    if (nextTableAddr == 0) return false;
+    PageTable* pageTable1 = (PageTable*)(nextTableAddr + hhdm_offset);
 
-        if (virtPTIdxAdjusted >= 512) {
-            printInfoLine(InfoTextType::Error, "map_pages: Paging Index is out of bounds");
-            break; //TODO update this
-        }
+    nextTableAddr = get_or_create_next_table(pageTable1, virtPDPTIdx);
+    if (nextTableAddr == 0) return false;
+    PageTable* pageTable2 = (PageTable*)(nextTableAddr + hhdm_offset);
 
-        // register on lowest tree level
-        pageTable3->entries[virtPTIdxAdjusted].Present = 1;
+    nextTableAddr = get_or_create_next_table(pageTable2, virtPDIdx);
+    if (nextTableAddr == 0) return false;
+    PageTable* pageTable3 = (PageTable*)(nextTableAddr + hhdm_offset);
 
-        if (flags & PAGE_FLAG_WRITE) {
-            pageTable3->entries[virtPTIdxAdjusted].ReadWrite = 1;
-        } else pageTable3->entries[virtPTIdxAdjusted].ReadWrite = 0;
+    PageTableEntry& pt3_PTI = pageTable3->entries[virtPTIdx];
 
-        if (flags & PAGE_FLAG_CACHE_DISABLE) {
-            pageTable3->entries[virtPTIdxAdjusted].CacheDisabled = 1;
-        } else pageTable3->entries[virtPTIdxAdjusted].CacheDisabled = 0;
+    // register on lowest tree level
+    pt3_PTI.Present = 1;
 
-        pageTable3->entries[virtPTIdxAdjusted].Address = ((physicalAddress + (i * PAGE_SIZE)) >> PAGE_SHIFT);
+    handle_read_write_flag(flags, pt3_PTI);
+    handle_cache_disable_flag(flags, pt3_PTI);
 
-        // drop this page from the CPUs translation cache
-        __asm__ volatile("invlpg (%0)" : : "r"((virtualAddress + (i * PAGE_SIZE))) : "memory");
-    }
+    pt3_PTI.Address = physicalAddress >> PAGE_SHIFT;
+
+    drop_page_from_TLC(virtualAddress);
+
+    return true;
 }
 
-void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags) {
-    map_pages(virtualAddress, physicalAddress, flags, PAGE_SIZE);
+bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize) {
+    const uint64_t requiredPages = divide_round_up(requiredSize, PAGE_SIZE);
+    uint64_t addressOffset = 0;
+
+    for (uint64_t i = 0; i < requiredPages; i++) {
+        addressOffset = i * PAGE_SIZE;
+        if (!map_page(virtualAddress + addressOffset, physicalAddress + addressOffset, flags)) return false;
+    }
+
+    return true;
 }

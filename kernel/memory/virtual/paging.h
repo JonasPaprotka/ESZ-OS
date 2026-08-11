@@ -26,7 +26,7 @@ struct PageTable {
 #define PAGE_FLAG_WRITE 0b00000010
 #define PAGE_FLAG_CACHE_DISABLE 0b00010000
 
-void map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize);
-void map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags);
+bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags);
+bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize);
 
 #endif // PAGING_H
