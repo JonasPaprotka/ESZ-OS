@@ -2,7 +2,7 @@
 
 ## v0.3.2
 
-
+- Updated Limine Bootloader to 12.6.0
 
 ## v0.3.1
 
