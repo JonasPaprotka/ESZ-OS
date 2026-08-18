@@ -2,6 +2,12 @@
 
 ## v0.3.2
 
+- Memory
+    - Refactored memory.cpp and paging.cpp
+    - Added free_page and free_pages to paging.cpp
+    - map_page and map_pages now return bool success state
+    - Improved page mapping, fixes table traversal issue
+- Refactored kernel.cpp and terminal.cpp
 - Updated Limine Bootloader to 12.6.0
 
 ## v0.3.1
