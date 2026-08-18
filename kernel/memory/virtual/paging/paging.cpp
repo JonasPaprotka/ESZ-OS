@@ -71,6 +71,7 @@ uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_t Idx) 
     return currRouterTableAddress;
 }
 
+//TODO: page walk should not require to create table. e.g. for later virt->phys
 PageTableEntry* page_walk(const uint64_t virtualAddress) {
     const uint16_t virtPML4Idx = get_PML4_Index(virtualAddress);
     const uint16_t virtPDPTIdx = get_PDPT_Index(virtualAddress);
