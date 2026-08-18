@@ -24,7 +24,7 @@ A hobby x86_64 kernel written in C++ and Assembly
 
 # "Install" the OS
 
-Currently you can run the OS on real hardware but not fully install it yet. SATA is supported, yes but FAT32 only supports read in the current version (v0.3.0). This might change soon.
+Currently you can run the OS on real hardware but not fully install it yet. SATA is supported, yes but FAT32 only supports read in the current version. This might change soon.
 Every version gets built and published as a **.iso** file you can download and use your iso-USB burner tool of your choice e.g. RUFUS or balenaEtcher - depends on your current running OS.
 Honestly the current state of the OS is very useless, which will remain in this state for a long period of time.
 
@@ -47,7 +47,7 @@ Configuration of this OS happens inside the `config.h` file. There you can set y
 ```zsh
 brew install x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
 mkdir limine
-curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.5.2/limine-binary.tar.xz
+curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.0/limine-binary.tar.xz
 curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
@@ -61,7 +61,7 @@ make clean && make
 brew upgrade x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
 rm -rf limine
 mkdir -p limine
-curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.5.2/limine-binary.tar.xz
+curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.0/limine-binary.tar.xz
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine

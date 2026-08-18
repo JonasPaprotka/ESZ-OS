@@ -294,12 +294,13 @@ bool reset_port_link(volatile AHCI_Ports* port) {
 }
 
 bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount) {
-    map_pages(
+    bool success = map_pages(
         (uint64_t)get_virtual_membar_address(BAR_IDX_5), // virt addr
         get_physical_membar_address(BAR_IDX_5), // phys addr
         0b00010010,  // writable and cache disabled
         sizeof(AHCI_Registers)
     );
+    if (!success) return false;
 
     volatile AHCI_Registers* ahciVirtualRegisters = (volatile AHCI_Registers*) get_virtual_membar_address(BAR_IDX_5);
 
