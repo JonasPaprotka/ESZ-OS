@@ -15,6 +15,7 @@ KERNEL_INC_DIRS := $(shell find kernel -type d)
 INC_FLAGS := $(addprefix -I , $(KERNEL_INC_DIRS))
 
 CXXFLAGS := \
+    -std=c++20 \
     -m64 -march=x86-64 \
     -mcmodel=kernel \
     -mno-red-zone \

@@ -26,7 +26,7 @@ COV_BIN    := $(patsubst ./%.cpp,$(BUILD)/cov/%,$(TEST_SRC))
 
 INC := -iquote vendor -iquote support $(addprefix -iquote ,$(shell find $(KERNEL) -type d))
 
-CXXFLAGS ?= -std=c++17 -Wall -Wextra -g -O0
+CXXFLAGS ?= -std=c++20 -Wall -Wextra -g -O0
 COVFLAGS := -fprofile-instr-generate -fcoverage-mapping
 DEPFLAGS := -MMD -MP
 
