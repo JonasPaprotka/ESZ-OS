@@ -6,15 +6,6 @@
 MemoryBlockHeader* heapStartPtr = nullptr;
 MemoryBlockHeader* heapEndPtr = nullptr;
 
-void init_heap_alloc() {
-    MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) pmm_malloc_addr(INIT_HEAP_SIZE);
-    initialHeapBlockPtr->Length = INIT_HEAP_SIZE - sizeof(MemoryBlockHeader);
-    initialHeapBlockPtr->Used = false;
-
-    heapStartPtr = initialHeapBlockPtr;
-    heapEndPtr = (MemoryBlockHeader*) ((char*) initialHeapBlockPtr + INIT_HEAP_SIZE);
-}
-
 MemoryBlockHeader create_mem_block(const uint64_t length, const bool used) {
     MemoryBlockHeader newHeader;
     newHeader.Length = length;
@@ -40,6 +31,24 @@ MemoryBlockHeader* get_prev_heap_block(const MemoryBlockHeader* currMemBlock) {
     }
 
     return nullptr;
+}
+
+void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
+    MemoryBlockHeader* rightBlockPtr = get_next_heap_block(freedBlockPtr);
+    if (rightBlockPtr < heapEndPtr) {
+        if (rightBlockPtr->Used == false) {
+            freedBlockPtr->Length += rightBlockPtr->Length + sizeof(MemoryBlockHeader);
+        }
+    }
+
+    MemoryBlockHeader* leftBlockPtr = get_prev_heap_block(freedBlockPtr);
+    if (leftBlockPtr == nullptr) { return; }
+
+    if (leftBlockPtr >= heapStartPtr) {
+        if (leftBlockPtr->Used == false) {
+            leftBlockPtr->Length += freedBlockPtr->Length + sizeof(MemoryBlockHeader);
+        }
+    }
 }
 
 void* malloc(const uint64_t size) {
@@ -80,27 +89,18 @@ void* malloc(const uint64_t size) {
     return returnAddr;
 }
 
-void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
-    MemoryBlockHeader* rightBlockPtr = get_next_heap_block(freedBlockPtr);
-    if (rightBlockPtr < heapEndPtr) {
-        if (rightBlockPtr->Used == false) {
-            freedBlockPtr->Length += rightBlockPtr->Length + sizeof(MemoryBlockHeader);
-        }
-    }
-
-    MemoryBlockHeader* leftBlockPtr = get_prev_heap_block(freedBlockPtr);
-    if (leftBlockPtr == nullptr) { return; }
-
-    if (leftBlockPtr >= heapStartPtr) {
-        if (leftBlockPtr->Used == false) {
-            leftBlockPtr->Length += freedBlockPtr->Length + sizeof(MemoryBlockHeader);
-        }
-    }
-}
-
 void free(const void* ptr) {
     MemoryBlockHeader* header = (MemoryBlockHeader*) ((char*) ptr - sizeof(MemoryBlockHeader));
     header->Used = false;
 
     try_defragment_page(header);
+}
+
+void init_heap_alloc() {
+    MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) pmm_malloc_addr(INIT_HEAP_SIZE);
+    initialHeapBlockPtr->Length = INIT_HEAP_SIZE - sizeof(MemoryBlockHeader);
+    initialHeapBlockPtr->Used = false;
+
+    heapStartPtr = initialHeapBlockPtr;
+    heapEndPtr = (MemoryBlockHeader*) ((char*) initialHeapBlockPtr + INIT_HEAP_SIZE);
 }

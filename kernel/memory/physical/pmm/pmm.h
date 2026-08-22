@@ -2,8 +2,10 @@
 #define PMM_H
 
 #include <stdint.h>
+#include "bitmap.h"
 
-extern unsigned char *pmm_bitmap;
+extern Bitmap pmm_bitmap;
+
 extern uint64_t memoryRegionCount;
 extern uint64_t totalUsableBytes;
 extern uint64_t highestAddress;

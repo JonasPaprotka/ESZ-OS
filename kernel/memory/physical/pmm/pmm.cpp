@@ -1,12 +1,12 @@
 #include "pmm.h"
 #include "config.h"
 #include "limine_boot.h"
-#include "bitmap.h"
+#include "pmm_bitmap.h"
 #include "bit.h"
 #include "math.h"
 #include "info_text.h"
 
-unsigned char *pmm_bitmap = nullptr;
+Bitmap pmm_bitmap = {};
 
 uint64_t memoryRegionCount = 0;
 uint64_t totalUsableBytes = 0;
@@ -36,33 +36,24 @@ void get_memory_regions() {
 
 void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
     for (uint64_t i = 0; i < pageAmount; i++) {
-        bit_write(pmm_bitmap, page, true);
+        bit_write(pmm_bitmap.bitmap, page, true);
         page++;
     }
 }
 
 uint64_t pmm_malloc(const uint64_t byteAmount) {
     const uint64_t reqPages = divide_round_up(byteAmount, PAGE_SIZE);
-    uint64_t freePageCounter = 0;
-    uint64_t firstPageOfSeries = 0;
 
-    for (uint64_t i = 0; i < pageCount; i++) {
-        if (!bit_read(pmm_bitmap, i)) {
-            if (freePageCounter == 0) {
-                firstPageOfSeries = i;
-            }
-            freePageCounter++;
-            if (freePageCounter == reqPages) {
-                pmm_malloc_page_range(firstPageOfSeries, reqPages);
-                return firstPageOfSeries * PAGE_SIZE;
-            }
-        } else {
-            freePageCounter = 0;
-        }
+    bool success = false;
+    uint64_t pageRangeBegin = pmm_bitmap.find_free_range(reqPages, success);
+
+    if (!success) {
+        printInfoLine(InfoTextType::Error, "PMM malloc failed: No free page range found");
+        return 0;
     }
 
-    printInfoLine(InfoTextType::Error, "pmm_malloc failed");
-    return 0;
+    pmm_malloc_page_range(pageRangeBegin, reqPages);
+    return pageRangeBegin * PAGE_SIZE;
 }
 
 uint64_t pmm_malloc_page() {
@@ -77,8 +68,8 @@ void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {
     freePageCounter = 0;
     usedPageCounter = 0;
 
-    for (uint64_t i = 0; i < pageCount; i++) {
-        if (!bit_read(pmm_bitmap, i)) {
+    for (uint64_t i = 0; i < pmm_bitmap.count; i++) {
+        if (!bit_read(pmm_bitmap.bitmap, i)) {
             freePageCounter++;
         } else {
             usedPageCounter++;
@@ -97,7 +88,7 @@ void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
     uint64_t currPage = addr / PAGE_SIZE;
 
     for (uint64_t i = 0; i < reqPages; i++) {
-        bit_write(pmm_bitmap, currPage, false);
+        bit_write(pmm_bitmap.bitmap, currPage, false);
         currPage++;
     }
 }
