@@ -12,6 +12,7 @@
     - Memory Info Improvements
         - Fixed meminfo reporting wrong RAM usage
         - Heap fragmentation view is now colored
+        - Simplified by removing Page-Info
 - AHCI now aborts on failed memory allocations instead of continuing
 - Refactored kernel.cpp and terminal.cpp
 - Updated Limine Bootloader to 12.6.0
