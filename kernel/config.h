@@ -51,6 +51,15 @@ constexpr uint64_t  MAX_PATH_DEPTH = 64; // segments
 // -------------------
 
 
+#pragma region COMMANDS
+// --- MEMORY INFO ---
+constexpr uint64_t MAX_FRAGMENTATION_VIEW_BLOCKS = 100;
+constexpr uint64_t RAM_UTILISATION_BAR_LENGTH = 16; // i would reccomend keeping it devideable by 2
+// -------------------
+
+#pragma endregion COMMANDS
+
+
 // --- OTHER ---
 #define STRINGIFY_IMPL(x) #x
 #define STRINGIFY(x) STRINGIFY_IMPL(x)

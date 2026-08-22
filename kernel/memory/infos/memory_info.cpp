@@ -68,35 +68,36 @@ void print_memory_info() {
     get_pmm_page_counts(freePages, usedPages);
     const uint64_t totalPages = freePages + usedPages;
 
-    print("----- PHYSICAL MEMORY MANAGER (PMM) -----");
-    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
-    char* highestAddressText = to_string(highestAddress, 16);
-    printInfoLine(InfoTextType::Info, String("Last Physical Address: ", highestAddressText));
-    free(highestAddressText);
+    print("----- PHYSICAL MEMORY MANAGER -----");
+    // printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
+    // char* highestAddressText = to_string(highestAddress, 16);
+    // printInfoLine(InfoTextType::Info, String("Last Physical Address: ", highestAddressText));
+    // free(highestAddressText);
 
-    // PAGES
-    printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
-    printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
-    printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
+    // // PAGES
+    // printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
+    // printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
+    // printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
 
     // RAM
-    const uint64_t ramUtilisationPct = (usedPages * 100) / totalPages;
     const uint64_t ramUsedBytes = usedPages * PAGE_SIZE;
     const uint64_t ramFreeBytes = freePages * PAGE_SIZE;
     const uint64_t ramUsedMiB = ramUsedBytes / 1024 / 1024;
     const uint64_t ramFreeMiB = ramFreeBytes / 1024 / 1024;
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
-    printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", ramUtilisationPct, " %"));
-    printInfoLine(InfoTextType::Info, String("RAM Used: ", ramUsedMiB, " MiB"));
-    printInfoLine(InfoTextType::Info, String("RAM Free: ", ramFreeMiB, " MiB"));
-    printPercentBar(ramUsedBytes, ramFreeBytes, 20, true);
+    printInfoLine(InfoTextType::Info, String("Total Available RAM: ", GiB, " GiB", " | ", MiB, " MiB"));
+    printInfoLine(InfoTextType::Info, String("Used: ", ramUsedMiB, " MiB", " | ", "Free: ", ramFreeMiB));
+
+    // RAM Util Percentage Bar
+    char* percentBar = getPercentBar(ramUsedBytes, ramFreeBytes, RAM_UTILISATION_BAR_LENGTH, true);
+    printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", percentBar));
+    free(percentBar);
 
     newline();
-    print("----- KERNEL HEAP ALLOCATOR -----");
+    print("----- VIRTUAL HEAP ALLOCATOR -----");
     char* heapStartAddr = to_string((uint64_t) heapStartPtr, 16);
     printInfoLine(InfoTextType::Info, String("Heap Start Address: ", heapStartAddr));
     free(heapStartAddr);
+
     char* heapEndAddr = to_string((uint64_t) heapEndPtr, 16);
     printInfoLine(InfoTextType::Info, String("Heap End Address: ", heapEndAddr));
     free(heapEndAddr);
@@ -111,7 +112,7 @@ void print_memory_info() {
 
     newline();
     print("--- HEAP FRAGMENTATION VIEW ---");
-    print_memory_fragmentation_graph(100, true);
+    print_memory_fragmentation_graph(MAX_FRAGMENTATION_VIEW_BLOCKS, true);
 
     print_separator();
 }
