@@ -3,12 +3,21 @@
 ## v0.3.2
 
 - Memory
+    - Virtual Memory Manager
+        - The kernel heap now runs on virtual memory
     - Refactored memory.cpp and paging.cpp
     - Added free_page and free_pages to paging.cpp
     - map_page and map_pages now return bool success state
     - Improved page mapping, fixes table traversal issue
+    - Memory Info Improvements
+        - Fixed meminfo reporting wrong RAM usage
+        - Heap fragmentation view is now colored
+- AHCI now aborts on failed memory allocations instead of continuing
 - Refactored kernel.cpp and terminal.cpp
 - Updated Limine Bootloader to 12.6.0
+- Config changes
+    - Added RAM_UTILISATION_BAR_LENGTH
+    - Added MAX_FRAGMENTATION_VIEW_BLOCKS
 
 ## v0.3.1
 

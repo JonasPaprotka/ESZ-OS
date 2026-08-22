@@ -2,6 +2,8 @@
 
 A hobby x86_64 kernel written in C++ and Assembly
 
+(Note: Gif is currently outdated)
+
 ![ESZ-OS](docs/images/hero.gif)
 
 ## What works right now
@@ -33,6 +35,8 @@ Honestly the current state of the OS is very useless, which will remain in this 
 - macOS works (tested)
 - Linux should work
 - Windows should work
+
+**Cpp-Version: 20**
 
 ## Configuration
 
