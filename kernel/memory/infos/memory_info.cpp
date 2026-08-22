@@ -75,15 +75,15 @@ void print_memory_info() {
     // printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
 
     // RAM
-    const uint64_t ramUsedBytes = usedPages * PAGE_SIZE;
     const uint64_t ramFreeBytes = freePages * PAGE_SIZE;
+    const uint64_t ramUsedBytes = totalUsableBytes - ramFreeBytes;
     const uint64_t ramUsedMiB = ramUsedBytes / 1024 / 1024;
     const uint64_t ramFreeMiB = ramFreeBytes / 1024 / 1024;
     printInfoLine(InfoTextType::Info, String("Total Available RAM: ", GiB, " GiB", " | ", MiB, " MiB"));
     printInfoLine(InfoTextType::Info, String("Used: ", ramUsedMiB, " MiB", " | ", "Free: ", ramFreeMiB, " MiB"));
 
     // RAM Util Percentage Bar
-    char* percentBar = getPercentBar(ramUsedBytes, ramUsedBytes + ramFreeBytes, RAM_UTILISATION_BAR_LENGTH, true);
+    char* percentBar = getPercentBar(ramUsedBytes, totalUsableBytes, RAM_UTILISATION_BAR_LENGTH, true);
     printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", percentBar));
     free(percentBar);
 
