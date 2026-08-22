@@ -83,7 +83,7 @@ void print_memory_info() {
     printInfoLine(InfoTextType::Info, String("Used: ", ramUsedMiB, " MiB", " | ", "Free: ", ramFreeMiB, " MiB"));
 
     // RAM Util Percentage Bar
-    char* percentBar = getPercentBar(ramUsedBytes, ramFreeBytes, RAM_UTILISATION_BAR_LENGTH, true);
+    char* percentBar = getPercentBar(ramUsedBytes, ramUsedBytes + ramFreeBytes, RAM_UTILISATION_BAR_LENGTH, true);
     printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", percentBar));
     free(percentBar);
 
