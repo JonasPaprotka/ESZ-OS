@@ -1,5 +1,4 @@
-#ifndef SCREEN_BUFFER_H
-#define SCREEN_BUFFER_H
+#pragma once
 
 #include "color.h"
 
@@ -30,5 +29,3 @@ Cell* get_screen_buffer_cell(const Line* line, const int x);
 
 bool init_empty_screen_buffer();
 bool init_screen_buffer();
-
-#endif // SCREEN_BUFFER_H

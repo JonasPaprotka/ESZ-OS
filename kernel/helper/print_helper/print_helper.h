@@ -1,5 +1,4 @@
-#ifndef PRINT_HELPER_H
-#define PRINT_HELPER_H
+#pragma once
 
 #include <stdint.h>
 
@@ -8,6 +7,6 @@ void printSysinfo();
 void printTerminalHeader();
 void printLoadingStart(const char* text);
 void printLoadingStatus(const bool success);
-void printPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage);
 
-#endif // PRINT_HELPER_H
+char* getPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage);
+void printPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage);

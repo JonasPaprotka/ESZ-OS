@@ -1,5 +1,4 @@
-#ifndef CHAR_H
-#define CHAR_H
+#pragma once
 
 bool is_digit(const char c);
 bool is_alpha(const char c);
@@ -9,5 +8,3 @@ bool is_whitespace(const char c);
 
 char to_upper(const char c);
 char to_lower(const char c);
-
-#endif // CHAR_H

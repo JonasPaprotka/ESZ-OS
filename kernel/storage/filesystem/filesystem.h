@@ -1,5 +1,4 @@
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
+#pragma once
 
 #include "config.h"
 #include <stdint.h>
@@ -28,5 +27,3 @@ void filesystem_print_working_directory();
 void filesystem_list();
 void filesystem_change_directory(const char* path);
 bool init_filesystem();
-
-#endif // FILESYSTEM_H

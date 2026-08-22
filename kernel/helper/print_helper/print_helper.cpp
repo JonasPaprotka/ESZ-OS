@@ -42,9 +42,10 @@ void printLoadingStatus(const bool success) {
     newline();
 }
 
-void printPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage) {
-    char outText[elements + 9];
-    memory_clear(outText, elements + 9);
+char* getPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage) {
+    const uint64_t size = elements + 9;
+    char* outText = malloc_str(size);
+    memory_clear(outText, size);
 
     outText[0] = '[';
     outText[elements + 1] = ']';
@@ -69,5 +70,11 @@ void printPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t 
         str_add(outText, String(" ", percentage, "%"));
     }
 
-    print(outText);
+    return outText;
+}
+
+void printPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage) {
+    char* percentBarText = getPercentBar(count, outOf, elements, showPercentage);
+    print(percentBarText);
+    free(percentBarText);
 }

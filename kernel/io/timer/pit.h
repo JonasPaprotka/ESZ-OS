@@ -1,6 +1,3 @@
-#ifndef PIT_H
-#define PIT_H
+#pragma once
 
 void pit_init();
-
-#endif // PIT_H

@@ -1,5 +1,4 @@
-#ifndef COMMANDS_H
-#define COMMANDS_H
+#pragma once
 
 struct Command {
     const char* name;
@@ -9,5 +8,3 @@ struct Command {
 void cmd_sysinfo(const char* = nullptr);
 
 extern const Command commands[];
-
-#endif // COMMANDS_H

@@ -1,5 +1,4 @@
-#ifndef LIMINE_BOOT_H
-#define LIMINE_BOOT_H
+#pragma once
 
 #include <stdint.h>
 #include "limine.h"
@@ -20,5 +19,3 @@ volatile extern limine_framebuffer_request framebuffer_request;
 volatile extern limine_memmap_request memmap_request;
 volatile extern limine_hhdm_request hhdm_request;
 volatile extern limine_rsdp_request rsdp_request;
-
-#endif // LIMINE_BOOT_H

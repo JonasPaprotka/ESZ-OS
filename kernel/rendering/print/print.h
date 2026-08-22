@@ -1,5 +1,4 @@
-#ifndef PRINT_H
-#define PRINT_H
+#pragma once
 
 #include "color.h"
 
@@ -67,6 +66,3 @@ void redraw();
 
 // --- INIT ---
 void init_print();
-
-
-#endif // PRINT_H

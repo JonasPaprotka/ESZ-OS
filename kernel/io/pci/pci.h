@@ -1,5 +1,4 @@
-#ifndef PCI_H
-#define PCI_H
+#pragma once
 
 #include <stdint.h>
 
@@ -67,5 +66,3 @@ extern PCI_Device* found_pci_devices;
 extern uint32_t PCIDeviceAmount;
 
 bool init_pci();
-
-#endif // PCI_H

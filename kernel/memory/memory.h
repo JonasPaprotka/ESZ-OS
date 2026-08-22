@@ -1,5 +1,4 @@
-#ifndef MEMORY_H
-#define MEMORY_H
+#pragma once
 
 #include <stdint.h>
 
@@ -11,5 +10,3 @@ struct MemoryBlockHeader {
 void memory_fill(void* target, uint8_t value, const uint64_t n);
 void memory_clear(void* target, const uint64_t n);
 void memory_copy(void* copyTo, const void* copyFrom, const uint64_t n);
-
-#endif // MEMORY_H

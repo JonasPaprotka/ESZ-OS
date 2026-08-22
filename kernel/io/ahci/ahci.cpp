@@ -111,6 +111,8 @@ PCI_Device* find_ahci_controller() {
 
 uint64_t AllocateCommandTable() {
     uint64_t commandTablePhysAddr = pmm_malloc_page();
+    if (commandTablePhysAddr == PMM_MALLOC_FAILED) return PMM_MALLOC_FAILED;
+
     memory_clear((void*)(commandTablePhysAddr + hhdm_offset), PAGE_SIZE);
     return commandTablePhysAddr;
 }
@@ -118,6 +120,8 @@ uint64_t AllocateCommandTable() {
 uint64_t AllocateDataBuffer(const uint32_t dataSize) {
     const uint64_t requiredPages = divide_round_up(dataSize, PAGE_SIZE);
     uint64_t dataBufferPhysAddr = pmm_malloc_pages(requiredPages);
+    if (dataBufferPhysAddr == PMM_MALLOC_FAILED) return PMM_MALLOC_FAILED;
+
     memory_clear((void*)(dataBufferPhysAddr + hhdm_offset), PAGE_SIZE * requiredPages);
     return dataBufferPhysAddr;
 }
@@ -192,6 +196,7 @@ bool RunCommand(volatile AHCI_Ports* port) {
 IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port) {
     uint64_t commandTablePhysAddr = AllocateCommandTable();
     uint64_t dataBufferPhysAddr = AllocateDataBuffer(PAGE_SIZE);
+    if (commandTablePhysAddr == PMM_MALLOC_FAILED || dataBufferPhysAddr == PMM_MALLOC_FAILED) return nullptr;
 
     SetCommandHeader(port, commandTablePhysAddr, false);
     AHCI_Command_Table* commandTable = BuildCommand(commandTablePhysAddr, IDENTIFY_DEVICE);
@@ -208,6 +213,7 @@ void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA,
     uint64_t commandTablePhysAddr = AllocateCommandTable();
     const uint32_t dataSize = sectorQuantity * SECTOR_SIZE_BYTES;
     uint64_t dataBufferPhysAddr = AllocateDataBuffer(dataSize);
+    if (commandTablePhysAddr == PMM_MALLOC_FAILED || dataBufferPhysAddr == PMM_MALLOC_FAILED) return;
 
     SetCommandHeader(port, commandTablePhysAddr, true);
     AHCI_Command_Table* commandTable = BuildCommand(commandTablePhysAddr, WRITE_DMA_EXT);
@@ -228,6 +234,7 @@ void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, c
     uint64_t commandTablePhysAddr = AllocateCommandTable();
     const uint32_t dataSize = sectorQuantity * SECTOR_SIZE_BYTES;
     uint64_t dataBufferPhysAddr = AllocateDataBuffer(dataSize);
+    if (commandTablePhysAddr == PMM_MALLOC_FAILED || dataBufferPhysAddr == PMM_MALLOC_FAILED) return;
 
     SetCommandHeader(port, commandTablePhysAddr, false);
     AHCI_Command_Table* commandTable = BuildCommand(commandTablePhysAddr, READ_DMA_EXT);
@@ -246,6 +253,7 @@ void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, c
 
 void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port) {
     uint64_t commandTablePhysAddr = AllocateCommandTable();
+    if (commandTablePhysAddr == PMM_MALLOC_FAILED) return;
 
     AHCI_Command_Header* commandList = SetCommandHeader(port, commandTablePhysAddr, false);
     commandList[0].PRDTL = 0;
@@ -258,10 +266,14 @@ bool preparePort(volatile AHCI_Ports* port) {
     // shutdown port
     if (!set_sata_port_status(port, false)) return false;
 
-    port->CLB = pmm_malloc_page(); // 1024 bytes needed
+    const uint64_t commandListPhysAddr = pmm_malloc_page(); // 1024 bytes needed
+    const uint64_t FBval = pmm_malloc_page(); // 256 bytes needed
+    if (commandListPhysAddr == PMM_MALLOC_FAILED || FBval == PMM_MALLOC_FAILED) return false;
+
+    port->CLB = commandListPhysAddr;
     memory_clear((void*)(port->CLB + hhdm_offset), PAGE_SIZE);
     port->CLBU = 0;
-    port->FB = pmm_malloc_page(); // 256 bytes needed
+    port->FB = FBval;
     memory_clear((void*)(port->FB + hhdm_offset), PAGE_SIZE);
     port->FBU = 0;
 
@@ -297,7 +309,7 @@ bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount) {
     bool success = map_pages(
         (uint64_t)get_virtual_membar_address(BAR_IDX_5), // virt addr
         get_physical_membar_address(BAR_IDX_5), // phys addr
-        0b00010010,  // writable and cache disabled
+        PagingFlags::PAGE_FLAG_WRITE_NO_CACHE,
         sizeof(AHCI_Registers)
     );
     if (!success) return false;

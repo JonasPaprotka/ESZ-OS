@@ -22,19 +22,16 @@ static void init_rendering_early() {
 }
 
 static void init_interrupts() {
-    printLoadingStart("Interrupts");
     idt_init();
     populate_idt_entries();
     pit_init();
     pic_init();
     while (inb(0x64) & 1) inb(0x60);
-    printLoadingStatus(true);
 }
 
 static void init_memory() {
     printLoadingStart("Memory");
-    memory_init();
-    printLoadingStatus(true);
+    printLoadingStatus(memory_init());
 }
 
 static void init_rendering_full() {
@@ -62,13 +59,20 @@ static void init_shell() {
 }
 
 extern "C" void kernel_main() {
-    init_rendering_early();
+    // STAGE 1
     init_interrupts();
+    init_rendering_early();
+
+    // STAGE 2
     init_memory();
+
+    // STAGE 3
     init_rendering_full();
     init_pci_layer();
     init_drive_layer();
     init_filesystem_layer();
+
+    // STAGE 4
     init_shell();
 
     __asm__ volatile("sti");

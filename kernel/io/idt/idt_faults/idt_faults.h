@@ -1,5 +1,4 @@
-#ifndef IDT_FAULTS_H
-#define IDT_FAULTS_H
+#pragma once
 
 #include "integer.h"
 
@@ -13,5 +12,3 @@ struct Registers {
 } __attribute__((packed));
 
 void populate_idt_entries();
-
-#endif // IDT_FAULTS_H

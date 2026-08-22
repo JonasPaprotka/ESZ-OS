@@ -1,5 +1,4 @@
-#ifndef PARTITIONING_H
-#define PARTITIONING_H
+#pragma once
 
 #include <stdint.h>
 
@@ -20,5 +19,3 @@ struct PartitionInfo {
     FilesystemType Type;
     bool Bootable;
 };
-
-#endif // PARTITIONING_H

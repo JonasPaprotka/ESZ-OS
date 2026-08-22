@@ -9,49 +9,44 @@
 #include "string.h"
 
 #pragma region MEMORY FRAG. GAPH
-void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showSize) {
+void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
     if (maxBlocks == 0) return; //TODO consider treating it as all blocks
-
-    uint64_t outputTextLength = maxBlocks + 5;
-    if (showSize) outputTextLength += maxBlocks * sizeof(uint64_t);
-    char outputText[outputTextLength];
-    memory_clear(outputText, outputTextLength);
 
     uint64_t blockCounter = 0;
     MemoryBlockHeader* currBlockPtr = heapStartPtr;
-    outputText[0] = '[';
+    print_inline("[");
 
     while (currBlockPtr < heapEndPtr)
     {
         if (currBlockPtr->Used) {
-            str_add(outputText, "U");
+            print_inline(String("U-", currBlockPtr->Length), Color::DeepOrange);
         } else {
-            str_add(outputText, "F");
-        }
-
-        if (showSize) {
-            //const uint64_t KiB = currBlockPtr->Length / 1024;
-            //const uint64_t MiB = KiB / 1024;
-            str_add(outputText, String("-", currBlockPtr->Length));
+            print_inline(String("F-", currBlockPtr->Length), Color::Green);
         }
 
         blockCounter++;
         if (blockCounter >= maxBlocks) {
-            str_add(outputText, "...");
+            print_inline("...");
             break;
         }
 
         // GET NEXT BLOCK
         currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
 
-        if (showSize && currBlockPtr < heapEndPtr) {
-            str_add(outputText, ", ");
+        if (currBlockPtr < heapEndPtr) {
+            print_inline(", ");
         }
     }
 
-    str_add(outputText, "]");
-    print(outputText);
-    print("Legend: [U] = Used; [F] = Free");
+    print_inline("]");
+    newline();
+
+    print_inline("[");
+    print_inline("U", Color::DeepOrange);
+    print_inline("] = Used | [");
+    print_inline("F", Color::Green);
+    print_inline("] = Free");
+    newline();
 }
 #pragma endregion MEMORY FRAG. GAPH
 
@@ -66,37 +61,38 @@ void print_memory_info() {
     uint64_t freePages;
     uint64_t usedPages;
     get_pmm_page_counts(freePages, usedPages);
-    const uint64_t totalPages = freePages + usedPages;
+    //const uint64_t totalPages = freePages + usedPages;
 
-    print("----- PHYSICAL MEMORY MANAGER (PMM) -----");
-    printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
-    char* highestAddressText = to_string(highestAddress, 16);
-    printInfoLine(InfoTextType::Info, String("Last Physical Address: ", highestAddressText));
-    free(highestAddressText);
+    print("----- PHYSICAL MEMORY MANAGER -----");
+    // printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));
+    // char* highestAddressText = to_string(highestAddress, 16);
+    // printInfoLine(InfoTextType::Info, String("Last Physical Address: ", highestAddressText));
+    // free(highestAddressText);
 
-    // PAGES
-    printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
-    printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
-    printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
+    // // PAGES
+    // printInfoLine(InfoTextType::Info, String("Total Managed Pages: ", totalPages));
+    // printInfoLine(InfoTextType::Info, String("Active Free Pages: ", freePages));
+    // printInfoLine(InfoTextType::Info, String("Active Used Pages: ", usedPages));
 
     // RAM
-    const uint64_t ramUtilisationPct = (usedPages * 100) / totalPages;
-    const uint64_t ramUsedBytes = usedPages * PAGE_SIZE;
     const uint64_t ramFreeBytes = freePages * PAGE_SIZE;
+    const uint64_t ramUsedBytes = totalUsableBytes - ramFreeBytes;
     const uint64_t ramUsedMiB = ramUsedBytes / 1024 / 1024;
     const uint64_t ramFreeMiB = ramFreeBytes / 1024 / 1024;
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", GiB, " GiB"));
-    printInfoLine(InfoTextType::Info, String("(Total) Available RAM: ", MiB, " MiB"));
-    printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", ramUtilisationPct, " %"));
-    printInfoLine(InfoTextType::Info, String("RAM Used: ", ramUsedMiB, " MiB"));
-    printInfoLine(InfoTextType::Info, String("RAM Free: ", ramFreeMiB, " MiB"));
-    printPercentBar(ramUsedBytes, ramFreeBytes, 20, true);
+    printInfoLine(InfoTextType::Info, String("Total Available RAM: ", GiB, " GiB", " | ", MiB, " MiB"));
+    printInfoLine(InfoTextType::Info, String("Used: ", ramUsedMiB, " MiB", " | ", "Free: ", ramFreeMiB, " MiB"));
+
+    // RAM Util Percentage Bar
+    char* percentBar = getPercentBar(ramUsedBytes, totalUsableBytes, RAM_UTILISATION_BAR_LENGTH, true);
+    printInfoLine(InfoTextType::Info, String("RAM Utilisation: ", percentBar));
+    free(percentBar);
 
     newline();
-    print("----- KERNEL HEAP ALLOCATOR -----");
+    print("----- VIRTUAL HEAP ALLOCATOR -----");
     char* heapStartAddr = to_string((uint64_t) heapStartPtr, 16);
     printInfoLine(InfoTextType::Info, String("Heap Start Address: ", heapStartAddr));
     free(heapStartAddr);
+
     char* heapEndAddr = to_string((uint64_t) heapEndPtr, 16);
     printInfoLine(InfoTextType::Info, String("Heap End Address: ", heapEndAddr));
     free(heapEndAddr);
@@ -111,7 +107,7 @@ void print_memory_info() {
 
     newline();
     print("--- HEAP FRAGMENTATION VIEW ---");
-    print_memory_fragmentation_graph(100, true);
+    print_memory_fragmentation_graph(MAX_FRAGMENTATION_VIEW_BLOCKS);
 
     print_separator();
 }

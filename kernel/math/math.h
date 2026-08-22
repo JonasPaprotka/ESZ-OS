@@ -1,5 +1,4 @@
-#ifndef MATH_H
-#define MATH_H
+#pragma once
 
 #include <stdint.h>
 
@@ -14,5 +13,3 @@ bool is_power_of_two(const int64_t n);
 bool is_aligned(const uint64_t addr, const uint64_t align);
 uint64_t align_up(const uint64_t addr, const uint64_t align);
 uint64_t align_down(const uint64_t addr, const uint64_t align);
-
-#endif // MATH_H
