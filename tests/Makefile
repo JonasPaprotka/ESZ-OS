@@ -30,7 +30,7 @@ CXXFLAGS ?= -std=c++20 -Wall -Wextra -g -O0
 COVFLAGS := -fprofile-instr-generate -fcoverage-mapping
 DEPFLAGS := -MMD -MP
 
-.PHONY: test coverage list clean distclean
+.PHONY: test coverage compile_commands list clean distclean
 
 test: $(TEST_BIN)
 	@fail=0; \
@@ -70,6 +70,18 @@ coverage: $(DOCTEST)
 	    $(addprefix -object ,$(wordlist 2,999,$(COV_BIN))) \
 	    -instr-profile=$(BUILD)/tests.profdata -format=lcov \
 	    $(KERNEL_SRC) > $(BUILD)/lcov.info
+
+compile_commands:
+	@echo '[' > ../compile_commands.json
+	@sep="%s"; for f in $(TEST_SRC) $(KERNEL_SRC); do \
+	    printf "$$sep" "" >> ../compile_commands.json; \
+	    printf '  {\n    "directory": "%s",\n    "file": "%s",\n    "command": "%s"\n  }' \
+	        "$(CURDIR)" "$$f" "$(CXX) $(CXXFLAGS) $(INC) -c $$f" >> ../compile_commands.json; \
+	    sep=",\n%s"; \
+	done
+	@echo '' >> ../compile_commands.json
+	@echo ']' >> ../compile_commands.json
+	@echo "wrote ../compile_commands.json"
 
 list:
 	@echo "tests:"; for t in $(TEST_SRC); do echo "  $$t"; done
