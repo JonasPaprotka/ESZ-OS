@@ -5,7 +5,7 @@
 #include "heap.h"
 #include "vmm.h"
 
-void memory_init() {
+bool memory_init() {
     hhdm_offset = hhdm_request.response->offset;
 
     get_memory_region_count();
@@ -13,5 +13,5 @@ void memory_init() {
     get_free_location_for_bitmap();
 
     init_heap_alloc(); // old physcial - soon to be removed
-    init_vmm();
+    return init_vmm();
 }
