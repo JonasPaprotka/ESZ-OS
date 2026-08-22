@@ -7,7 +7,7 @@ TEST_CASE("is_digit") {
     for(uint64_t i = 0; i < 47; i++) {
         CHECK(is_digit(i) == false);
     }
-    for(uint64_t i = 48; i < 57; i++) {
+    for(uint64_t i = 48; i <= 57; i++) {
         CHECK(is_digit(i) == true);
     }
     for(uint64_t i = 58; i < 127; i++) {
@@ -19,13 +19,13 @@ TEST_CASE("is_alpha") {
     for(uint64_t i = 0; i < 64; i++) {
         CHECK(is_alpha(i) == false);
     }
-    for(uint64_t i = 65; i < 90; i++) {
+    for(uint64_t i = 65; i <= 90; i++) {
         CHECK(is_alpha(i) == true);
     }
     for(uint64_t i = 91; i < 96; i++) {
         CHECK(is_alpha(i) == false);
     }
-    for(uint64_t i = 97; i < 122; i++) {
+    for(uint64_t i = 97; i <= 122; i++) {
         CHECK(is_alpha(i) == true);
     }
     for(uint64_t i = 123; i < 127; i++) {
@@ -37,7 +37,7 @@ TEST_CASE("is_upper_alpha") {
     for(uint64_t i = 0; i < 64; i++) {
         CHECK(is_upper_alpha(i) == false);
     }
-    for(uint64_t i = 65; i < 90; i++) {
+    for(uint64_t i = 65; i <= 90; i++) {
         CHECK(is_upper_alpha(i) == true);
     }
     for(uint64_t i = 91; i < 127; i++) {
@@ -49,7 +49,7 @@ TEST_CASE("is_lower_alpha") {
     for(uint64_t i = 0; i < 96; i++) {
         CHECK(is_lower_alpha(i) == false);
     }
-    for(uint64_t i = 97; i < 122; i++) {
+    for(uint64_t i = 97; i <= 122; i++) {
         CHECK(is_lower_alpha(i) == true);
     }
     for(uint64_t i = 123; i < 127; i++) {

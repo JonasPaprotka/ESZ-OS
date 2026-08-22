@@ -4,7 +4,7 @@
 #include "bit.h"
 
 TEST_CASE("bit_set") {
-    unsigned char bitmap[] = { 0b01000010 };
+    unsigned char bitmap[] = { 0b01000010, 0 };
     bit_set(bitmap, 0);
     bit_set(bitmap, 1);
     bit_set(bitmap, 2);
@@ -15,14 +15,14 @@ TEST_CASE("bit_set") {
 }
 
 TEST_CASE("bit_clear") {
-    unsigned char bitmap[] = { 0b01001010 };
+    unsigned char bitmap[] = { 0b01001010, 0 };
     bit_clear(bitmap, 0);
     bit_clear(bitmap, 1);
     bit_clear(bitmap, 2);
-    CHECK(bitmap[0] == 0b01000000);
+    CHECK(bitmap[0] == 0b01001000);
 
     bit_clear(bitmap, 10);
-    CHECK(bitmap[0] == 0b01000000);
+    CHECK(bitmap[0] == 0b01001000);
 }
 
 TEST_CASE("bit_write") {
