@@ -9,7 +9,7 @@
 #include "string.h"
 
 #pragma region MEMORY FRAG. GAPH
-void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showSize) {
+void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
     if (maxBlocks == 0) return; //TODO consider treating it as all blocks
 
     uint64_t blockCounter = 0;
@@ -19,11 +19,10 @@ void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showS
     while (currBlockPtr < heapEndPtr)
     {
         if (currBlockPtr->Used) {
-            if (showSize) print_inline(String("U-", currBlockPtr->Length), Color::DeepOrange);
+            print_inline(String("U-", currBlockPtr->Length), Color::DeepOrange);
         } else {
-            if (showSize) print_inline(String("F-", currBlockPtr->Length), Color::Green);
+            print_inline(String("F-", currBlockPtr->Length), Color::Green);
         }
-
 
         blockCounter++;
         if (blockCounter >= maxBlocks) {
@@ -34,7 +33,7 @@ void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showS
         // GET NEXT BLOCK
         currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
 
-        if (showSize && currBlockPtr < heapEndPtr) {
+        if (currBlockPtr < heapEndPtr) {
             print_inline(", ");
         }
     }
@@ -81,7 +80,7 @@ void print_memory_info() {
     const uint64_t ramUsedMiB = ramUsedBytes / 1024 / 1024;
     const uint64_t ramFreeMiB = ramFreeBytes / 1024 / 1024;
     printInfoLine(InfoTextType::Info, String("Total Available RAM: ", GiB, " GiB", " | ", MiB, " MiB"));
-    printInfoLine(InfoTextType::Info, String("Used: ", ramUsedMiB, " MiB", " | ", "Free: ", ramFreeMiB));
+    printInfoLine(InfoTextType::Info, String("Used: ", ramUsedMiB, " MiB", " | ", "Free: ", ramFreeMiB, " MiB"));
 
     // RAM Util Percentage Bar
     char* percentBar = getPercentBar(ramUsedBytes, ramFreeBytes, RAM_UTILISATION_BAR_LENGTH, true);
@@ -108,7 +107,7 @@ void print_memory_info() {
 
     newline();
     print("--- HEAP FRAGMENTATION VIEW ---");
-    print_memory_fragmentation_graph(MAX_FRAGMENTATION_VIEW_BLOCKS, true);
+    print_memory_fragmentation_graph(MAX_FRAGMENTATION_VIEW_BLOCKS);
 
     print_separator();
 }

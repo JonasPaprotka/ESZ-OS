@@ -14,4 +14,4 @@ void try_defragment_page(MemoryBlockHeader* freedBlockPtr);
 void* malloc(const uint64_t size);
 void free(const void* ptr);
 
-void init_heap_alloc();
+bool init_heap_alloc();

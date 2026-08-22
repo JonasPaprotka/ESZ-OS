@@ -96,11 +96,11 @@ void free(const void* ptr) {
     try_defragment_page(header);
 }
 
-void init_heap_alloc() {
+bool init_heap_alloc() {
     MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) vmm_malloc_pages(INIT_HEAP_SIZE);
     if (initialHeapBlockPtr == nullptr) {
         printInfoLine(InfoTextType::Error, "Heap init failed: Could not reserve the initial heap");
-        return;
+        return false;
     }
 
     initialHeapBlockPtr->Length = INIT_HEAP_SIZE - sizeof(MemoryBlockHeader);
@@ -108,4 +108,6 @@ void init_heap_alloc() {
 
     heapStartPtr = initialHeapBlockPtr;
     heapEndPtr = (MemoryBlockHeader*) ((char*) initialHeapBlockPtr + INIT_HEAP_SIZE);
+
+    return true;
 }
