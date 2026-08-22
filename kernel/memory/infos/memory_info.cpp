@@ -12,32 +12,22 @@
 void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showSize) {
     if (maxBlocks == 0) return; //TODO consider treating it as all blocks
 
-    uint64_t outputTextLength = maxBlocks + 5;
-    if (showSize) outputTextLength += maxBlocks * sizeof(uint64_t);
-    char outputText[outputTextLength];
-    memory_clear(outputText, outputTextLength);
-
     uint64_t blockCounter = 0;
     MemoryBlockHeader* currBlockPtr = heapStartPtr;
-    outputText[0] = '[';
+    print_inline("[");
 
     while (currBlockPtr < heapEndPtr)
     {
         if (currBlockPtr->Used) {
-            str_add(outputText, "U");
+            if (showSize) print_inline(String("U-", currBlockPtr->Length), Color::DeepOrange);
         } else {
-            str_add(outputText, "F");
+            if (showSize) print_inline(String("F-", currBlockPtr->Length), Color::Green);
         }
 
-        if (showSize) {
-            //const uint64_t KiB = currBlockPtr->Length / 1024;
-            //const uint64_t MiB = KiB / 1024;
-            str_add(outputText, String("-", currBlockPtr->Length));
-        }
 
         blockCounter++;
         if (blockCounter >= maxBlocks) {
-            str_add(outputText, "...");
+            print_inline("...");
             break;
         }
 
@@ -45,13 +35,19 @@ void print_memory_fragmentation_graph(const uint64_t maxBlocks, const bool showS
         currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
 
         if (showSize && currBlockPtr < heapEndPtr) {
-            str_add(outputText, ", ");
+            print_inline(", ");
         }
     }
 
-    str_add(outputText, "]");
-    print(outputText);
-    print("Legend: [U] = Used; [F] = Free");
+    print_inline("]");
+    newline();
+
+    print_inline("[");
+    print_inline("U", Color::DeepOrange);
+    print_inline("] = Used | [");
+    print_inline("F", Color::Green);
+    print_inline("] = Free");
+    newline();
 }
 #pragma endregion MEMORY FRAG. GAPH
 
