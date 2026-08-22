@@ -1,5 +1,4 @@
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 #include <stdint.h>
 
@@ -40,5 +39,3 @@ enum class Color : uint32_t {
 
     Transparent  = 0x00000000
 };
-
-#endif // COLOR_H

@@ -1,5 +1,4 @@
-#ifndef IO_H
-#define IO_H
+#pragma once
 
 #include <stdint.h>
 
@@ -13,5 +12,3 @@ void outl(const uint16_t port, const uint32_t value);
 uint32_t inl(const uint16_t port);
 
 void halt();
-
-#endif // IO_H

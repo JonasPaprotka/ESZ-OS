@@ -1,5 +1,4 @@
-#ifndef STORAGE_H
-#define STORAGE_H
+#pragma once
 
 #include <stdint.h>
 #include "partitioning.h"
@@ -39,5 +38,3 @@ extern StorageDevice* selectedStorageDevice;
 extern PartitionInfo* selectedPartition;
 
 bool init_storage();
-
-#endif // STORAGE_H

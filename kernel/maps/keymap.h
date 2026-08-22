@@ -1,7 +1,5 @@
 // File Updated with AI / Assisted by AI
-
-#ifndef KEYMAPS_H
-#define KEYMAPS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -33,5 +31,3 @@ extern uint16_t us_keymap[2][0x3A];
 extern uint16_t de_keymap[2][0x3A];
 
 uint16_t scancode_to_keycode(const uint8_t scancode);
-
-#endif // KEYMAPS_H

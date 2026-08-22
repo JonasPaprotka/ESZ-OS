@@ -1,5 +1,4 @@
-#ifndef AHCI_H
-#define AHCI_H
+#pragma once
 
 #include <stdint.h>
 
@@ -205,5 +204,3 @@ void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA,
 void AHCI_READ_DMA_EXT(volatile AHCI_Ports* port, const uint64_t readStartLBA, const uint16_t sectorQuantity, void* RAM_OutputPtr);
 void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port);
 #pragma endregion GLOBALS
-
-#endif // AHCI_H

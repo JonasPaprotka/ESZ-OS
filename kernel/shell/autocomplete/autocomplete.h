@@ -1,6 +1,3 @@
-#ifndef AUTOCOMPLETE_H
-#define AUTOCOMPLETE_H
+#pragma once
 
 void handleTabAutoCompletion();
-
-#endif // AUTOCOMPLETE_H

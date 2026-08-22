@@ -1,5 +1,4 @@
-#ifndef PCI_CLASS_NAMES_H
-#define PCI_CLASS_NAMES_H
+#pragma once
 
 #include <stdint.h>
 
@@ -9,5 +8,3 @@ struct PCIClassInfo {
 };
 
 PCIClassInfo resolve_class_name(const uint8_t ClassCode, const uint8_t SubClass);
-
-#endif // PCI_CLASS_NAMES_H

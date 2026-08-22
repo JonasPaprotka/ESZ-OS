@@ -1,5 +1,4 @@
-#ifndef INFO_HELPER_H
-#define INFO_HELPER_H
+#pragma once
 
 enum class InfoTextType {
     Info,
@@ -13,5 +12,3 @@ enum class InfoTextType {
 };
 
 void printInfoLine(enum InfoTextType textType, const char* infoText);
-
-#endif // INFO_HELPER_H

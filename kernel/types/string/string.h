@@ -1,5 +1,4 @@
-#ifndef STRING_H
-#define STRING_H
+#pragma once
 
 #include <stdint.h>
 #include "heap.h"
@@ -74,5 +73,3 @@ struct String {
         return data;
     }
 };
-
-#endif // STRING_H

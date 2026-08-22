@@ -1,5 +1,4 @@
-#ifndef PAGING_H
-#define PAGING_H
+#pragma once
 
 #include <stdint.h>
 
@@ -36,5 +35,3 @@ bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, co
 
 bool free_page(const uint64_t virtualAddress);
 bool free_pages(const uint64_t virtualAddress, const uint64_t requiredSize);
-
-#endif // PAGING_H

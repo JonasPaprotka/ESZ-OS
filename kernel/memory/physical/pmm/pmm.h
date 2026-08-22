@@ -1,10 +1,9 @@
-#ifndef PMM_H
-#define PMM_H
+#pragma once
 
 #include <stdint.h>
 #include "bitmap.h"
 
-#define PMM_MALLOC_FAILED UINT64_MAX
+constexpr uint64_t PMM_MALLOC_FAILED = UINT64_MAX;
 
 extern Bitmap pmm_bitmap;
 
@@ -24,5 +23,3 @@ void* pmm_malloc_addr(const uint64_t byteAmount);
 
 bool pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount);
 bool pmm_free(const uint64_t addr, const uint64_t byteAmount);
-
-#endif // PMM_H

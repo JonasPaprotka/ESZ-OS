@@ -1,5 +1,4 @@
-#ifndef TERMINAL_H
-#define TERMINAL_H
+#pragma once
 
 #include "config.h"
 #include <stdint.h>
@@ -18,5 +17,3 @@ void newTerminalInputLine();
 
 void terminal_init();
 void terminal_on_key(uint8_t scancode);
-
-#endif // TERMINAL_H

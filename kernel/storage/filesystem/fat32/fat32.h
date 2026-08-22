@@ -1,5 +1,4 @@
-#ifndef FAT32_H
-#define FAT32_H
+#pragma once
 
 #include <stdint.h>
 #include "filesystem.h"
@@ -95,5 +94,3 @@ struct BPB {
 } __attribute__((packed));
 
 extern FilesystemDriver FAT32_Driver;
-
-#endif // FAT32_H

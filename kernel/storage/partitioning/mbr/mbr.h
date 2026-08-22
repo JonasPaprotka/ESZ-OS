@@ -1,5 +1,4 @@
-#ifndef MBR_H
-#define MBR_H
+#pragma once
 
 #include <stdint.h>
 #include "partitioning.h"
@@ -26,5 +25,3 @@ struct Partition_Entry { // 16 byte
 } __attribute__((packed));
 
 bool parse_mbr(const uint8_t* sectorBuffer, PartitionInfo* outPartitions);
-
-#endif // MBR_H

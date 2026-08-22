@@ -1,5 +1,4 @@
-#ifndef CMD_HISTORY_H
-#define CMD_HISTORY_H
+#pragma once
 
 #include "config.h"
 #include <stdint.h>
@@ -10,5 +9,3 @@ extern char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
 
 void add_command_to_history(char command[TERMINAL_BUFFER_SIZE]);
 void handle_show_history();
-
-#endif // CMD_HISTORY_H

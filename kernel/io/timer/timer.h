@@ -1,5 +1,4 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include <stdint.h>
 
@@ -11,5 +10,3 @@ uint64_t get_ticks_in_ms();
 
 void sleep_sec(const uint64_t sec);
 void sleep_ms(const uint64_t ms);
-
-#endif // TIMER_H
