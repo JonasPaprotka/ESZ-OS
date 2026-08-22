@@ -580,3 +580,43 @@ TEST_CASE("str_cut_end_malloc") {
         CHECK(str_equal(str_cut_end_malloc("Cut Me -#", 0), "Cut Me -#"));
     }
 }
+
+TEST_CASE("str_move_right") {
+    CHECK(str_equal(str_move_right("", 0), ""));
+    CHECK(str_equal(str_move_right("", 1), " "));
+    CHECK(str_equal(str_move_right("", 2), "  "));
+
+    CHECK(str_equal(str_move_right("AbC#- 1%", 0), "AbC#- 1%"));
+    CHECK(str_equal(str_move_right("AbC#- 1%", 1), " AbC#- 1%"));
+    CHECK(str_equal(str_move_right("AbC#- 1%", 5), "     AbC#- 1%"));
+}
+
+TEST_CASE("str_trim_start") {
+    CHECK(str_equal(str_trim_start(""), ""));
+    CHECK(str_equal(str_trim_start(" "), ""));
+    CHECK(str_equal(str_trim("         "), ""));
+    CHECK(str_equal(str_trim_start(" A"), "A"));
+    CHECK(str_equal(str_trim_start("A "), "A "));
+    CHECK(str_equal(str_trim_start(" A "), "A "));
+    CHECK(str_equal(str_trim_start("       A. b. c. 1.    "), "A. b. c. 1.    "));
+}
+
+TEST_CASE("str_trim_end") {
+    CHECK(str_equal(str_trim_end(""), ""));
+    CHECK(str_equal(str_trim_end(" "), ""));
+    CHECK(str_equal(str_trim("         "), ""));
+    CHECK(str_equal(str_trim_end(" A"), " A"));
+    CHECK(str_equal(str_trim_end("A "), "A"));
+    CHECK(str_equal(str_trim_end(" A "), " A"));
+    CHECK(str_equal(str_trim_end("       A. b. c. 1.    "), "       A. b. c. 1."));
+}
+
+TEST_CASE("str_trim") {
+    CHECK(str_equal(str_trim(""), ""));
+    CHECK(str_equal(str_trim(" "), ""));
+    CHECK(str_equal(str_trim("         "), ""));
+    CHECK(str_equal(str_trim(" A"), "A"));
+    CHECK(str_equal(str_trim("A "), "A"));
+    CHECK(str_equal(str_trim(" A "), "A"));
+    CHECK(str_equal(str_trim("       A. b. c. 1.    "), "A. b. c. 1."));
+}
