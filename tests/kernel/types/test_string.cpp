@@ -620,3 +620,139 @@ TEST_CASE("str_trim") {
     CHECK(str_equal(str_trim(" A "), "A"));
     CHECK(str_equal(str_trim("       A. b. c. 1.    "), "A. b. c. 1."));
 }
+
+TEST_CASE("str_split") {
+    char* splits[16];
+    uint64_t qty = 0;
+
+    SUBCASE("no separator present") {
+        str_split("Lorem", ',', splits, qty);
+        CHECK(qty == 1);
+        CHECK(str_equal(splits[0], "Lorem") == true);
+    }
+
+    SUBCASE("empty text") {
+        str_split("", ',', splits, qty);
+        CHECK(qty == 1);
+        CHECK(str_equal(splits[0], "") == true);
+    }
+
+    SUBCASE("single separator") {
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "b") == true);
+    }
+
+    SUBCASE("multiple separators") {
+        str_split("a,b,c", ',', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "b") == true);
+        CHECK(str_equal(splits[2], "c") == true);
+    }
+
+    SUBCASE("multi char parts") {
+        str_split("Lorem ipsum dolor", ' ', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "Lorem") == true);
+        CHECK(str_equal(splits[1], "ipsum") == true);
+        CHECK(str_equal(splits[2], "dolor") == true);
+    }
+
+    SUBCASE("path like") {
+        str_split("user/jonas/bin", '/', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "user") == true);
+        CHECK(str_equal(splits[1], "jonas") == true);
+        CHECK(str_equal(splits[2], "bin") == true);
+    }
+
+    SUBCASE("absolute path keeps the leading empty part") {
+        str_split("/user/jonas", '/', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "user") == true);
+        CHECK(str_equal(splits[2], "jonas") == true);
+    }
+
+    SUBCASE("leading separator empty first part") {
+        str_split(",a", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "a") == true);
+    }
+
+    SUBCASE("trailing separator empty last part") {
+        str_split("a,", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "") == true);
+    }
+
+    SUBCASE("multiple separators yield empty part") {
+        str_split("a,,b", ',', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "") == true);
+        CHECK(str_equal(splits[2], "b") == true);
+    }
+
+    SUBCASE("leading and trailing separator") {
+        str_split(",a,", ',', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "a") == true);
+        CHECK(str_equal(splits[2], "") == true);
+    }
+
+    SUBCASE("only separators") {
+        str_split(",,,", ',', splits, qty);
+        CHECK(qty == 4);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "") == true);
+        CHECK(str_equal(splits[2], "") == true);
+        CHECK(str_equal(splits[3], "") == true);
+    }
+
+    SUBCASE("text is a single separator") {
+        str_split("/", '/', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "") == true);
+    }
+
+    SUBCASE("separator not present in text") {
+        str_split("Lorem ipsum", ',', splits, qty);
+        CHECK(qty == 1);
+        CHECK(str_equal(splits[0], "Lorem ipsum") == true);
+    }
+
+    SUBCASE("parts keep their own terminator") {
+        str_split("Lorem,a", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_length(splits[1]) == 1);
+        CHECK(str_equal(splits[1], "a") == true);
+    }
+
+    SUBCASE("outSplitQty is assigned not incremented") {
+        qty = 5;
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "b") == true);
+    }
+
+    SUBCASE("does not write past the last part") {
+        for (uint64_t i = 0; i < 16; i++) splits[i] = nullptr;
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(splits[2] == nullptr);
+    }
+
+    SUBCASE("parts are separately allocated") {
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(splits[0] != splits[1]);
+    }
+}

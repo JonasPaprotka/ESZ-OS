@@ -401,40 +401,27 @@ char* str_to_lower(const char* text) {
 void str_split(const char* text, const char splitChar, char* outSplits[], uint64_t &outSplitQty) {
     const uint64_t text_len = str_length(text);
 
+    outSplitQty = 1;
     for (uint64_t i = 0; i < text_len; i++) {
-        if (text[i] != splitChar) continue;
-        if (i != text_len - 1) outSplitQty++;
+        if (text[i] == splitChar) outSplitQty++;
     }
 
-    if (outSplitQty == 0) {
-        outSplits[0] = malloc_str(text_len + 1);
-        str_copy(outSplits[0], text);
-        return;
-    }
+    uint64_t partStart = 0;
+    uint64_t partNo = 0;
 
-    char* currSplit = malloc_str(text_len + 1);
-    uint64_t currSplitNo = 0;
-    uint64_t charsInCurrSplit = 0;
+    for (uint64_t i = 0; i <= text_len; i++) {
+        if (i != text_len && text[i] != splitChar) continue;
 
-    for (uint64_t i = 0; i < text_len; i++) {
-        if (text[i] != splitChar) {
-            str_add(currSplit, text[i]);
-            charsInCurrSplit++;
-            continue;
+        const uint64_t part_len = i - partStart;
+        char* part = malloc_str(part_len + 1);
+
+        for (uint64_t j = 0; j < part_len; j++) {
+            part[j] = text[partStart + j];
         }
+        part[part_len] = 0;
 
-        outSplits[currSplitNo] = malloc_str(charsInCurrSplit + 1);
-        str_copy(outSplits[currSplitNo], currSplit);
-        currSplit[0] = 0;
-
-        currSplitNo++;
-        charsInCurrSplit = 0;
+        outSplits[partNo] = part;
+        partNo++;
+        partStart = i + 1;
     }
-
-    if (charsInCurrSplit > 0) {
-        outSplits[currSplitNo] = malloc_str(charsInCurrSplit + 1);
-        str_copy(outSplits[currSplitNo], currSplit);
-    }
-
-    free(currSplit);
 }
