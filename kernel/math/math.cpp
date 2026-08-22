@@ -32,6 +32,7 @@ bool is_power_of_two(const int64_t n) {
 }
 
 bool is_aligned(const uint64_t addr, const uint64_t align) {
+    if (align == 0) return addr == 0;
     return addr % align == 0;
 }
 
