@@ -24,8 +24,8 @@ constexpr uint64_t FONT_SIZE = 1;
 
 // --- VERSION TRACKER ---
 #define OS_VERSION_MAJOR 0
-#define OS_VERSION_MINOR 3
-#define OS_VERSION_PATCH 2
+#define OS_VERSION_MINOR 4
+#define OS_VERSION_PATCH 0
 // -----------------------
 
 // --- TERMINAL CONFIG ---
