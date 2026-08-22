@@ -46,5 +46,6 @@ uint64_t align_up(const uint64_t addr, const uint64_t align) {
 
 // e.g. 5000, 4096 -> 4096
 uint64_t align_down(const uint64_t addr, const uint64_t align) {
+    if (align == 0) return addr;
     return addr - (addr % align);
 }
