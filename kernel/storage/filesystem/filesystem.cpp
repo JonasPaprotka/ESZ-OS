@@ -65,7 +65,7 @@ void filesystem_change_directory(const char* path) {
     uint64_t splitCount = 0;
     str_split(path, '/', pathSections, splitCount);
 
-    if (splitCount == 0) {
+    if (splitCount == 1) {
         //TODO check if exists
 
         str_add(currentPath, String(pathSections[0], "/"));

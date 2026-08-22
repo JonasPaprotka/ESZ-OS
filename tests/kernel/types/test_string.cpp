@@ -403,3 +403,356 @@ TEST_CASE("str_to_upper") {
     CHECK(str_equal(str_to_upper(" "), " ") == true);
     CHECK(str_equal(str_to_upper(""), "") == true);
 }
+
+TEST_CASE("str_combine") {
+    CHECK(str_equal(str_combine("", ""), "") == true);
+    CHECK(str_equal(str_combine(" ", ""), " ") == true);
+    CHECK(str_equal(str_combine("", " "), " ") == true);
+    CHECK(str_equal(str_combine("a", "A"), "aA") == true);
+    CHECK(str_equal(str_combine("", "A"), "A") == true);
+    CHECK(str_equal(str_combine("A", ""), "A") == true);
+}
+
+TEST_CASE("to_string - main") {
+    SUBCASE("base 0") {
+        CHECK(str_equal(to_string((uint64_t) 0, 0), "0") == true);
+        CHECK(str_equal(to_string((uint64_t) 1, 0), "0") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 0), "0") == true);
+    }
+    SUBCASE("base 1") {
+        CHECK(str_equal(to_string((uint64_t) 1, 1), "0") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 1), "0") == true);
+    }
+
+    SUBCASE("value 0") {
+        CHECK(str_equal(to_string((uint64_t) 0, 2), "0") == true);
+        CHECK(str_equal(to_string((uint64_t) 0, 10), "0") == true);
+        CHECK(str_equal(to_string((uint64_t) 0, 16), "0") == true);
+    }
+
+    SUBCASE("value 1 in all bases") {
+        for (uint8_t base = 2; base <= 100; ++base) {
+            CAPTURE(base);
+            CHECK(str_equal(to_string((uint64_t) 1, base), "1") == true);
+        }
+    }
+
+    SUBCASE("value 999 in all bases") {
+        CHECK(str_equal(to_string((uint64_t) 999, 2),  "1111100111") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 3),  "1101000") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 4),  "33213") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 5),  "12444") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 6),  "4343") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 7),  "2625") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 8),  "1747") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 9),  "1330") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 10), "999") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 11), "829") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 12), "6b3") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 13), "5bb") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 14), "515") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 15), "469") == true);
+        CHECK(str_equal(to_string((uint64_t) 999, 16), "3e7") == true);
+    }
+
+    SUBCASE("digit alphabet") {
+        CHECK(str_equal(to_string((uint64_t) 9, 16),  "9") == true);
+        CHECK(str_equal(to_string((uint64_t) 10, 16), "a") == true);
+        CHECK(str_equal(to_string((uint64_t) 15, 16), "f") == true);
+        CHECK(str_equal(to_string((uint64_t) 16, 16), "10") == true);
+        CHECK(str_equal(to_string((uint64_t) 0xdeadbeef, 16), "deadbeef") == true);
+    }
+
+    SUBCASE("base == value") {
+        for (uint8_t base = 2; base <= 100; ++base) {
+            CAPTURE(base);
+            CHECK(str_equal(to_string((uint64_t) base, base), "10") == true);
+        }
+    }
+
+    SUBCASE("max uint64") {
+        const uint64_t max = UINT64_MAX;
+        CHECK(str_equal(to_string(max, 2), "1111111111111111111111111111111111111111111111111111111111111111") == true);
+        CHECK(str_equal(to_string(max, 10), "18446744073709551615") == true);
+        CHECK(str_equal(to_string(max, 16), "ffffffffffffffff") == true);
+    }
+}
+
+TEST_CASE("to_string - wrappers") {
+
+    SUBCASE("uint32_t") {
+        CHECK(str_equal(to_string((uint32_t) 0, 16), "0") == true);
+        CHECK(str_equal(to_string((uint32_t) 999, 16), "3e7") == true);
+        CHECK(str_equal(to_string((uint32_t) 0xFFFFFFFF, 16), "ffffffff") == true);
+        CHECK(str_equal(to_string((uint32_t) 0xFFFFFFFF, 10), "4294967295") == true);
+    }
+
+    SUBCASE("uint16_t") {
+        CHECK(str_equal(to_string((uint16_t) 999, 16), "3e7") == true);
+        CHECK(str_equal(to_string((uint16_t) 0xFFFF, 16), "ffff") == true);
+        CHECK(str_equal(to_string((uint16_t) 0xFFFF, 10), "65535") == true);
+    }
+
+    SUBCASE("int64_t - positive path") {
+        CHECK(str_equal(to_string((int64_t) 0, 10), "0") == true);
+        CHECK(str_equal(to_string((int64_t) 999, 16), "3e7") == true);
+        CHECK(str_equal(to_string((int64_t) 9223372036854775807LL, 10), "9223372036854775807") == true);
+    }
+
+    SUBCASE("int64_t - negative path") {
+        CHECK(str_equal(to_string((int64_t) -1, 10), "-1") == true);
+        CHECK(str_equal(to_string((int64_t) -999, 10), "-999") == true);
+        CHECK(str_equal(to_string((int64_t) -999, 16), "-3e7") == true);
+        CHECK(str_equal(to_string((int64_t) -999, 2), "-1111100111") == true);
+        CHECK(str_equal(to_string((int64_t) (-9223372036854775807LL - 1), 10), "-9223372036854775808") == true);
+        CHECK(str_equal(to_string((int64_t) -999, 0), "-0") == true);
+        CHECK(str_equal(to_string((int64_t) -999, 1), "-0") == true);
+    }
+
+    SUBCASE("default overloads") {
+        CHECK(str_equal(to_string((uint64_t) 999), "999") == true);
+        CHECK(str_equal(to_string((int64_t) 999), "999") == true);
+        CHECK(str_equal(to_string((int64_t) -999), "-999") == true);
+        CHECK(str_equal(to_string((uint32_t) 999), "999") == true);
+        CHECK(str_equal(to_string((int32_t) 999), "999") == true);
+        CHECK(str_equal(to_string((int32_t) -999), "-999") == true);
+        CHECK(str_equal(to_string((uint64_t) 18446744073709551615ULL), "18446744073709551615") == true);
+        CHECK(str_equal(to_string((uint32_t) 4294967295U), "4294967295") == true);
+        CHECK(str_equal(to_string((int32_t) 2147483647), "2147483647") == true);
+        CHECK(str_equal(to_string((int32_t) (-2147483647 - 1)), "-2147483648") == true);
+        CHECK(str_equal(to_string((int32_t) -1), "-1") == true);
+    }
+
+    SUBCASE("wrapper same behavior as main") {
+        for (uint8_t base = 2; base <= 100; ++base) {
+            CAPTURE((int) base);
+            CHECK(str_equal(to_string((uint32_t) 12345, base), to_string((uint64_t) 12345, base)) == true);
+            CHECK(str_equal(to_string((uint16_t) 12345, base), to_string((uint64_t) 12345, base)) == true);
+            CHECK(str_equal(to_string((int64_t) 12345, base), to_string((uint64_t) 12345, base)) == true);
+        }
+    }
+}
+
+TEST_CASE("str_cut_end") {
+    char text[128];
+
+    SUBCASE("empty string") {
+        text[0] = 0;
+        str_cut_end(text, 0);
+        CHECK(str_equal(text, ""));
+    }
+    SUBCASE("normal usage") {
+        str_copy(text, "Cut Me -#");
+        str_cut_end(text, 3);
+        CHECK(str_equal(text, "Cut Me"));
+    }
+    SUBCASE("to much cut") {
+        str_copy(text, "Cut Me -#");
+        str_cut_end(text, 10);
+        CHECK(str_equal(text, ""));
+    }
+    SUBCASE("cut all") {
+        str_copy(text, "Cut Me -#");
+        str_cut_end(text, 9);
+        CHECK(str_equal(text, ""));
+    }
+    SUBCASE("nothing cut") {
+        str_copy(text, "Cut Me -#");
+        str_cut_end(text, 0);
+        CHECK(str_equal(text, "Cut Me -#"));
+    }
+}
+
+TEST_CASE("str_cut_end_malloc") {
+    SUBCASE("empty string") {
+        CHECK(str_equal(str_cut_end_malloc("", 0), ""));
+    }
+    SUBCASE("normal usage") {
+        CHECK(str_equal(str_cut_end_malloc("Cut Me -#", 3), "Cut Me"));
+    }
+    SUBCASE("to much cut") {
+        CHECK(str_equal(str_cut_end_malloc("Cut Me -#", 10), ""));
+    }
+    SUBCASE("cut all") {
+        CHECK(str_equal(str_cut_end_malloc("Cut Me -#", 9), ""));
+    }
+    SUBCASE("nothing cut") {
+        CHECK(str_equal(str_cut_end_malloc("Cut Me -#", 0), "Cut Me -#"));
+    }
+}
+
+TEST_CASE("str_move_right") {
+    CHECK(str_equal(str_move_right("", 0), ""));
+    CHECK(str_equal(str_move_right("", 1), " "));
+    CHECK(str_equal(str_move_right("", 2), "  "));
+
+    CHECK(str_equal(str_move_right("AbC#- 1%", 0), "AbC#- 1%"));
+    CHECK(str_equal(str_move_right("AbC#- 1%", 1), " AbC#- 1%"));
+    CHECK(str_equal(str_move_right("AbC#- 1%", 5), "     AbC#- 1%"));
+}
+
+TEST_CASE("str_trim_start") {
+    CHECK(str_equal(str_trim_start(""), ""));
+    CHECK(str_equal(str_trim_start(" "), ""));
+    CHECK(str_equal(str_trim("         "), ""));
+    CHECK(str_equal(str_trim_start(" A"), "A"));
+    CHECK(str_equal(str_trim_start("A "), "A "));
+    CHECK(str_equal(str_trim_start(" A "), "A "));
+    CHECK(str_equal(str_trim_start("       A. b. c. 1.    "), "A. b. c. 1.    "));
+}
+
+TEST_CASE("str_trim_end") {
+    CHECK(str_equal(str_trim_end(""), ""));
+    CHECK(str_equal(str_trim_end(" "), ""));
+    CHECK(str_equal(str_trim("         "), ""));
+    CHECK(str_equal(str_trim_end(" A"), " A"));
+    CHECK(str_equal(str_trim_end("A "), "A"));
+    CHECK(str_equal(str_trim_end(" A "), " A"));
+    CHECK(str_equal(str_trim_end("       A. b. c. 1.    "), "       A. b. c. 1."));
+}
+
+TEST_CASE("str_trim") {
+    CHECK(str_equal(str_trim(""), ""));
+    CHECK(str_equal(str_trim(" "), ""));
+    CHECK(str_equal(str_trim("         "), ""));
+    CHECK(str_equal(str_trim(" A"), "A"));
+    CHECK(str_equal(str_trim("A "), "A"));
+    CHECK(str_equal(str_trim(" A "), "A"));
+    CHECK(str_equal(str_trim("       A. b. c. 1.    "), "A. b. c. 1."));
+}
+
+TEST_CASE("str_split") {
+    char* splits[16];
+    uint64_t qty = 0;
+
+    SUBCASE("no separator present") {
+        str_split("Lorem", ',', splits, qty);
+        CHECK(qty == 1);
+        CHECK(str_equal(splits[0], "Lorem") == true);
+    }
+
+    SUBCASE("empty text") {
+        str_split("", ',', splits, qty);
+        CHECK(qty == 1);
+        CHECK(str_equal(splits[0], "") == true);
+    }
+
+    SUBCASE("single separator") {
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "b") == true);
+    }
+
+    SUBCASE("multiple separators") {
+        str_split("a,b,c", ',', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "b") == true);
+        CHECK(str_equal(splits[2], "c") == true);
+    }
+
+    SUBCASE("multi char parts") {
+        str_split("Lorem ipsum dolor", ' ', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "Lorem") == true);
+        CHECK(str_equal(splits[1], "ipsum") == true);
+        CHECK(str_equal(splits[2], "dolor") == true);
+    }
+
+    SUBCASE("path like") {
+        str_split("user/jonas/bin", '/', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "user") == true);
+        CHECK(str_equal(splits[1], "jonas") == true);
+        CHECK(str_equal(splits[2], "bin") == true);
+    }
+
+    SUBCASE("absolute path keeps the leading empty part") {
+        str_split("/user/jonas", '/', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "user") == true);
+        CHECK(str_equal(splits[2], "jonas") == true);
+    }
+
+    SUBCASE("leading separator empty first part") {
+        str_split(",a", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "a") == true);
+    }
+
+    SUBCASE("trailing separator empty last part") {
+        str_split("a,", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "") == true);
+    }
+
+    SUBCASE("multiple separators yield empty part") {
+        str_split("a,,b", ',', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "") == true);
+        CHECK(str_equal(splits[2], "b") == true);
+    }
+
+    SUBCASE("leading and trailing separator") {
+        str_split(",a,", ',', splits, qty);
+        CHECK(qty == 3);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "a") == true);
+        CHECK(str_equal(splits[2], "") == true);
+    }
+
+    SUBCASE("only separators") {
+        str_split(",,,", ',', splits, qty);
+        CHECK(qty == 4);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "") == true);
+        CHECK(str_equal(splits[2], "") == true);
+        CHECK(str_equal(splits[3], "") == true);
+    }
+
+    SUBCASE("text is a single separator") {
+        str_split("/", '/', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "") == true);
+        CHECK(str_equal(splits[1], "") == true);
+    }
+
+    SUBCASE("separator not present in text") {
+        str_split("Lorem ipsum", ',', splits, qty);
+        CHECK(qty == 1);
+        CHECK(str_equal(splits[0], "Lorem ipsum") == true);
+    }
+
+    SUBCASE("parts keep their own terminator") {
+        str_split("Lorem,a", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_length(splits[1]) == 1);
+        CHECK(str_equal(splits[1], "a") == true);
+    }
+
+    SUBCASE("outSplitQty is assigned not incremented") {
+        qty = 5;
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(str_equal(splits[0], "a") == true);
+        CHECK(str_equal(splits[1], "b") == true);
+    }
+
+    SUBCASE("does not write past the last part") {
+        for (uint64_t i = 0; i < 16; i++) splits[i] = nullptr;
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(splits[2] == nullptr);
+    }
+
+    SUBCASE("parts are separately allocated") {
+        str_split("a,b", ',', splits, qty);
+        CHECK(qty == 2);
+        CHECK(splits[0] != splits[1]);
+    }
+}

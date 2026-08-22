@@ -2,7 +2,12 @@
 
 ## v0.4.0
 
-
+- Fixes
+    - Fixed to_int not respecting the base
+    - Fixed string splitting missbehaving
+    - Fixed math clamp not priorizing min over max value
+- Others
+    - Added many test cases for string, memory, utf16, integer, char, bit, math
 
 ## v0.3.2
 

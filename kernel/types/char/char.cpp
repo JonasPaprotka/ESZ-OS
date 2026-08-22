@@ -18,7 +18,7 @@ bool is_lower_alpha(const char c) {
 
 bool is_whitespace(const char c) {
     // 9 = tab
-    return (c == ' ' || c == 9);
+    return (c == 32 || c == 9);
 }
 
 char to_upper(const char c) {

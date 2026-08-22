@@ -115,7 +115,7 @@ void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCou
 }
 
 static void free_path_sections(char* pathSections[], const uint64_t count) {
-    for (uint64_t i = 0; i <= count; i++) {
+    for (uint64_t i = 0; i < count; i++) {
         free(pathSections[i]);
     }
 }
@@ -142,7 +142,7 @@ Entry find_entry(const char* path) {
     uint32_t currCluster = context.RootCluster;
     const uint32_t maxEntries = context.ClusterSizeInBytes / sizeof(Directory_Entry);
 
-    for (uint64_t i = 0; i < splitCount; i++) {
+    for (uint64_t i = 0; i + 1 < splitCount; i++) {
         Entry* entries = (Entry*) malloc(sizeof(Entry) * maxEntries);
         memory_clear(entries, sizeof(Entry) * maxEntries);
 
@@ -175,7 +175,7 @@ Entry find_entry(const char* path) {
     read_dir_entries(currCluster, entries, entryCount);
 
     for (uint32_t j = 0; j < entryCount; j++) {
-        if (str_equal(entries[j].Name, pathSections[splitCount])) {
+        if (str_equal(entries[j].Name, pathSections[splitCount - 1])) {
             Entry result = entries[j];
             result.Found = true;
             free(entries);
