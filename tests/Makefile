@@ -147,7 +147,6 @@ help:
 	@echo "make test                  run every test binary"
 	@echo "make test TEST=string      only binaries whose path contains 'string'"
 	@echo "make test CASE=str_length  only test cases matching '*str_length*'"
-	@echo "make test SAN=1            rebuild with address + UB sanitizers"
 	@echo "make test ARGS='-s -d'     raw doctest flags (ARGS=--help lists them)"
 	@echo "make list / list-cases     show test files / test case names"
 	@echo "make coverage              write build/lcov.info"
