@@ -6,11 +6,6 @@
     - Fixed to_int not respecting the base
     - Fixed string splitting missbehaving
     - Fixed math clamp not priorizing min over max value
-- Others
-    - Added many test cases for string, memory, utf16, integer, char, bit, math
-
-## v0.3.2
-
 - Memory
     - Virtual Memory Manager
         - The kernel heap now runs on virtual memory
@@ -28,6 +23,8 @@
 - Config changes
     - Added RAM_UTILISATION_BAR_LENGTH
     - Added MAX_FRAGMENTATION_VIEW_BLOCKS
+- Others
+    - Added many test cases for string, memory, utf16, integer, char, bit, math
 
 ## v0.3.1
 
