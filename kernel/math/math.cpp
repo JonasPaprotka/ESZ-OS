@@ -15,12 +15,13 @@ int64_t max(const int64_t a, const int64_t b) {
     return b;
 }
 
-uint64_t abs(const int64_t n) {
+uint64_t abs_value(const int64_t n) {
     if (n >= 0) return n;
     return -(n);
 }
 
 int64_t clamp(const int64_t n, const int64_t min, const int64_t max) {
+    if (max <= min) return min;
     if (n <= min) return min;
     if (n >= max) return max;
     return n;
