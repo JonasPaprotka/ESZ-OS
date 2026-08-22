@@ -62,7 +62,7 @@ void print_memory_info() {
     uint64_t freePages;
     uint64_t usedPages;
     get_pmm_page_counts(freePages, usedPages);
-    const uint64_t totalPages = freePages + usedPages;
+    //const uint64_t totalPages = freePages + usedPages;
 
     print("----- PHYSICAL MEMORY MANAGER -----");
     // printInfoLine(InfoTextType::Info, String("Memory regions: ", memoryRegionCount));

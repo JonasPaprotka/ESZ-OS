@@ -12,15 +12,15 @@
 #define PAGE_SHIFT 12
 
 uint16_t get_PML4_Index(const uint64_t address) {
-    return (address >> PAGE_SHIFT + 9 * 3) & TABLE_IDX_MASK;
+    return (address >> (PAGE_SHIFT + 9 * 3)) & TABLE_IDX_MASK;
 }
 
 uint16_t get_PDPT_Index(const uint64_t address) {
-    return (address >> PAGE_SHIFT + 9 * 2) & TABLE_IDX_MASK;
+    return (address >> (PAGE_SHIFT + 9 * 2)) & TABLE_IDX_MASK;
 }
 
 uint16_t get_PD_Index(const uint64_t address) {
-    return (address >> PAGE_SHIFT + 9) & TABLE_IDX_MASK;
+    return (address >> (PAGE_SHIFT + 9)) & TABLE_IDX_MASK;
 }
 
 uint16_t get_PT_Index(const uint64_t address) {

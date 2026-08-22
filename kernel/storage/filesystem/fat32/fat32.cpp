@@ -242,8 +242,9 @@ uint8_t* fat32_read(const Entry& entry) {
 #pragma endregion READ
 
 #pragma region WRITE
-uint64_t fat32_write(const Entry& entry, const uint8_t* data, uint64_t size) {
+uint64_t fat32_write(const Entry&, const uint8_t*, uint64_t) {
     //TODO
+    return 0;
 }
 #pragma endregion WRITE
 
