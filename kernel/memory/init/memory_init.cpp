@@ -12,6 +12,8 @@ bool memory_init() {
     get_memory_regions();
     get_free_location_for_bitmap();
 
+    if (!init_vmm()) return false;
     init_heap_alloc(); // old physcial - soon to be removed
-    return init_vmm();
+
+    return true;
 }

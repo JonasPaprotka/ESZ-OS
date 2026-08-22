@@ -7,7 +7,7 @@ void Bitmap::clear() {
     }
 }
 
-uint64_t Bitmap::find_free_range(uint64_t range, bool& success) {
+uint64_t Bitmap::find_free_range(const uint64_t range, bool& success) {
     success = false;
 
     uint64_t foundFreeCounter = 0;
@@ -29,4 +29,10 @@ uint64_t Bitmap::find_free_range(uint64_t range, bool& success) {
     }
 
     return 0;
+}
+
+void Bitmap::write_bits_in_range_from(const uint64_t range, const uint64_t startBit, const bool state) {
+    for (uint64_t i = startBit; i < range + startBit; i++) {
+        bit_write(bitmap, i, state);
+    }
 }

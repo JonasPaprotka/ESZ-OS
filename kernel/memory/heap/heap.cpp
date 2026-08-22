@@ -1,7 +1,7 @@
 #include "heap.h"
 #include "config.h"
 #include "info_text.h"
-#include "pmm.h"
+#include "vmm.h"
 
 MemoryBlockHeader* heapStartPtr = nullptr;
 MemoryBlockHeader* heapEndPtr = nullptr;
@@ -97,7 +97,12 @@ void free(const void* ptr) {
 }
 
 void init_heap_alloc() {
-    MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) pmm_malloc_addr(INIT_HEAP_SIZE);
+    MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) vmm_malloc_pages(INIT_HEAP_SIZE);
+    if (initialHeapBlockPtr == nullptr) {
+        printInfoLine(InfoTextType::Error, "Heap init failed: Could not reserve the initial heap");
+        return;
+    }
+
     initialHeapBlockPtr->Length = INIT_HEAP_SIZE - sizeof(MemoryBlockHeader);
     initialHeapBlockPtr->Used = false;
 

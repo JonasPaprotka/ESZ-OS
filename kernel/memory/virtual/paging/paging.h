@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 
+enum PagingFlags : uint8_t {
+    PAGE_FLAG_WRITE = 0b00000010,
+    PAGE_FLAG_CACHE_DISABLE = 0b00010000,
+    PAGE_FLAG_WRITE_NO_CACHE = 0b00010010
+};
+
 struct PageTableEntry {
     uint64_t Present : 1; // 1=valid entry
     uint64_t ReadWrite : 1; // 1=write / 0=read only
@@ -23,11 +29,10 @@ struct PageTable {
     PageTableEntry entries[512];
 } __attribute__((packed));
 
-#define PAGE_FLAG_WRITE 0b00000010
-#define PAGE_FLAG_CACHE_DISABLE 0b00010000
+PageTableEntry* page_walk(const uint64_t virtualAddress);
 
-bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags);
-bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const uint8_t flags, const uint64_t requiredSize);
+bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const PagingFlags flags);
+bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const PagingFlags flags, const uint64_t requiredSize);
 
 bool free_page(const uint64_t virtualAddress);
 bool free_pages(const uint64_t virtualAddress, const uint64_t requiredSize);

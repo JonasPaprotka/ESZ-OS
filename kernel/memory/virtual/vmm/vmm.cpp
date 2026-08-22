@@ -1,24 +1,77 @@
 #include "config.h"
-#include <stdint.h>
+#include "vmm.h"
 #include "pmm.h"
 #include "pmm_bitmap.h"
 #include "bit.h"
 #include "math.h"
+#include "info_text.h"
+#include "paging.h"
 
 Bitmap vmm_bitmap = {};
 
-bool init_vmm_bitmap() {
+uint64_t vmm_malloc_pages(const uint64_t byteAmount) {
+    const uint64_t reqPages = divide_round_up(byteAmount, PAGE_SIZE);
+
+    bool success = false;
+    uint64_t pageRangeBegin = vmm_bitmap.find_free_range(reqPages, success);
+
+    if (!success) {
+        printInfoLine(InfoTextType::Error, "VMM malloc failed: No free page range found");
+        return 0;
+    }
+
+    vmm_bitmap.write_bits_in_range_from(reqPages, pageRangeBegin, true);
+
+
+    for (uint64_t i = 0; i < reqPages; i++) {
+        uint64_t currVirtAddr = ((pageRangeBegin + i) * PAGE_SIZE) + VIRTUAL_OFFSET_VMM;
+        uint64_t currPhysAddr = pmm_malloc_page();
+
+        if (currPhysAddr == PMM_MALLOC_FAILED) {
+            printInfoLine(InfoTextType::Error, "VMM malloc failed: No physical page to alloc the range");
+            vmm_bitmap.write_bits_in_range_from(reqPages, pageRangeBegin, false);
+            // todo: fix theoretical rollback of pmm pages could be needed
+            return 0;
+        }
+
+        map_page(currVirtAddr, currPhysAddr, PAGE_FLAG_WRITE);
+    }
+
+    return (pageRangeBegin * PAGE_SIZE) + VIRTUAL_OFFSET_VMM;
+}
+
+bool vmm_free_pages(const uint64_t virtAddr, const uint64_t byteAmount) {
+    const uint64_t reqPages = divide_round_up(byteAmount, PAGE_SIZE);
+    uint64_t currPage = (virtAddr - VIRTUAL_OFFSET_VMM) / PAGE_SIZE;
+
+    for (uint64_t i = 0; i < reqPages; i++) {
+        const uint64_t currVirtAddr = virtAddr + (i * PAGE_SIZE);
+        PageTableEntry *pageTableEntry = page_walk(currVirtAddr);
+
+        if (pageTableEntry == nullptr || !pageTableEntry->Present) {
+            printInfoLine(InfoTextType::Error, "VMM Free: Error in pageTableEntry");
+            return false;
+        }
+
+        bit_write(vmm_bitmap.bitmap, currPage, false);
+
+        const uint64_t physAddr = pageTableEntry->Address << 12;
+        free_page(currVirtAddr);
+        pmm_free(physAddr, PAGE_SIZE);
+
+        currPage++;
+    }
+    return true;
+}
+
+bool init_vmm() {
     vmm_bitmap.count = pmm_bitmap.count; // TODO maybe only free pages later?
     if (vmm_bitmap.count == 0) return false;
 
     vmm_bitmap.bitmap = (unsigned char*) pmm_malloc_addr(divide_round_up(vmm_bitmap.count, 8));
+    if (vmm_bitmap.bitmap == nullptr) return false;
+
     vmm_bitmap.clear();
 
     return true;
-}
-
-// uint64_t vmm_malloc_page() {}
-
-bool init_vmm() {
-    return init_vmm_bitmap();
 }

@@ -1,5 +1,6 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
+
+#include <stdint.h>
 
 // --- OS INFO ---
 #define OS_NAME "ESZ-OS"
@@ -13,12 +14,12 @@
 // ---------------------------
 
 // --- CURSOR CONFIG ---
-#define CURSOR_HEIGHT 2
-#define CURSOR_BLINK_INTERVAL 400 // in ms
+constexpr uint64_t CURSOR_HEIGHT = 2;
+constexpr uint64_t CURSOR_BLINK_INTERVAL = 400; // in ms
 // ---------------------
 
 // --- FONT CONFIG ---
-#define FONT_SIZE 1
+constexpr uint64_t FONT_SIZE = 1;
 // -------------------
 
 // --- VERSION TRACKER ---
@@ -28,26 +29,27 @@
 // -----------------------
 
 // --- TERMINAL CONFIG ---
-#define TERMINAL_BUFFER_SIZE 256
-#define MAX_COMMAND_HISTORY 100
-#define SCROLL_HISTORY_LINES 100
+constexpr uint64_t TERMINAL_BUFFER_SIZE = 256;
+constexpr uint64_t MAX_COMMAND_HISTORY = 100;
+constexpr uint64_t SCROLL_HISTORY_LINES = 100;
 // -----------------------
 
 // --- MEMORY CONFIG ---
-#define PAGE_SIZE 4096
-#define INIT_HEAP_SIZE 4096 * 1024 * 4 // 16 MiB
-#define VIRTUAL_OFFSET_MMIO 0xFFFFA00000000000
-#define VIRTUAL_OFFSET_VMM 0xFFFFB00000000000
+constexpr uint64_t PAGE_SIZE = 4096;
+constexpr uint64_t INIT_HEAP_SIZE = 4096 * 1024 * 4; // 16 MiB
+constexpr uint64_t VIRTUAL_OFFSET_MMIO = 0xFFFFA00000000000;
+constexpr uint64_t VIRTUAL_OFFSET_VMM = 0xFFFFB00000000000;
 // ---------------------
 
 // --- TIMER CONFIG ---
-#define PIT_TICK_HZ 100 // timer percision in Hz
+constexpr uint64_t  PIT_TICK_HZ = 100; // timer percision in Hz
 // --------------------
 
 // --- PATH CONFIG ---
-#define MAX_PATH_LENGTH 4096 // chars
-#define MAX_PATH_DEPTH 64 // segments
+constexpr uint64_t  MAX_PATH_LENGTH = 4096; // chars
+constexpr uint64_t  MAX_PATH_DEPTH = 64; // segments
 // -------------------
+
 
 // --- OTHER ---
 #define STRINGIFY_IMPL(x) #x
@@ -58,5 +60,3 @@
     STRINGIFY(OS_VERSION_MAJOR) "." \
     STRINGIFY(OS_VERSION_MINOR) "." \
     STRINGIFY(OS_VERSION_PATCH)
-
-#endif // CONFIG_H

@@ -34,11 +34,12 @@ void get_memory_regions() {
 #pragma endregion MEMORY REGIONS
 
 
-void pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
+bool pmm_malloc_page_range(uint64_t page, const uint64_t pageAmount) {
     for (uint64_t i = 0; i < pageAmount; i++) {
         bit_write(pmm_bitmap.bitmap, page, true);
         page++;
     }
+    return true;
 }
 
 uint64_t pmm_malloc(const uint64_t byteAmount) {
@@ -49,10 +50,10 @@ uint64_t pmm_malloc(const uint64_t byteAmount) {
 
     if (!success) {
         printInfoLine(InfoTextType::Error, "PMM malloc failed: No free page range found");
-        return 0;
+        return PMM_MALLOC_FAILED;
     }
 
-    pmm_malloc_page_range(pageRangeBegin, reqPages);
+    if (!pmm_malloc_page_range(pageRangeBegin, reqPages)) return PMM_MALLOC_FAILED;
     return pageRangeBegin * PAGE_SIZE;
 }
 
@@ -79,11 +80,11 @@ void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {
 
 void* pmm_malloc_addr(const uint64_t byteAmount) {
     uint64_t phys_addr = pmm_malloc(byteAmount);
-    if (phys_addr == 0) return nullptr;
+    if (phys_addr == PMM_MALLOC_FAILED) return nullptr;
     return (void*)(phys_addr + hhdm_offset);
 }
 
-void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
+bool pmm_free(const uint64_t addr, const uint64_t byteAmount) {
     const uint64_t reqPages = divide_round_up(byteAmount, PAGE_SIZE);
     uint64_t currPage = addr / PAGE_SIZE;
 
@@ -91,4 +92,5 @@ void pmm_free(const uint64_t addr, const uint64_t byteAmount) {
         bit_write(pmm_bitmap.bitmap, currPage, false);
         currPage++;
     }
+    return true;
 }
