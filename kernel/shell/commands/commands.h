@@ -5,6 +5,4 @@ struct Command {
     void (*execute)(const char* args);
 };
 
-void cmd_sysinfo(const char* = nullptr);
-
 extern const Command commands[];

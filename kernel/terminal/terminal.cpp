@@ -16,7 +16,7 @@ char lineInputBuffer[TERMINAL_BUFFER_SIZE];
 unsigned int lineInputCursorPos;
 unsigned int lineInputStart_X;
 
-void reset_line_input() {
+static void reset_line_input() {
     lineInputLength = 0;
     lineInputCursorPos = 0;
     lineInputBuffer[0] = 0;
@@ -43,13 +43,13 @@ void clear_input_on_screen() {
     update_cursor_render();
 }
 
-void displayTerminalError(const char* Text) {
+static void displayTerminalError(const char* Text) {
     newline();
     printInfoLine(InfoTextType::Error, Text);
     reset_line_input();
 }
 
-void processLineInputBuffer() {
+static void processLineInputBuffer() {
     if (lineInputLength == 0) {
         newline();
         reset_line_input();
@@ -76,6 +76,40 @@ void newTerminalInputLine() {
     String linePrefix(renderPath, " >> ");
     print_inline(linePrefix);
     lineInputStart_X = cursorAt_X;
+}
+
+static void insert_char_at_cursor(const char c) {
+    for (uint64_t i = lineInputLength; i > lineInputCursorPos; i--) {
+        lineInputBuffer[i] = lineInputBuffer[i - 1];
+    }
+    lineInputBuffer[lineInputCursorPos] = c;
+    lineInputLength++;
+    lineInputBuffer[lineInputLength] = 0;
+
+    Line* line = get_screen_buffer_line(cursorAt_Y);
+    for (int i = (int)line->amountOfCells; i > (int)cursorAt_X; i--) {
+        line->cells[i] = line->cells[i - 1];
+    }
+    line->cells[cursorAt_X].text = c;
+    line->cells[cursorAt_X].interactable = true;
+    line->cells[cursorAt_X].color = Color::White;
+    line->amountOfCells++;
+
+    lineInputCursorPos++;
+    cursorAt_X++;
+
+    const int savedX = cursorAt_X;
+    isRedrawing = true;
+    redraw_line(cursorAt_Y);
+    isRedrawing = false;
+    cursorAt_X = savedX;
+    update_cursor_render();
+}
+
+static void handle_input_buffer_insertion(const uint8_t scancode) {
+    const char c = scancode_to_keycode(scancode);
+    if (!c) return;
+    insert_char_at_cursor(c);
 }
 
 void replaceCurrentToken(const char* oldToken, const char* newToken) {
@@ -134,40 +168,6 @@ void handle_input_buffer_deletion() {
     isRedrawing = false;
     cursorAt_X = savedX;
     update_cursor_render();
-}
-
-void insert_char_at_cursor(const char c) {
- for (uint64_t i = lineInputLength; i > lineInputCursorPos; i--) {
-        lineInputBuffer[i] = lineInputBuffer[i - 1];
-    }
-    lineInputBuffer[lineInputCursorPos] = c;
-    lineInputLength++;
-    lineInputBuffer[lineInputLength] = 0;
-
-    Line* line = get_screen_buffer_line(cursorAt_Y);
-    for (int i = (int)line->amountOfCells; i > (int)cursorAt_X; i--) {
-        line->cells[i] = line->cells[i - 1];
-    }
-    line->cells[cursorAt_X].text = c;
-    line->cells[cursorAt_X].interactable = true;
-    line->cells[cursorAt_X].color = Color::White;
-    line->amountOfCells++;
-
-    lineInputCursorPos++;
-    cursorAt_X++;
-
-    const int savedX = cursorAt_X;
-    isRedrawing = true;
-    redraw_line(cursorAt_Y);
-    isRedrawing = false;
-    cursorAt_X = savedX;
-    update_cursor_render();
-}
-
-void handle_input_buffer_insertion(const uint8_t scancode) {
-    const char c = scancode_to_keycode(scancode);
-    if (!c) return;
-    insert_char_at_cursor(c);
 }
 
 void terminal_on_key(const uint8_t scancode) {
