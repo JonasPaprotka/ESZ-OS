@@ -2,6 +2,7 @@
 
 ## v0.4.1
 
+- Updated Limine Bootloader to 12.6.1
 - Fixes
     - Fixed use after free in newTerminalInputLine
     - Fixed division by zero in getPercentBar
