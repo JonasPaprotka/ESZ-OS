@@ -27,6 +27,7 @@ KERNEL_MODULES := string char memory math bit integer utf16 pci_class_names mbr 
 ##########
 
 KERNEL_SRC := $(sort $(foreach m,$(KERNEL_MODULES),$(shell find $(KERNEL) -name '$(m).cpp')))
+KERNEL_HDR := $(sort $(foreach m,$(KERNEL_MODULES),$(shell find $(KERNEL) -name '$(m).h')))
 TEST_SRC   := $(sort $(shell find . -name 'test_*.cpp' -not -path './$(BUILD)/*'))
 
 KERNEL_OBJ := $(patsubst $(KERNEL)/%.cpp,$(BUILD)/kobj/%.o,$(KERNEL_SRC))
@@ -118,7 +119,7 @@ coverage: $(DOCTEST)
 	xcrun llvm-cov export $(firstword $(COV_BIN)) \
 	    $(addprefix -object ,$(wordlist 2,999,$(COV_BIN))) \
 	    -instr-profile=$(BUILD)/tests.profdata -format=lcov \
-	    $(KERNEL_SRC) > $(BUILD)/lcov.info
+	    $(KERNEL_SRC) $(KERNEL_HDR) > $(BUILD)/lcov.info
 
 compile_commands:
 	@echo '[' > ../compile_commands.json
