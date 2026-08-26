@@ -20,21 +20,12 @@ extern bool isRedrawing;
 
 
 // --- CURSOR ---
-void render_cursor(const int printAt_X, const int printAt_Y, const Color color);
 void update_cursor_render();
-void cursor_backspace();
-void delete_unprotected_chars();
 
 
 // --- LINE MGT ---
 void newline();
 void prevline();
-void handle_automatic_newline();
-void handle_scroll();
-
-
-// --- DRAW CHAR ---
-void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable);
 
 
 // --- PRINT CHAR ---
@@ -61,8 +52,6 @@ void print(const char* text);
 
 // --- REDRAW ---
 void redraw_line(const int line);
-void redraw();
-
 
 // --- INIT ---
 void init_print();

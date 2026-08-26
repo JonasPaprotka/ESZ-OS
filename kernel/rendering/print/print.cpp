@@ -24,8 +24,80 @@ bool useScreenBuffer;
 bool isRedrawing;
 
 
+#pragma region DRAW CHAR
+static void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable) {
+    if (useScreenBuffer && !isRedrawing) {
+        Line* line = get_screen_buffer_line(cursorAt_Y);
+        Cell* cell = get_screen_buffer_cell(line, cursorAt_X);
+
+        cell->text = c;
+        cell->color = color;
+        cell->interactable = interactable;
+
+        if (cursorAt_X + 1 > (int)line->amountOfCells) line->amountOfCells = cursorAt_X + 1;
+    }
+
+    int renderY = printAt_Y;
+    if (useScreenBuffer) renderY -= (int) screenBufferPtr->startRenderLine;
+    if (renderY < 0 || renderY >= MAX_LINES) return;
+    if (printAt_X >= MAX_CHARS) return;
+
+    // 8 x 16 arr char rendering
+    const int x = printAt_X * FONT_W;
+    const int y = renderY * FONT_H;
+
+    for (int row = 0; row < FONT_H; row++) {
+        uint8_t bits = font8x16[(uint8_t) c][row / FONT_SIZE];
+
+        for (int col = 0; col < FONT_W; col++) {
+            boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
+        }
+    }
+}
+#pragma endregion DRAW CHAR
+
+
+#pragma region REDRAW
+void redraw_line(const int line) {
+    const int cellAmount = screenBufferPtr->lines[line].amountOfCells;
+    cursorAt_X = 0;
+    cursorAt_Y = line;
+
+    for (int i = 0; i < MAX_CHARS; i++) {
+        if (i < cellAmount) {
+            Cell& cell = screenBufferPtr->lines[line].cells[i];
+            draw_char(cell.text, cursorAt_X, cursorAt_Y, cell.color, cell.interactable);
+        } else {
+            draw_char(' ', cursorAt_X, cursorAt_Y, Color::White, false);
+        }
+        cursorAt_X++;
+    }
+}
+
+static void redraw() {
+    isRedrawing = true;
+    const int savedX = cursorAt_X;
+    const int savedY = cursorAt_Y;
+
+    const int lineAmount = screenBufferPtr->visibleLines;
+    const int renderStart = screenBufferPtr->startRenderLine;
+
+    for (int i = 0; i < lineAmount; i++) {
+        redraw_line(renderStart + i);
+    }
+
+    cursorAt_X = savedX;
+    cursorAt_Y = savedY;
+    isRedrawing = false;
+
+    cursorRendered_X = cursorAt_X;
+    cursorRendered_Y = cursorAt_Y;
+}
+#pragma endregion REDRAW
+
+
 #pragma region CURSOR
-void render_cursor(const int printAt_X, const int printAt_Y, const Color color) {
+static void render_cursor(const int printAt_X, const int printAt_Y, const Color color) {
     if (printAt_X >= MAX_CHARS) return;
 
     const int x = printAt_X * FONT_W;
@@ -61,55 +133,15 @@ void update_cursor_render() {
     cursorRendered_X = cursorAt_X;
     cursorRendered_Y = cursorAt_Y;
 }
-
-void cursor_backspace() {
-    if (!screenBufferPtr) return;
-    if (cursorAt_X == (int) lineInputStart_X) return;
-
-    Line* line = get_screen_buffer_line(cursorAt_Y);
-    if (line->cells[cursorAt_X - 1].interactable == false) return;
-
-    cursorAt_X--;
-    lineInputCursorPos--;
-
-    line->cells[cursorAt_X].text = 0;
-    line->amountOfCells--;
-    clear_char(cursorAt_X, cursorAt_Y);
-    update_cursor_render();
-}
-
-void delete_unprotected_chars() {
-    while (cursorAt_X > 0 && get_screen_buffer_cell(cursorAt_Y, cursorAt_X - 1)->interactable) cursor_backspace();
-}
 #pragma endregion CURSOR
 
 
 #pragma region LINE MGT
-void newline() {
-    if (useScreenBuffer && !isRedrawing) {
-        screenBufferPtr->amountOfLines++;
-    }
-
-    cursorAt_X = 0;
-    cursorAt_Y++;
-    handle_scroll();
-}
-
-void prevline() {
-    if (useScreenBuffer && !isRedrawing) {
-        screenBufferPtr->amountOfLines--;
-    }
-
-    cursorAt_Y--;
-    handle_scroll();
-}
-
 void handle_automatic_newline() {
     if (cursorAt_X >= MAX_CHARS) newline();
 }
 
-
-void handle_scroll() {
+static void handle_scroll() {
     if (!useScreenBuffer || isRedrawing) return;
 
     // HANDLE dropping old history
@@ -146,40 +178,26 @@ void handle_scroll() {
 
     update_cursor_render();
 }
-#pragma endregion LINE MGT
 
-
-#pragma region DRAW CHAR
-void draw_char(const char c, const int printAt_X, const int printAt_Y, const Color color, const bool interactable) {
+void newline() {
     if (useScreenBuffer && !isRedrawing) {
-        Line* line = get_screen_buffer_line(cursorAt_Y);
-        Cell* cell = get_screen_buffer_cell(line, cursorAt_X);
-
-        cell->text = c;
-        cell->color = color;
-        cell->interactable = interactable;
-
-        if (cursorAt_X + 1 > (int)line->amountOfCells) line->amountOfCells = cursorAt_X + 1;
+        screenBufferPtr->amountOfLines++;
     }
 
-    int renderY = printAt_Y;
-    if (useScreenBuffer) renderY -= (int) screenBufferPtr->startRenderLine;
-    if (renderY < 0 || renderY >= MAX_LINES) return;
-    if (printAt_X >= MAX_CHARS) return;
-
-    // 8 x 16 arr char rendering
-    const int x = printAt_X * FONT_W;
-    const int y = renderY * FONT_H;
-
-    for (int row = 0; row < FONT_H; row++) {
-        uint8_t bits = font8x16[(uint8_t) c][row / FONT_SIZE];
-
-        for (int col = 0; col < FONT_W; col++) {
-            boot_info.framebuffer[(y + row) * ADJUSTED_WIDTH + (x + col)] = (bits & (0x80 >> (col / FONT_SIZE))) ? (uint32_t) color : 0;
-        }
-    }
+    cursorAt_X = 0;
+    cursorAt_Y++;
+    handle_scroll();
 }
-#pragma endregion DRAW CHAR
+
+void prevline() {
+    if (useScreenBuffer && !isRedrawing) {
+        screenBufferPtr->amountOfLines--;
+    }
+
+    cursorAt_Y--;
+    handle_scroll();
+}
+#pragma endregion LINE MGT
 
 
 #pragma region PRINT CHAR
@@ -246,45 +264,6 @@ void print(const char* text) {
     print(text, Color::White);
 }
 #pragma endregion PRINT
-
-
-#pragma region REDRAW
-void redraw_line(const int line) {
-    const int cellAmount = screenBufferPtr->lines[line].amountOfCells;
-    cursorAt_X = 0;
-    cursorAt_Y = line;
-
-    for (int i = 0; i < MAX_CHARS; i++) {
-        if (i < cellAmount) {
-            Cell& cell = screenBufferPtr->lines[line].cells[i];
-            draw_char(cell.text, cursorAt_X, cursorAt_Y, cell.color, cell.interactable);
-        } else {
-            draw_char(' ', cursorAt_X, cursorAt_Y, Color::White, false);
-        }
-        cursorAt_X++;
-    }
-}
-
-void redraw() {
-    isRedrawing = true;
-    const int savedX = cursorAt_X;
-    const int savedY = cursorAt_Y;
-
-    const int lineAmount = screenBufferPtr->visibleLines;
-    const int renderStart = screenBufferPtr->startRenderLine;
-
-    for (int i = 0; i < lineAmount; i++) {
-        redraw_line(renderStart + i);
-    }
-
-    cursorAt_X = savedX;
-    cursorAt_Y = savedY;
-    isRedrawing = false;
-
-    cursorRendered_X = cursorAt_X;
-    cursorRendered_Y = cursorAt_Y;
-}
-#pragma endregion REDRAW
 
 
 void init_print() {
