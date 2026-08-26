@@ -9,20 +9,20 @@ const uint32_t PCI_ENUM_WRITE_PORT = 0xCF8;
 const uint32_t PCI_ENUM_READ_PORT = 0xCFC;
 const uint32_t START_DEVICE_ADDRESS = 0x80000000;
 
-uint32_t calc_address(const uint16_t bus, const uint8_t device, const uint8_t funct) {
+static uint32_t calc_address(const uint16_t bus, const uint8_t device, const uint8_t funct) {
     return 0x80000000 | (bus << 16) | (device << 11) | (funct << 8);
 }
 
-uint32_t pci_read(const uint16_t bus, const uint8_t dev, const uint8_t func, const uint8_t offset) {
+static uint32_t pci_read(const uint16_t bus, const uint8_t dev, const uint8_t func, const uint8_t offset) {
     outl(PCI_ENUM_WRITE_PORT, calc_address(bus, dev, func) | (offset & 0xFC));
     return inl(PCI_ENUM_READ_PORT);
 }
 
-bool is_device_present(const uint32_t value) {
+static bool is_device_present(const uint32_t value) {
     return (value & 0xFFFF) != 0xFFFF;
 }
 
-uint32_t count_pci_devices() {
+static uint32_t count_pci_devices() {
     uint32_t deviceCounter = 0;
 
     for (uint16_t bus = 0; bus < 256; bus++) {
@@ -39,11 +39,7 @@ uint32_t count_pci_devices() {
     return deviceCounter;
 }
 
-bool is_IO_BAR(const PCI_BAR bar) {
-    return bar.io.RegionType == 1;
-}
-
-void get_pci_devices() {
+static void get_pci_devices() {
     uint32_t deviceCounter = 0;
 
     for (uint16_t bus = 0; bus < 256; bus++) {
