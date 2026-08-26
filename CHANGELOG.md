@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.4.1
+## v0.4.3
 
 - Updated Limine Bootloader to 12.6.1
 - Fixes
