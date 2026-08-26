@@ -73,7 +73,7 @@ void processLineInputBuffer() {
 
 void newTerminalInputLine() {
     const char* renderPath = currentPath;
-    const char* linePrefix = String(renderPath, " >> ");
+    String linePrefix(renderPath, " >> ");
     print_inline(linePrefix);
     lineInputStart_X = cursorAt_X;
 }

@@ -65,4 +65,4 @@ struct PCI_Device {
 extern PCI_Device* found_pci_devices;
 extern uint32_t PCIDeviceAmount;
 
-bool init_pci();
+[[nodiscard]] bool init_pci();

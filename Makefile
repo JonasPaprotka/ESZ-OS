@@ -11,6 +11,16 @@ CXX := x86_64-elf-g++
 LD  := x86_64-elf-ld
 ASM := nasm
 
+# ---- Output verbosity ----
+V ?= 0
+ifeq ($(V),0)
+    Q := @
+    LOG := @printf '  %-5s %s\n'
+else
+    Q :=
+    LOG := @:
+endif
+
 KERNEL_INC_DIRS := $(shell find kernel -type d)
 INC_FLAGS := $(addprefix -I , $(KERNEL_INC_DIRS))
 
@@ -82,15 +92,18 @@ all: $(ISO)
 
 bin/obj/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(LOG) CXX $<
+	$(Q)$(CXX) $(CXXFLAGS) -c $< -o $@
 
 bin/obj/%.asm.o: %.asm
 	@mkdir -p $(dir $@)
-	$(ASM) $(ASMFLAGS) $< -o $@
+	$(LOG) ASM $<
+	$(Q)$(ASM) $(ASMFLAGS) $< -o $@
 
 $(KERNEL): $(OBJ) kernel/linker.ld
 	@mkdir -p $(dir $@)
-	$(LD) $(LDFLAGS) $(OBJ) -o $@
+	$(LOG) LD $@
+	$(Q)$(LD) $(LDFLAGS) $(OBJ) -o $@
 
 $(ISO): $(KERNEL) limine.conf
 	@rm -rf $(ISO_ROOT)
@@ -102,20 +115,23 @@ $(ISO): $(KERNEL) limine.conf
 	@cp $(LIMINE)/limine-bios-cd.bin $(ISO_ROOT)/boot/limine/
 	@cp $(LIMINE)/limine-uefi-cd.bin $(ISO_ROOT)/boot/limine/
 	@cp $(LIMINE)/BOOTX64.EFI $(ISO_ROOT)/EFI/BOOT/
-	xorriso -as mkisofs \
+	$(LOG) ISO $(ISO)
+	$(Q)xorriso -as mkisofs -quiet \
 	    -b boot/limine/limine-bios-cd.bin \
 	    -no-emul-boot -boot-load-size 4 -boot-info-table \
 	    --efi-boot boot/limine/limine-uefi-cd.bin \
 	    -efi-boot-part --efi-boot-image --protective-msdos-label \
-	    $(ISO_ROOT) -o $(ISO)
-	$(LIMINE)/limine bios-install $(ISO)
+	    $(ISO_ROOT) -o $(ISO) 2>/dev/null
+	$(LOG) BIOS $(ISO)
+	$(Q)out=$$($(LIMINE)/limine bios-install $(ISO) 2>&1) || { printf '%s\n' "$$out"; exit 1; }
 
 # ---- Disk image ------
 # Needs parted + mtools (mformat/mcopy)
 $(DISK_IMG):
 	@mkdir -p $(dir $@)
-	qemu-img create -f raw $(DISK_IMG) $(DISK_SIZE)
-	python3 -c "\
+	$(LOG) DISK $(DISK_IMG)
+	$(Q)qemu-img create -f raw $(DISK_IMG) $(DISK_SIZE) > /dev/null
+	$(Q)python3 -c "\
 import struct; \
 f = open('$(DISK_IMG)', 'r+b'); \
 mbr = bytearray(512); \
@@ -126,14 +142,16 @@ mbr[446:462] = entry; \
 mbr[510:512] = bytes([0x55,0xAA]); \
 f.write(mbr); \
 f.close()"
-	mformat -i $(DISK_IMG)@@$(PART_OFFSET) -F -v $(FAT_LABEL) ::
+	$(LOG) FAT32 $(FAT_LABEL)
+	$(Q)mformat -i $(DISK_IMG)@@$(PART_OFFSET) -F -v $(FAT_LABEL) ::
 	@if [ -d $(ROOTFS) ]; then \
-	    echo "  copying $(ROOTFS)/ into image"; \
+	    printf '  %-5s %s\n' COPY "$(ROOTFS)/ -> image"; \
 	    mcopy -s -o -i $(DISK_IMG)@@$(PART_OFFSET) $(ROOTFS)/* :: ; \
 	fi
 
 disk-files:
-	mcopy -s -o -i $(DISK_IMG)@@$(PART_OFFSET) $(ROOTFS)/* ::
+	$(LOG) COPY "$(ROOTFS)/ -> image"
+	$(Q)mcopy -s -o -i $(DISK_IMG)@@$(PART_OFFSET) $(ROOTFS)/* ::
 
 disk: clean-disk $(DISK_IMG)
 

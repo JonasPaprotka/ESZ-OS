@@ -28,10 +28,10 @@ struct PageTable {
     PageTableEntry entries[512];
 } __attribute__((packed));
 
-PageTableEntry* page_walk(const uint64_t virtualAddress);
+[[nodiscard]] PageTableEntry* page_walk(const uint64_t virtualAddress);
 
-bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const PagingFlags flags);
-bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const PagingFlags flags, const uint64_t requiredSize);
+[[nodiscard]] bool map_page(const uint64_t virtualAddress, const uint64_t physicalAddress, const PagingFlags flags);
+[[nodiscard]] bool map_pages(const uint64_t virtualAddress, const uint64_t physicalAddress, const PagingFlags flags, const uint64_t requiredSize);
 
-bool free_page(const uint64_t virtualAddress);
-bool free_pages(const uint64_t virtualAddress, const uint64_t requiredSize);
+[[nodiscard]] bool free_page(const uint64_t virtualAddress);
+[[nodiscard]] bool free_pages(const uint64_t virtualAddress, const uint64_t requiredSize);

@@ -32,6 +32,7 @@ uint64_t get_start_of_tree() {
     __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
     return cr3;
 }
+
 void drop_page_from_TLC(const uint64_t pageVirtualAddr) {
     __asm__ volatile("invlpg (%0)" : : "r"(pageVirtualAddr) : "memory");
 }
