@@ -26,7 +26,7 @@ jobs:
       - name: Setup Limine
         run: |
           mkdir -p limine
-          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v${{ vars.LIMINE_VERSION || '12.6.' }}/limine-binary.tar.xz
+          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v${{ vars.LIMINE_VERSION || '12.6.1' }}/limine-binary.tar.xz
           tar -xf limine.tar.xz -C limine --strip-components=1
           rm limine.tar.xz
           make -C limine
