@@ -43,6 +43,8 @@ void printLoadingStatus(const bool success) {
 }
 
 char* getPercentBar(const uint64_t count, const uint64_t outOf, const uint64_t elements, const bool showPercentage) {
+    if (outOf == 0) return malloc_empty_str();
+
     const uint64_t size = elements + 9;
     char* outText = malloc_str(size);
     memory_clear(outText, size);

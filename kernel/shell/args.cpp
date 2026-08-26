@@ -7,7 +7,7 @@ const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64
     int tokenStartsAt = 0;
 
     for (int i = inputBufferCursorAt_X; i > 0; i--) {
-        if (inputBuffer[i] == ' ' and i != inputBufferCursorAt_X) {
+        if (inputBuffer[i] == ' ' && i != inputBufferCursorAt_X) {
             tokenStartsAt = i;
             break;
         }

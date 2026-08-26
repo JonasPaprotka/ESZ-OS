@@ -99,11 +99,15 @@ void cmd_dumpsector(const char* args) {
 
 void cmd_read(const char* args) {
     const char* filePath = str_combine(currentPath, args);
+
     Entry e = activeDriver->find_entry(filePath);
     if (!e.Found || e.IsDirectory) {
         printInfoLine(InfoTextType::Error, String("File: '", filePath, "' was not found"));
+        free(filePath);
         return;
     }
+    free(filePath);
+
     uint8_t* data = activeDriver->read(e);
     print((char*) data);
     free(data);
