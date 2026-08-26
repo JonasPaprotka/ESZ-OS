@@ -14,11 +14,11 @@ PCI_Device* ahci_controller;
 PCI_BAR BAR_IDX_5;
 
 
-void Start_AHCI_Command(volatile AHCI_Ports* port) {
+static void Start_AHCI_Command(volatile AHCI_Ports* port) {
     port->CI |= (1 << 0);
 }
 
-bool Await_AHCI_Task_Finish(volatile AHCI_Ports* port) {
+static bool Await_AHCI_Task_Finish(volatile AHCI_Ports* port) {
     const uint64_t timeout = 3000; // 3 sec
     uint64_t elapsed = 0;
 
@@ -29,7 +29,7 @@ bool Await_AHCI_Task_Finish(volatile AHCI_Ports* port) {
     return true;
 }
 
-void ata_string_byteswap(char* text, const uint32_t length) {
+static void ata_string_byteswap(char* text, const uint32_t length) {
     for (uint32_t i = 0; i < length; i += 2) {
         char temp = text[i];
         text[i] = text[i + 1];
@@ -37,7 +37,7 @@ void ata_string_byteswap(char* text, const uint32_t length) {
     }
 }
 
-bool await_fis_receive_engine(volatile AHCI_Ports* port, const uint32_t awaitStatus) {
+static bool await_fis_receive_engine(volatile AHCI_Ports* port, const uint32_t awaitStatus) {
     const uint64_t timeout = 3000; // 3 sec
     uint64_t elapsed = 0;
 
@@ -48,7 +48,7 @@ bool await_fis_receive_engine(volatile AHCI_Ports* port, const uint32_t awaitSta
     return true;
 }
 
-bool await_command_list_engine(volatile AHCI_Ports* port, const uint32_t awaitStatus) {
+static bool await_command_list_engine(volatile AHCI_Ports* port, const uint32_t awaitStatus) {
     const uint64_t timeout = 3000; // 3 sec
     uint64_t elapsed = 0;
 
@@ -59,7 +59,7 @@ bool await_command_list_engine(volatile AHCI_Ports* port, const uint32_t awaitSt
     return true;
 }
 
-bool await_drive_ready(volatile AHCI_Ports* port) {
+static bool await_drive_ready(volatile AHCI_Ports* port) {
     const uint64_t timeout = 3000; // 3 sec
     uint64_t elapsed = 0;
 
@@ -70,7 +70,7 @@ bool await_drive_ready(volatile AHCI_Ports* port) {
     return true;
 }
 
-bool set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
+static bool set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
     if (activate) {
         port->CMD.FRE = 1;
         if (!await_fis_receive_engine(port, 1)) return false;
@@ -92,15 +92,15 @@ bool set_sata_port_status(volatile AHCI_Ports* port, const bool activate) {
     return true;
 }
 
-volatile uint32_t* get_virtual_membar_address(const PCI_BAR bar) {
+static volatile uint32_t* get_virtual_membar_address(const PCI_BAR bar) {
     return (uint32_t*)((uint32_t)(bar.mem.BaseAddress << 4) + VIRTUAL_OFFSET_MMIO);
 }
 
-uint64_t get_physical_membar_address(const PCI_BAR bar) {
+static uint64_t get_physical_membar_address(const PCI_BAR bar) {
     return (uint32_t)(bar.mem.BaseAddress << 4);
 }
 
-PCI_Device* find_ahci_controller() {
+static PCI_Device* find_ahci_controller() {
     for (uint32_t i = 0; i < PCIDeviceAmount; i++) {
         if ((found_pci_devices[i].ClassCode == 0x1) && (found_pci_devices[i].Subclass == 0x6)) {
             return &found_pci_devices[i];
@@ -109,7 +109,7 @@ PCI_Device* find_ahci_controller() {
     return nullptr;
 }
 
-uint64_t AllocateCommandTable() {
+static uint64_t AllocateCommandTable() {
     uint64_t commandTablePhysAddr = pmm_malloc_page();
     if (commandTablePhysAddr == PMM_MALLOC_FAILED) return PMM_MALLOC_FAILED;
 
@@ -117,7 +117,7 @@ uint64_t AllocateCommandTable() {
     return commandTablePhysAddr;
 }
 
-uint64_t AllocateDataBuffer(const uint32_t dataSize) {
+static uint64_t AllocateDataBuffer(const uint32_t dataSize) {
     const uint64_t requiredPages = divide_round_up(dataSize, PAGE_SIZE);
     uint64_t dataBufferPhysAddr = pmm_malloc_pages(requiredPages);
     if (dataBufferPhysAddr == PMM_MALLOC_FAILED) return PMM_MALLOC_FAILED;
@@ -126,7 +126,7 @@ uint64_t AllocateDataBuffer(const uint32_t dataSize) {
     return dataBufferPhysAddr;
 }
 
-AHCI_Command_Header* SetCommandHeader(volatile AHCI_Ports* port, const uint64_t commandTablePhysAddr, const bool write) {
+static AHCI_Command_Header* SetCommandHeader(volatile AHCI_Ports* port, const uint64_t commandTablePhysAddr, const bool write) {
     AHCI_Command_Header* commandList = (AHCI_Command_Header*)(port->CLB + hhdm_offset);
     commandList[0].CTBA = (uint32_t) commandTablePhysAddr;
     commandList[0].CTBAU = 0;
@@ -137,7 +137,7 @@ AHCI_Command_Header* SetCommandHeader(volatile AHCI_Ports* port, const uint64_t 
     return commandList;
 }
 
-AHCI_Command_Table* BuildCommand(const uint64_t commandTablePhysAddr, const uint8_t CommandCode) {
+static AHCI_Command_Table* BuildCommand(const uint64_t commandTablePhysAddr, const uint8_t CommandCode) {
     AHCI_Command_Table* commandTable = (AHCI_Command_Table*)(commandTablePhysAddr + hhdm_offset);
     commandTable->CFIS.FISType = 0x27; // marker for H2D_Register_FIS
     commandTable->CFIS.C = 1; // 1=real command
@@ -146,7 +146,7 @@ AHCI_Command_Table* BuildCommand(const uint64_t commandTablePhysAddr, const uint
     return commandTable;
 }
 
-void Fill_LBA_Address(AHCI_Command_Table* commandTable, const uint64_t LBA_Address) {
+static void Fill_LBA_Address(AHCI_Command_Table* commandTable, const uint64_t LBA_Address) {
     commandTable->CFIS.Device = 0x40; // LBA mode
 
     // split LBA address in lower 6 bytes
@@ -158,12 +158,12 @@ void Fill_LBA_Address(AHCI_Command_Table* commandTable, const uint64_t LBA_Addre
     commandTable->CFIS.LBA5 = LBA_Address >> 40;
 }
 
-void Fill_Sector_Quantity(AHCI_Command_Table* commandTable, const uint16_t sectorQuantity) {
+static void Fill_Sector_Quantity(AHCI_Command_Table* commandTable, const uint16_t sectorQuantity) {
     commandTable->CFIS.CountLow = sectorQuantity;
     commandTable->CFIS.CountHigh = sectorQuantity >> 8;
 }
 
-IDENTIFY_Response* Get_AHCI_IdentifyResponse(const uint64_t dataBufferPhysAddr) {
+static IDENTIFY_Response* Get_AHCI_IdentifyResponse(const uint64_t dataBufferPhysAddr) {
     IDENTIFY_Response* identifyData = (IDENTIFY_Response*)(dataBufferPhysAddr + hhdm_offset);
 
     identifyData->Reserved2[0] = 0;
@@ -182,13 +182,13 @@ IDENTIFY_Response* Get_AHCI_IdentifyResponse(const uint64_t dataBufferPhysAddr) 
     return identifyData;
 }
 
-void set_ahci_prdt(AHCI_Command_Table* commandTable, const uint64_t dataBufferPhysAddr, const uint32_t dataSize) {
+static void set_ahci_prdt(AHCI_Command_Table* commandTable, const uint64_t dataBufferPhysAddr, const uint32_t dataSize) {
     commandTable->PRDT[0].DBA = (uint32_t) dataBufferPhysAddr; // input here
     commandTable->PRDT[0].DBAU = 0;
     commandTable->PRDT[0].DBC = dataSize - 1;
 }
 
-bool RunCommand(volatile AHCI_Ports* port) {
+static bool RunCommand(volatile AHCI_Ports* port) {
     Start_AHCI_Command(port);
     return Await_AHCI_Task_Finish(port);
 }
@@ -262,7 +262,7 @@ void AHCI_FLUSH_CACHE_EXT(volatile AHCI_Ports* port) {
     RunCommand(port);
 }
 
-bool preparePort(volatile AHCI_Ports* port) {
+static bool preparePort(volatile AHCI_Ports* port) {
     // shutdown port
     if (!set_sata_port_status(port, false)) return false;
 
@@ -279,30 +279,6 @@ bool preparePort(volatile AHCI_Ports* port) {
 
     // start port
     return set_sata_port_status(port, true);
-}
-
-bool await_port_reset(volatile AHCI_Ports* port) {
-    const uint64_t timeout = 3000;
-    uint64_t elapsed = 0;
-    while ((port->SSTS.DET != 3)) {
-        sleep_ms(1);
-        if (++elapsed >= timeout) return false;
-    }
-    return true;
-}
-
-bool reset_port_link(volatile AHCI_Ports* port) {
-    port->SCTL = (port->SCTL & ~0xF) | 0x1; // DET=1 - COMRESET
-    sleep_ms(10);
-    port->SCTL = (port->SCTL & ~0xF) | 0x0; // DET=0 - Free
-
-    if (!await_port_reset(port)) return false;
-
-    // clear RW1C error registers
-    port->SERR = port->SERR;
-    port->IS = port->IS;
-
-    return true;
 }
 
 bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount) {

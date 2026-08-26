@@ -10,7 +10,7 @@ uint8_t StorageDeviceAmount = 0;
 StorageDevice* selectedStorageDevice;
 PartitionInfo* selectedPartition;
 
-bool fill_partition_infos(StorageDevice &storageDevice) {
+static bool fill_partition_infos(StorageDevice &storageDevice) {
     uint8_t buffer[SECTOR_SIZE_BYTES];
     AHCI_READ_DMA_EXT(storageDevice.Port, 0, 1, buffer);
     PartitionInfo partitions[4];
@@ -25,7 +25,7 @@ bool fill_partition_infos(StorageDevice &storageDevice) {
     return true;
 }
 
-void setup_storage_devices() {
+static void setup_storage_devices() {
     ReadyPort readyPorts[32];
 
     find_ready_ports(readyPorts, StorageDeviceAmount);
@@ -52,7 +52,7 @@ void setup_storage_devices() {
     }
 }
 
-bool search_suitable_storage_partition() {
+static bool search_suitable_storage_partition() {
     for (uint32_t i = 0; i < StorageDeviceAmount; i++) {
         const uint8_t availablePartitions = StorageDevices[i].PartitionCount;
 

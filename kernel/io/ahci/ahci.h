@@ -197,7 +197,7 @@ struct ReadyPort {
 const uint32_t SECTOR_SIZE_BYTES = 512;
 
 bool find_ready_ports(ReadyPort outReadyPorts[], uint8_t &outReadyPortCount);
-bool init_ahci();
+[[nodiscard]] bool init_ahci();
 
 IDENTIFY_Response* AHCI_IDENTIFY_DEVICE(volatile AHCI_Ports* port);
 void AHCI_WRTIE_DMA_EXT(volatile AHCI_Ports* port, const uint64_t writeStartLBA, const uint16_t sectorQuantity, const void* RAM_InputPtr);

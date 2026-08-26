@@ -6,18 +6,11 @@
 MemoryBlockHeader* heapStartPtr = nullptr;
 MemoryBlockHeader* heapEndPtr = nullptr;
 
-MemoryBlockHeader create_mem_block(const uint64_t length, const bool used) {
-    MemoryBlockHeader newHeader;
-    newHeader.Length = length;
-    newHeader.Used = used;
-    return newHeader;
-}
-
 MemoryBlockHeader* get_next_heap_block(const MemoryBlockHeader* currMemBlock) {
     return (MemoryBlockHeader*) ((char*) currMemBlock + sizeof(MemoryBlockHeader) + currMemBlock->Length);
 }
 
-MemoryBlockHeader* get_prev_heap_block(const MemoryBlockHeader* currMemBlock) {
+static MemoryBlockHeader* get_prev_heap_block(const MemoryBlockHeader* currMemBlock) {
     // need loop through all blocks due to not knowing length of prev block
 
     MemoryBlockHeader* loopBlockPtr = heapStartPtr;
@@ -33,7 +26,7 @@ MemoryBlockHeader* get_prev_heap_block(const MemoryBlockHeader* currMemBlock) {
     return nullptr;
 }
 
-void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
+static void try_defragment_page(MemoryBlockHeader* freedBlockPtr) {
     MemoryBlockHeader* rightBlockPtr = get_next_heap_block(freedBlockPtr);
     if (rightBlockPtr < heapEndPtr) {
         if (rightBlockPtr->Used == false) {

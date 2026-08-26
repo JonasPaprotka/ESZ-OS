@@ -11,19 +11,19 @@
 FAT32_Context context;
 
 #pragma region Helpers
-bool isLFN(FAT_Attributes_Bits attributes) {
+static bool isLFN(FAT_Attributes_Bits attributes) {
     return attributes.ReadOnly && attributes.Hidden && attributes.System && attributes.VolumeID;
 }
 
-uint64_t get_fat_sector_to_read(const uint32_t cluster) {
+static uint64_t get_fat_sector_to_read(const uint32_t cluster) {
     return (cluster * 4) / context.BytesPerSector + context.FatStartLBA;
 }
 
-uint64_t cluster_to_lba(const uint32_t cluster) {
+static uint64_t cluster_to_lba(const uint32_t cluster) {
     return context.DataRegionStartLBA + (cluster - 2) * context.SectorsPerCluster;
 }
 
-uint32_t get_next_cluster(const uint32_t cluster) {
+static uint32_t get_next_cluster(const uint32_t cluster) {
     uint8_t buffer[SECTOR_SIZE_BYTES];
     const uint64_t fatSector = get_fat_sector_to_read(cluster);
     const uint64_t offsetInSector = (cluster * 4) % context.BytesPerSector;
@@ -36,19 +36,19 @@ uint32_t get_next_cluster(const uint32_t cluster) {
 #pragma endregion Helpers
 
 #pragma region GET ENTRIES
-void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& outEntryCount) {
+static void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& outEntryCount) {
     bool gotLongName = false;
     const uint32_t maxEntryCount = context.ClusterSizeInBytes / sizeof(Directory_Entry);
 
     for (uint32_t i = 0; i < maxEntryCount; i++) {
         if (entries[i].Name[0] == 0) break;
 
-        if (entries[i].Name[0] == '.' and entries[i].Name[1] == ' ') continue;
-        if (entries[i].Name[0] == '.' and entries[i].Name[1] == '.' and entries[i].Name[2] == ' ') continue;
+        if (entries[i].Name[0] == '.' && entries[i].Name[1] == ' ') continue;
+        if (entries[i].Name[0] == '.' && entries[i].Name[1] == '.' && entries[i].Name[2] == ' ') continue;
 
         const bool isEntryLFN = isLFN(entries[i].Attributes);
 
-        if (!isEntryLFN and entries[i].Attributes.VolumeID) continue;
+        if (!isEntryLFN && entries[i].Attributes.VolumeID) continue;
 
         if (isEntryLFN) {
             LFN_Entry_Struct* lfn = (LFN_Entry_Struct*)&entries[i];
@@ -105,7 +105,7 @@ void get_entries_in_dir(Directory_Entry* entries, Entry* outEntries, uint32_t& o
 #pragma endregion GET ENTRIES
 
 #pragma region FIND
-void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCount) {
+static void read_dir_entries(uint32_t cluster, Entry* outEntries, uint32_t& outEntryCount) {
     if (cluster < 2 || cluster >= EOC_START) return;
 
     uint8_t* tempBuffer = (uint8_t*) malloc(context.ClusterSizeInBytes);
@@ -211,7 +211,7 @@ uint64_t get_entries(const char* path, Entry*& outEntries) {
 #pragma endregion FIND
 
 #pragma region READ
-uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
+static uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
     if (startCluster < 2 || startCluster >= EOC_START) return nullptr;
 
     uint32_t currCluster = startCluster;
@@ -234,7 +234,7 @@ uint8_t* read_cluster_chain(const uint32_t startCluster, const uint64_t size) {
     return outBuffer;
 }
 
-uint8_t* fat32_read(const Entry& entry) {
+static uint8_t* fat32_read(const Entry& entry) {
     uint8_t* fileData = read_cluster_chain(entry.FirstCluster, entry.Size);
     fileData[entry.Size] = 0;
     return fileData;
@@ -242,7 +242,7 @@ uint8_t* fat32_read(const Entry& entry) {
 #pragma endregion READ
 
 #pragma region WRITE
-uint64_t fat32_write(const Entry&, const uint8_t*, uint64_t) {
+static uint64_t fat32_write(const Entry&, const uint8_t*, uint64_t) {
     //TODO
     return 0;
 }

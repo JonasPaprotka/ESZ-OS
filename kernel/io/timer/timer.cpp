@@ -20,7 +20,7 @@ uint64_t get_ticks_in_ms() {
     return ticks * 1000 / PIT_TICK_HZ;
 }
 
-void halt_till_tick(const uint64_t targetTick) {
+static void halt_till_tick(const uint64_t targetTick) {
     while(ticks < targetTick) {
         __asm__ volatile("sti; hlt");
     }

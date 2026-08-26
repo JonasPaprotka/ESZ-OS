@@ -9,10 +9,10 @@ char currentPath[MAX_PATH_LENGTH + 1];
 
 #pragma region HELPER FUNCTIONS
 bool is_root_path(const char* path) {
-    return (path[0] == '/') and (path[1] == 0);
+    return (path[0] == '/') && (path[1] == 0);
 }
 
-bool is_absolute_path(const char* path) {
+static bool is_absolute_path(const char* path) {
     return path[0] == '/';
 }
 #pragma endregion HELPER FUNCTIONS

@@ -37,4 +37,4 @@ extern uint8_t StorageDeviceAmount;
 extern StorageDevice* selectedStorageDevice;
 extern PartitionInfo* selectedPartition;
 
-bool init_storage();
+[[nodiscard]] bool init_storage();

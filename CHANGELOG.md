@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v0.4.1
+
+- Fixes
+    - Fixed use after free in newTerminalInputLine
+    - Fixed division by zero in getPercentBar
+    - Fixed memory leak in cmd_read
+    - improved VMM error handling
+- Memory
+    - Heap header 9 -> 8 bytes
+- Performance
+    - bit and math functions are now inline
+    - static for all file local functions
+- Cleanup
+    - Removed dead code
+
 ## v0.4.0
 
 - Fixes

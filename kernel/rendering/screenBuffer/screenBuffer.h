@@ -28,4 +28,4 @@ Cell* get_screen_buffer_cell(const int y, const int x);
 Cell* get_screen_buffer_cell(const Line* line, const int x);
 
 bool init_empty_screen_buffer();
-bool init_screen_buffer();
+[[nodiscard]] bool init_screen_buffer();

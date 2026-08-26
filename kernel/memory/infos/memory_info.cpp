@@ -9,7 +9,7 @@
 #include "string.h"
 
 #pragma region MEMORY FRAG. GAPH
-void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
+static void print_memory_fragmentation_graph(const uint64_t maxBlocks) {
     if (maxBlocks == 0) return; //TODO consider treating it as all blocks
 
     uint64_t blockCounter = 0;

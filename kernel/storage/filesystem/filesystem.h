@@ -26,4 +26,4 @@ bool is_root_path(const char* path);
 void filesystem_print_working_directory();
 void filesystem_list();
 void filesystem_change_directory(const char* path);
-bool init_filesystem();
+[[nodiscard]] bool init_filesystem();

@@ -17,19 +17,19 @@
 #include "integer.h"
 #include "string.h"
 
-void cmd_cd(const char* args) {
+static void cmd_cd(const char* args) {
     filesystem_change_directory(args);
 }
 
-void cmd_ls(const char*) {
+static void cmd_ls(const char*) {
     filesystem_list();
 }
 
-void cmd_pwd(const char*) {
+static void cmd_pwd(const char*) {
     filesystem_print_working_directory();
 }
 
-void cmd_driveinfo(const char*) {
+static void cmd_driveinfo(const char*) {
     if (selectedStorageDevice->Identified == false) {
         printInfoLine(InfoTextType::Error, "No drive identify data available");
         return;
@@ -77,7 +77,7 @@ void cmd_driveinfo(const char*) {
     print_separator();
 }
 
-void cmd_dumpsector(const char* args) {
+static void cmd_dumpsector(const char* args) {
     if (args[0] == 0) {
         printInfoLine(InfoTextType::Error, "Missing Argument: Sector Number");
         return;
@@ -97,19 +97,23 @@ void cmd_dumpsector(const char* args) {
     newline();
 }
 
-void cmd_read(const char* args) {
+static void cmd_read(const char* args) {
     const char* filePath = str_combine(currentPath, args);
+
     Entry e = activeDriver->find_entry(filePath);
     if (!e.Found || e.IsDirectory) {
         printInfoLine(InfoTextType::Error, String("File: '", filePath, "' was not found"));
+        free(filePath);
         return;
     }
+    free(filePath);
+
     uint8_t* data = activeDriver->read(e);
     print((char*) data);
     free(data);
 }
 
-void cmd_get_uptime(const char*) {
+static void cmd_get_uptime(const char*) {
     const uint64_t ms = get_ticks_in_ms();
     const uint64_t sec = ms / 1000;
     const uint64_t min = sec / 60;
@@ -125,7 +129,7 @@ void cmd_get_uptime(const char*) {
     ));
 }
 
-void cmd_help(const char*) {
+static void cmd_help(const char*) {
     for (uint64_t i = 0; commands[i].name != 0; i++) {
         print_inline(commands[i].name);
         print_inline("; ");
@@ -133,7 +137,7 @@ void cmd_help(const char*) {
     newline();
 }
 
-void cmd_clear(const char*) {
+static void cmd_clear(const char*) {
     clearScreen();
     cursorAt_X = 0;
     cursorAt_Y = 0;
@@ -142,29 +146,29 @@ void cmd_clear(const char*) {
     cursorRendered_Y = 0;
 }
 
-void cmd_echo(const char* args) {
+static void cmd_echo(const char* args) {
     print(args);
 }
 
-void cmd_sysinfo(const char*) {
+static void cmd_sysinfo(const char*) {
     printSysinfo();
 }
 
-void cmd_reboot(const char*) {
+static void cmd_reboot(const char*) {
     outb(0x64, 0xFE);
 }
 
-void cmd_memory_info(const char*) {
+static void cmd_memory_info(const char*) {
     print_memory_info();
 }
 
-void cmd_history(const char*) {
+static void cmd_history(const char*) {
     for (uint64_t i = 0; i < cmdHistCount; i++) {
         print(commandHistory[i]);
     }
 }
 
-void cmd_pciinfo(const char* args) {
+static void cmd_pciinfo(const char* args) {
     if (PCIDeviceAmount == 0) {
         printInfoLine(InfoTextType::Error, "No PCI devices were detected on boot");
         return;
