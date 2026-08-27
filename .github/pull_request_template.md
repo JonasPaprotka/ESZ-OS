@@ -2,7 +2,7 @@
 
 
 ## Issue ticket number(s) and link(s)
-Fixed: #xyz
+Fixed: #issue no + title
 
 ## Checklist before requesting a review
 - [ ] I have performed a self-review of my code?

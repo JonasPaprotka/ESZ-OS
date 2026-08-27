@@ -1,7 +1,10 @@
 # CHANGELOG
 
-## v0.4.3
+## v0.4.4
 
+- .ttf font support preperation
+    - FiraCode font .ttf files were added
+    - str_truetype.h was added to install script
 - Updated Limine Bootloader to 12.6.1
 - Fixes
     - Fixed use after free in newTerminalInputLine
@@ -15,6 +18,7 @@
     - static for all file local functions
 - Cleanup
     - Removed dead code
+    - Updated README.md Gif
 
 ## v0.4.0
 

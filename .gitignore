@@ -2,19 +2,16 @@
 *.o
 *.elf
 *.DS_Store
-
-bin/
-
-limine/
-limine.h
-
 *.code-workspace
 *img
 
-test_files/
+compile_commands.json
+
+bin/
 rootfs/
 
-tests/build/
-tests/vendor/
+limine/
+vendor/
 
-compile_commands.json
+test_files/
+tests/build/
