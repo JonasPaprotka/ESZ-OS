@@ -2,8 +2,6 @@
 
 A hobby x86_64 kernel written in C++ and Assembly
 
-(Note: Gif is currently outdated)
-
 ![ESZ-OS](docs/images/hero.gif)
 
 ## What works right now
@@ -52,7 +50,8 @@ Configuration of this OS happens inside the `config.h` file. There you can set y
 brew install x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
 mkdir limine
 curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.1/limine-binary.tar.xz
-curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+curl -L -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+curl -L -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine
@@ -69,7 +68,9 @@ curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/do
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine
-curl -L -o kernel/types/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+mkdir -p kernel/vendor
+curl -L -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+curl -L -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com
 make clean
 ```
 
