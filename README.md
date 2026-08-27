@@ -48,10 +48,10 @@ Configuration of this OS happens inside the `config.h` file. There you can set y
 
 ```zsh
 brew install x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
-mkdir limine
-curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.1/limine-binary.tar.xz
-curl -L -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
-curl -L -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com
+mkdir -p limine kernel/vendor
+curl -fL -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.1/limine-binary.tar.xz
+curl -fL -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+curl -fL -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com/nothings/stb/master/stb_truetype.h
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine
@@ -63,14 +63,13 @@ make clean && make
 ```zsh
 brew upgrade x86_64-elf-gcc x86_64-elf-binutils nasm xorriso mtools qemu
 rm -rf limine
-mkdir -p limine
-curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.1/limine-binary.tar.xz
+mkdir -p limine kernel/vendor
+curl -fL -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v12.6.1/limine-binary.tar.xz
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine
-mkdir -p kernel/vendor
-curl -L -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
-curl -L -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com
+curl -fL -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+curl -fL -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com/nothings/stb/master/stb_truetype.h
 make clean
 ```
 
