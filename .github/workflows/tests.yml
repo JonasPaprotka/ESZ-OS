@@ -1,7 +1,18 @@
 name: Tests
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_call:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   tests:
@@ -14,7 +25,7 @@ jobs:
         uses: actions/cache@v6.1.0
         with:
           path: tests/vendor
-          key: doctest-${{ vars.DOCTEST_VERSION || '2.5.3' }}
+          key: ${{ runner.os }}-doctest-${{ hashFiles('versions.env') }}
 
       - name: Run Tests
-        run: make -C tests DOCTEST_VERSION=${{ vars.DOCTEST_VERSION || '2.5.3' }}
+        run: make -C tests

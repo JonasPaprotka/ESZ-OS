@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.4.5
+
+- Moved assets into dedicated rootfs folder
+- GitHub Workflow rework
+
 ## v0.4.4
 
 - .ttf font support preperation

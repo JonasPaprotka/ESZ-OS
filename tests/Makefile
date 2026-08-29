@@ -4,7 +4,8 @@ ifeq ($(origin CXX),default)
 CXX := c++
 endif
 
-DOCTEST_VERSION ?= 2.5.3
+include ../versions.env
+
 DOCTEST := vendor/doctest.h
 
 KERNEL := ../kernel
@@ -14,6 +15,9 @@ MAKEFLAGS += --no-print-directory
 
 CXXFLAGS ?= -std=c++20 -Wall -Wextra -g -O0
 COVFLAGS := -fprofile-instr-generate -fcoverage-mapping
+
+LLVM_PROFDATA ?= $(shell command -v llvm-profdata >/dev/null 2>&1 && echo llvm-profdata || echo 'xcrun llvm-profdata')
+LLVM_COV ?= $(shell command -v llvm-cov >/dev/null 2>&1 && echo llvm-cov || echo 'xcrun llvm-cov')
 DEPFLAGS := -MMD -MP
 
 ifdef SAN
@@ -107,6 +111,8 @@ $(DOCTEST):
 	curl -L -o $@ https://raw.githubusercontent.com/doctest/doctest/v$(DOCTEST_VERSION)/doctest/doctest.h
 
 coverage: $(DOCTEST)
+	@$(CXX) --version 2>/dev/null | grep -qi clang || \
+	    { echo "coverage needs a clang based CXX (got: $(CXX))"; exit 1; }
 	@mkdir -p $(BUILD)/cov
 	@rm -f $(BUILD)/cov/*.profraw
 	@for src in $(TEST_SRC); do \
@@ -115,8 +121,8 @@ coverage: $(DOCTEST)
 	    $(CXX) $(CXXFLAGS) $(COVFLAGS) $(INC) $$src $(KERNEL_SRC) -o $$bin || exit 1; \
 	    LLVM_PROFILE_FILE=$$bin.profraw ./$$bin -q || true; \
 	done
-	xcrun llvm-profdata merge -sparse $$(find $(BUILD)/cov -name '*.profraw') -o $(BUILD)/tests.profdata
-	xcrun llvm-cov export $(firstword $(COV_BIN)) \
+	$(LLVM_PROFDATA) merge -sparse $$(find $(BUILD)/cov -name '*.profraw') -o $(BUILD)/tests.profdata
+	$(LLVM_COV) export $(firstword $(COV_BIN)) \
 	    $(addprefix -object ,$(wordlist 2,999,$(COV_BIN))) \
 	    -instr-profile=$(BUILD)/tests.profdata -format=lcov \
 	    $(KERNEL_SRC) $(KERNEL_HDR) > $(BUILD)/lcov.info
