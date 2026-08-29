@@ -2,8 +2,12 @@
 
 ## v0.4.5
 
-- Moved assets into dedicated rootfs folder
-- GitHub Workflow rework
+- rootfs
+    - Moved assets into rootfs
+    - Added esz.cnf for later configurations
+- Repository
+    - GitHub Workflow rework
+    - Centralized dependency versions in versions.env
 
 ## v0.4.4
 
