@@ -2,6 +2,8 @@
 
 ## v0.4.5
 
+- String
+    - Fixes and improvements
 - rootfs
     - Moved assets into rootfs
     - Added esz.cnf for later configurations

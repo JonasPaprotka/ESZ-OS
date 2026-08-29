@@ -34,6 +34,18 @@ bool str_equal(const char* a, const char* b) {
     return true;
 }
 
+bool str_equal(const char* a, const char b) {
+    return str_length(a) == 1 && a[0] == b;
+}
+
+bool str_equal(const char a, const char* b) {
+    return str_length(b) == 1 && a == b[0];
+}
+
+bool str_equal(const char a, const char b) {
+    return a == b;
+}
+
 void str_copy(char* dest, const char* src) {
     const uint64_t src_len = str_length(src);
 
@@ -200,6 +212,18 @@ char* str_combine(const char* a, const char* b) {
     return returnString;
 }
 
+char* str_combine(const char* a, const char b) {
+    const uint64_t len_a = str_length(a);
+
+    char* returnString = malloc_str(len_a + 2);
+
+    for (uint64_t i = 0; i < len_a; i++) {
+        returnString[i] = a[i];
+    }
+    returnString[len_a] = b;
+    returnString[len_a + 1] = 0;
+    return returnString;
+}
 
 char* to_string(const uint64_t inputValue, const uint8_t base) {
     if (inputValue == 0 || base == 0 || base == 1) {

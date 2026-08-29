@@ -40,6 +40,22 @@ TEST_CASE("str_equal") {
     SUBCASE("equal empty") {
         CHECK(str_equal("", "") == true);
     }
+    SUBCASE("string and char") {
+        CHECK(str_equal("A", 'A') == true);
+        CHECK(str_equal("A", 'B') == false);
+        CHECK(str_equal("AB", 'A') == false);
+        CHECK(str_equal("", 'A') == false);
+    }
+    SUBCASE("char and string") {
+        CHECK(str_equal('A', "A") == true);
+        CHECK(str_equal('A', "B") == false);
+        CHECK(str_equal('A', "AB") == false);
+        CHECK(str_equal('A', "") == false);
+    }
+    SUBCASE("char and char") {
+        CHECK(str_equal('A', 'A') == true);
+        CHECK(str_equal('A', 'B') == false);
+    }
 }
 
 TEST_CASE("str_copy") {
@@ -754,5 +770,274 @@ TEST_CASE("str_split") {
         str_split("a,b", ',', splits, qty);
         CHECK(qty == 2);
         CHECK(splits[0] != splits[1]);
+    }
+}
+
+TEST_CASE("String += String") {
+    CHECK(str_equal(String("ABC") += String(123), "ABC123") == true);
+    CHECK(str_equal(String("A", 1, " ") += String("TEST"), "A1 TEST") == true);
+    CHECK(str_equal(String("") += String(""), "") == true);
+    CHECK(str_equal(String("ABC") += "-TEST1", "ABC-TEST1") == true);
+    CHECK(str_equal(String("123") += 'B', "123B") == true);
+}
+
+TEST_CASE("String = String") {
+    String b("ESZ-OS");
+    String a;
+    a = b;
+
+    CHECK(str_equal(a, "ESZ-OS") == true);
+    CHECK((a.data != b.data) == true);
+
+    SUBCASE("target stays untouched when the source changes") {
+        b += "-CHANGED";
+        CHECK(str_equal(a, "ESZ-OS") == true);
+        CHECK(str_equal(b, "ESZ-OS-CHANGED") == true);
+    }
+
+    SUBCASE("source stays untouched when the target changes") {
+        a += "-CHANGED";
+        CHECK(str_equal(a, "ESZ-OS-CHANGED") == true);
+        CHECK(str_equal(b, "ESZ-OS") == true);
+    }
+
+    SUBCASE("self assignment keeps the value") {
+        String& self = a;
+        a = self;
+        CHECK(str_equal(a, "ESZ-OS") == true);
+    }
+
+    SUBCASE("returns a reference to itself") {
+        String c("X");
+        String& ret = (c = b);
+        CHECK((&ret == &c) == true);
+    }
+
+    SUBCASE("chained assignment") {
+        String c("X");
+        String d("Y");
+        d = c = b;
+        CHECK(str_equal(c, "ESZ-OS") == true);
+        CHECK(str_equal(d, "ESZ-OS") == true);
+        CHECK((c.data != d.data) == true);
+    }
+
+    SUBCASE("assigning shorter and longer values in sequence") {
+        a = String("short");
+        CHECK(str_equal(a, "short") == true);
+        a = String("a clearly longer value than before");
+        CHECK(str_equal(a, "a clearly longer value than before") == true);
+        a = String("");
+        CHECK(str_equal(a, "") == true);
+    }
+}
+
+TEST_CASE("String(String)") {
+    String b("ESZ-OS");
+    String a(b);
+
+    CHECK(str_equal(a, "ESZ-OS") == true);
+    CHECK((a.data != b.data) == true);
+
+    SUBCASE("copy stays untouched when the original changes") {
+        b += "-CHANGED";
+        CHECK(str_equal(a, "ESZ-OS") == true);
+    }
+
+    SUBCASE("copy of a copy") {
+        String c(a);
+        CHECK(str_equal(c, "ESZ-OS") == true);
+        CHECK((c.data != a.data) == true);
+    }
+
+    SUBCASE("copy of an empty string") {
+        String empty;
+        String copy(empty);
+        CHECK(str_equal(copy, "") == true);
+        CHECK((copy.data != empty.data) == true);
+    }
+}
+
+TEST_CASE("String - diffrent integer wrappers") {
+    CHECK(str_equal(String(100), "100") == true);
+
+    CHECK(str_equal(String((uint64_t) UINT64_MAX), "18446744073709551615") == true);
+    CHECK(str_equal(String((uint64_t) 100), "100") == true);
+    CHECK(str_equal(String((uint32_t) UINT32_MAX), "4294967295") == true);
+    CHECK(str_equal(String((uint32_t) 100), "100") == true);
+    CHECK(str_equal(String((uint16_t) UINT16_MAX), "65535") == true);
+    CHECK(str_equal(String((uint16_t) 100), "100") == true);
+    CHECK(str_equal(String((uint8_t) UINT8_MAX), "255") == true);
+    CHECK(str_equal(String((uint8_t) 100), "100") == true);
+
+    CHECK(str_equal(String((int64_t) INT64_MAX), "9223372036854775807") == true);
+    CHECK(str_equal(String((int64_t) INT64_MIN), "-9223372036854775808") == true);
+    CHECK(str_equal(String((int64_t) 100), "100") == true);
+    CHECK(str_equal(String((int32_t) INT32_MAX), "2147483647") == true);
+    CHECK(str_equal(String((int32_t) INT32_MIN), "-2147483648") == true);
+    CHECK(str_equal(String((int32_t) 100), "100") == true);
+    CHECK(str_equal(String((int16_t) INT16_MAX), "32767") == true);
+    CHECK(str_equal(String((int16_t) INT16_MIN), "-32768") == true);
+    CHECK(str_equal(String((int16_t) 100), "100") == true);
+    CHECK(str_equal(String((int8_t) INT8_MAX), "127") == true);
+    CHECK(str_equal(String((int8_t) INT8_MIN), "-128") == true);
+    CHECK(str_equal(String((int8_t) 100), "100") == true);
+}
+
+TEST_CASE("String - char wrapper") {
+    CHECK(str_equal(String('a'), "a") == true);
+}
+
+TEST_CASE("String += returns and chains") {
+    SUBCASE("returns a reference to itself") {
+        String a("A");
+        String& ret = (a += "B");
+        CHECK((&ret == &a) == true);
+        CHECK(str_equal(a, "AB") == true);
+    }
+
+    SUBCASE("chained") {
+        String a("A");
+        (a += "B") += "C";
+        CHECK(str_equal(a, "ABC") == true);
+    }
+
+    SUBCASE("appending itself") {
+        String a("AB");
+        a += a;
+        CHECK(str_equal(a, "ABAB") == true);
+    }
+
+    SUBCASE("repeated growth") {
+        String a;
+        for (uint64_t i = 0; i < 100; i++) a += "xy";
+        CHECK(str_length(a) == 200);
+        CHECK(str_starts_with(a, "xyxy") == true);
+        CHECK(str_ends_with(a, "xyxy") == true);
+    }
+}
+
+TEST_CASE("String - default construction") {
+    String a;
+    CHECK(str_length(a) == 0);
+    CHECK(str_equal(a, "") == true);
+}
+
+TEST_CASE("String - argument counts") {
+    CHECK(str_equal(String("a"), "a") == true);
+    CHECK(str_equal(String("a", "b"), "ab") == true);
+    CHECK(str_equal(String("a", 1, "b", 2, "c", 3, "d", 4, "e", 5), "a1b2c3d4e5") == true);
+}
+
+TEST_CASE("String - zero values") {
+    CHECK(str_equal(String(0), "0") == true);
+    CHECK(str_equal(String((uint64_t) 0), "0") == true);
+    CHECK(str_equal(String((int64_t) 0), "0") == true);
+    CHECK(str_equal(String((uint8_t) 0), "0") == true);
+}
+
+TEST_CASE("String - long content") {
+    char* longText = str_repeat("0123456789", 500);
+
+    String a(longText);
+    CHECK(str_length(a) == 5000);
+    CHECK(str_equal(a, longText) == true);
+
+    String b(a);
+    CHECK(str_equal(b, longText) == true);
+    CHECK((a.data != b.data) == true);
+
+    free(longText);
+}
+
+TEST_CASE("String == String") {
+    String a("ABC");
+    String b("ABC");
+    CHECK((a == b) == true);
+
+    String c("123");
+    String d("456");
+    CHECK((c == d) == false);
+
+    const char* a1 = "123";
+    const char* a2 = "123";
+    CHECK((a1 == a2) == true);
+
+    const char* a3 = "123";
+    const char* a4 = "456";
+    CHECK((a3 == a4) == false);
+
+    const char b1 = '1';
+    const char b2 = '1';
+    CHECK((b1 == b2) == true);
+
+    const char b3 = '1';
+    const char b4 = '2';
+    CHECK((b3 == b4) == false);
+}
+
+TEST_CASE("String != String") {
+    String a("ABC");
+    String b("ABC");
+    CHECK((a != b) == false);
+
+    String c("123");
+    String d("456");
+    CHECK((c != d) == true);
+}
+
+TEST_CASE("String == and !=") {
+    String a("ESZ-OS");
+
+    SUBCASE("against another String") {
+        CHECK((a == String("ESZ-OS")) == true);
+        CHECK((a != String("ESZ-OS")) == false);
+        CHECK((a == String("other")) == false);
+        CHECK((a != String("other")) == true);
+    }
+
+    SUBCASE("compares content, not the pointer") {
+        String b(a);
+        CHECK((a.data != b.data) == true);
+        CHECK((a == b) == true);
+    }
+
+    SUBCASE("against a c string") {
+        CHECK((a == "ESZ-OS") == true);
+        CHECK((a != "ESZ-OS") == false);
+        CHECK((a == "other") == false);
+        CHECK((a != "other") == true);
+    }
+
+    SUBCASE("against a char") {
+        String c("A");
+        CHECK((c == 'A') == true);
+        CHECK((c != 'A') == false);
+        CHECK((c == 'B') == false);
+        CHECK((String("AB") == 'A') == false);
+    }
+
+    SUBCASE("c string on the left hand side") {
+        CHECK(("ESZ-OS" == a) == true);
+        CHECK(("other" != a) == true);
+    }
+
+    SUBCASE("char on the left hand side") {
+        String c("A");
+        CHECK(('A' == c) == true);
+        CHECK(('B' != c) == true);
+    }
+
+    SUBCASE("empty strings") {
+        String e;
+        CHECK((e == "") == true);
+        CHECK((e == String()) == true);
+        CHECK((e != "x") == true);
+    }
+
+    SUBCASE("works on a const String") {
+        const String c("ESZ-OS");
+        CHECK((c == "ESZ-OS") == true);
+        CHECK((c != "x") == true);
     }
 }
