@@ -2,6 +2,11 @@
 
 A hobby x86_64 kernel written in C++ and Assembly
 
+[![Build](https://img.shields.io/github/actions/workflow/status/JonasPaprotka/ESZ-OS/build.yml?branch=main&label=build)](https://github.com/JonasPaprotka/ESZ-OS/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/JonasPaprotka/ESZ-OS/tests.yml?branch=main&label=tests)](https://github.com/JonasPaprotka/ESZ-OS/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/v/release/JonasPaprotka/ESZ-OS)](https://github.com/JonasPaprotka/ESZ-OS/releases/latest)
+[![License](https://img.shields.io/github/license/JonasPaprotka/ESZ-OS)](LICENSE)
+
 ![ESZ-OS](docs/images/hero.gif)
 
 ## What works right now
