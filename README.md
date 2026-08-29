@@ -55,6 +55,7 @@ curl -fL -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com/nothi
 tar -xf limine.tar.xz -C limine --strip-components=1
 rm limine.tar.xz
 make -C limine
+make disk
 make clean && make
 ```
 
@@ -70,6 +71,7 @@ rm limine.tar.xz
 make -C limine
 curl -fL -o kernel/vendor/limine.h https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
 curl -fL -o kernel/vendor/stb_truetype.h https://raw.githubusercontent.com/nothings/stb/master/stb_truetype.h
+make disk
 make clean
 ```
 
@@ -93,9 +95,9 @@ Targets
 You can override the QEMU settings on the command line
 
 ```zsh
-make run MEM=8G # RAM (default 4G)
-make run SMP=4 # CPU cores (default 2)
-make disk DISK_SIZE=32G # disk image size (default 8G)
+make run MEM=8G
+make run SMP=4 # CPU cores
+make disk DISK_SIZE=32G
 ```
 
 The Makefile was heavily edited with AI due to my lack of interest in learning Makefile - I will revisit it again and make it better... or worse, but human.

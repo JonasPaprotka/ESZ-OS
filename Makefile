@@ -7,8 +7,10 @@ LIMINE   := limine
 DISK_IMG := bin/disk.img
 ROOTFS   := rootfs
 
-CXX := x86_64-elf-g++
-LD  := x86_64-elf-ld
+CROSS ?= x86_64-elf-
+
+CXX := $(CROSS)g++
+LD := $(CROSS)ld
 ASM := nasm
 
 # ---- Output verbosity ----

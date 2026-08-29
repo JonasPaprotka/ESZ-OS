@@ -1,7 +1,18 @@
 name: Build
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_call:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -10,37 +21,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.1
 
+      - name: Load Versions
+        run: grep -E '^[A-Z_]+=' versions.env >> "$GITHUB_ENV"
+
       - name: Cache Limine
+        id: limine-cache
         uses: actions/cache@v6.1.0
         with:
           path: limine
-          key: limine-${{ vars.LIMINE_VERSION || '12.6.1' }}
+          key: ${{ runner.os }}-limine-${{ hashFiles('versions.env') }}
 
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y nasm xorriso mtools \
+          sudo apt-get install -y nasm xorriso \
             gcc-x86-64-linux-gnu g++-x86-64-linux-gnu \
             curl tar make
 
       - name: Setup Limine
+        if: steps.limine-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p limine
-          curl -L -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v${{ vars.LIMINE_VERSION || '12.6.1' }}/limine-binary.tar.xz
+          curl -fL -o limine.tar.xz https://github.com/limine-bootloader/limine/releases/download/v$LIMINE_VERSION/limine-binary.tar.xz
           tar -xf limine.tar.xz -C limine --strip-components=1
           rm limine.tar.xz
           make -C limine
 
-      - name: Fetch Limine Header
+      - name: Fetch Vendor Headers
         run: |
-          mkdir -p kernel/types
-          curl -L -o kernel/types/limine.h \
+          curl -fL --create-dirs -o kernel/vendor/limine.h \
             https://raw.githubusercontent.com/limine-bootloader/limine-protocol/trunk/include/limine.h
+          curl -fL --create-dirs -o kernel/vendor/stb_truetype.h \
+            https://raw.githubusercontent.com/nothings/stb/master/stb_truetype.h
 
       - name: Build
-        run: |
-          make clean
-          make CXX=x86_64-linux-gnu-g++ LD=x86_64-linux-gnu-ld
+        run: make CROSS=x86_64-linux-gnu-
 
       - name: Upload ISO
         uses: actions/upload-artifact@v7.0.1
@@ -48,4 +63,4 @@ jobs:
           name: eszos-iso
           path: bin/eszos.iso
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 90
