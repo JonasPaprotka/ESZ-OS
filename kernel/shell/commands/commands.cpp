@@ -140,15 +140,26 @@ static Return cmd_get_uptime(const Command& command) {
 }
 
 static Return cmd_help(const Command& command) {
-    print_inline("Help:");
-    newline();
     for (uint64_t i = 0; commands[i].name != 0; i++) {
         print_inline(" - ");
         print_inline(commands[i].name);
+
         if (commands[i].summary[0] != 0) {
-            print_inline(": ");
+            print_inline("  ->  ");
             print_inline(commands[i].summary);
         }
+
+        if (commands[i].args[0].name != 0) {
+            print_inline(" | ");
+            for (uint64_t j = 0; j < MAX_COMMAND_ARGS; j++) {
+                if (commands[i].args[j].name == 0) break;
+
+                print_inline("[-");
+                print_inline(commands[i].args[j].name);
+                print_inline("] ");
+            }
+        }
+
         newline();
     }
 
@@ -247,17 +258,22 @@ static Return cmd_pciinfo(const Command& command) {
 Command commands[] = {
     { "help", "", cmd_help },
     { "history", "", cmd_history },
-    { "echo", "", cmd_echo },
-    { "clear", "", cmd_clear },
+    { "echo", "", cmd_echo,
+        Argument("text", "Text to print", Types::String, true) },
+    { "clear", "Clear the screen", cmd_clear },
     { "sysinfo", "", cmd_sysinfo },
     { "reboot", "", cmd_reboot },
-    { "meminfo", "", cmd_memory_info },
-    { "uptime", "", cmd_get_uptime },
-    { "pciinfo", "", cmd_pciinfo, Argument("c", "Compact", Types::Boolean, false) },
-    { "read", "", cmd_read },
-    { "driveinfo", "", cmd_driveinfo },
-    { "dumpsector", "", cmd_dumpsector },
-    { "cd", "", cmd_cd },
+    { "meminfo", "Show memory informations", cmd_memory_info },
+    { "uptime", "Time since boot", cmd_get_uptime },
+    { "pciinfo", "List detected PCI devices", cmd_pciinfo,
+        Argument("c", "Compact", Types::Boolean, false) },
+    { "read", "Print the contents of a file", cmd_read,
+        Argument("file", "File to read", Types::String, true) },
+    { "driveinfo", "Show selected drive and partition information", cmd_driveinfo },
+    { "dumpsector", "Print a sector as hex", cmd_dumpsector,
+        Argument("lba", "Sector to dump", Types::Integer, true) },
+    { "cd", "", cmd_cd,
+        Argument("path", "Target directory, empty for root", Types::String, false) },
     { "ls", "", cmd_ls },
     { "pwd", "", cmd_pwd },
     { 0 }
