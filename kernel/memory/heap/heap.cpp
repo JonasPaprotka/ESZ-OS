@@ -51,7 +51,6 @@ void* malloc(const uint64_t size) {
     {
         currBlockPtr = (MemoryBlockHeader*) get_next_heap_block(currBlockPtr);
         if (currBlockPtr >= heapEndPtr) {
-            printInfoLine(InfoTextType::Error, "Malloc can\'t build a suitable new block");
             return nullptr;
         }
     }
@@ -91,7 +90,7 @@ void free(const void* ptr) {
 
 bool init_heap_alloc() {
     MemoryBlockHeader* initialHeapBlockPtr = (MemoryBlockHeader*) vmm_malloc_pages(INIT_HEAP_SIZE);
-    if (initialHeapBlockPtr == nullptr) {
+    if (initialHeapBlockPtr == nullptr || initialHeapBlockPtr == (MemoryBlockHeader*) UINT64_MAX) {
         printInfoLine(InfoTextType::Error, "Heap init failed: Could not reserve the initial heap");
         return false;
     }

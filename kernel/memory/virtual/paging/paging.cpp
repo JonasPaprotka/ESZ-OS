@@ -60,7 +60,7 @@ static uint64_t get_or_create_next_table(PageTable* prevTableAddr, const uint16_
         return (prevTableAddr->entries[Idx].Address << PAGE_SHIFT); // page number -> phys. address
 
     uint64_t currRouterTableAddress = pmm_malloc_page();
-    if (currRouterTableAddress == PMM_MALLOC_FAILED) return 0;
+    if (currRouterTableAddress == UINT64_MAX) return 0;
 
     memory_clear((uint64_t*)(currRouterTableAddress + hhdm_offset), PAGE_SIZE);
 

@@ -17,22 +17,25 @@
 #include "integer.h"
 #include "string.h"
 
-static void cmd_cd(const char* args) {
-    filesystem_change_directory(args);
+static Return cmd_cd(const Command& command) {
+    filesystem_change_directory(command.args[0].value);
+    return Return::Success; //TODO HANLDE IN CMD
 }
 
-static void cmd_ls(const char*) {
+static Return cmd_ls(const Command& command) {
     filesystem_list();
+    return Return::Success; //TODO HANLDE IN CMD
 }
 
-static void cmd_pwd(const char*) {
+static Return cmd_pwd(const Command& command) {
     filesystem_print_working_directory();
+    return Return::Success; //TODO HANLDE IN CMD
 }
 
-static void cmd_driveinfo(const char*) {
+static Return cmd_driveinfo(const Command& command) {
     if (selectedStorageDevice->Identified == false) {
         printInfoLine(InfoTextType::Error, "No drive identify data available");
-        return;
+        return Return::Error;
     }
 
     const uint64_t totalGiB = (selectedStorageDevice->IdentificationInformation.AmountOfSectors_64bit * 512) / 1024 / 1024 / 1024;
@@ -75,45 +78,50 @@ static void cmd_driveinfo(const char*) {
     printInfoLine(InfoTextType::Info, String("Filesystem:   ", fsType));
     printInfoLine(InfoTextType::Info, String("Bootable:     ", selectedPartition->Bootable ? "YES" : "NO"));
     print_separator();
+
+    return Return::Success;
 }
 
-static void cmd_dumpsector(const char* args) {
-    if (args[0] == 0) {
+static Return cmd_dumpsector(const Command& command) {
+    if (command.args[0].value[0] == 0) {
         printInfoLine(InfoTextType::Error, "Missing Argument: Sector Number");
-        return;
+        return Return::Error;
     }
 
     uint8_t buffer[SECTOR_SIZE_BYTES];
-    AHCI_READ_DMA_EXT(selectedStorageDevice->Port, to_int(args), 1, buffer);
+    AHCI_READ_DMA_EXT(selectedStorageDevice->Port, to_int(command.args[0].value), 1, buffer);
 
-    printInfoLine(InfoTextType::Info, String(" --- SECTOR ", args, " DATA --- "));
+    printInfoLine(InfoTextType::Info, String(" --- SECTOR ", command.args[0].value, " DATA --- "));
     for (uint64_t i = 0; i < SECTOR_SIZE_BYTES; i++) {
         const char* valueHex = to_string((uint64_t) buffer[i], 16);
         print_inline(valueHex);
         print_inline(" ");
         free(valueHex);
     }
-
     newline();
+
+    return Return::Success;
 }
 
-static void cmd_read(const char* args) {
-    const char* filePath = str_combine(currentPath, args);
+static Return cmd_read(const Command& command) {
+    const char* filePath = str_combine(currentPath, command.args[0].value);
 
     Entry e = activeDriver->find_entry(filePath);
     if (!e.Found || e.IsDirectory) {
         printInfoLine(InfoTextType::Error, String("File: '", filePath, "' was not found"));
         free(filePath);
-        return;
+        return Return::Error;
     }
     free(filePath);
 
     uint8_t* data = activeDriver->read(e);
     print((char*) data);
     free(data);
+
+    return Return::Success;
 }
 
-static void cmd_get_uptime(const char*) {
+static Return cmd_get_uptime(const Command& command) {
     const uint64_t ms = get_ticks_in_ms();
     const uint64_t sec = ms / 1000;
     const uint64_t min = sec / 60;
@@ -127,54 +135,76 @@ static void cmd_get_uptime(const char*) {
         sec % 60, "s, ",
         ms % 1000, "ms"
     ));
+
+    return Return::Success;
 }
 
-static void cmd_help(const char*) {
-    for (uint64_t i = 0; commands[i].name != 0; i++) {
-        print_inline(commands[i].name);
-        print_inline("; ");
-    }
+static Return cmd_help(const Command& command) {
+    print_inline("Help:");
     newline();
+    for (uint64_t i = 0; commands[i].name != 0; i++) {
+        print_inline(" - ");
+        print_inline(commands[i].name);
+        if (commands[i].summary[0] != 0) {
+            print_inline(": ");
+            print_inline(commands[i].summary);
+        }
+        newline();
+    }
+
+    return Return::Success;
 }
 
-static void cmd_clear(const char*) {
+static Return cmd_clear(const Command& command) {
     clearScreen();
     cursorAt_X = 0;
     cursorAt_Y = 0;
 
     cursorRendered_X = 0;
     cursorRendered_Y = 0;
+
+    return Return::Success;
 }
 
-static void cmd_echo(const char* args) {
-    print(args);
+static Return cmd_echo(const Command& command) {
+    print(command.args[0].value); //TODO only temporary
+
+    return Return::Success;
 }
 
-static void cmd_sysinfo(const char*) {
+static Return cmd_sysinfo(const Command& command) {
     printSysinfo();
+
+    return Return::Success;
 }
 
-static void cmd_reboot(const char*) {
+static Return cmd_reboot(const Command& command) {
     outb(0x64, 0xFE);
+
+    return Return::NoReturn; //or maybe error
 }
 
-static void cmd_memory_info(const char*) {
+static Return cmd_memory_info(const Command& command) {
     print_memory_info();
+
+    return Return::Success;
 }
 
-static void cmd_history(const char*) {
+static Return cmd_history(const Command& command) {
     for (uint64_t i = 0; i < cmdHistCount; i++) {
         print(commandHistory[i]);
     }
+
+    return Return::Success;
 }
 
-static void cmd_pciinfo(const char* args) {
+static Return cmd_pciinfo(const Command& command) {
     if (PCIDeviceAmount == 0) {
         printInfoLine(InfoTextType::Error, "No PCI devices were detected on boot");
-        return;
+        return Return::Error;
     }
 
-    const bool compact = str_equal(args, "-c");
+    const bool compact = str_equal(command.args[0].value, "-c"); //TODO
 
     printInfoLine(InfoTextType::Info, String(PCIDeviceAmount, " PCI Devices were detected on boot."));
 
@@ -210,23 +240,25 @@ static void cmd_pciinfo(const char* args) {
         free(vendorHex);
         free(deviceHex);
     }
+
+    return Return::Success;
 }
 
-const Command commands[] = {
-    { "help", cmd_help },
-    { "history", cmd_history },
-    { "echo", cmd_echo },
-    { "clear", cmd_clear },
-    { "sysinfo", cmd_sysinfo },
-    { "reboot", cmd_reboot },
-    { "meminfo", cmd_memory_info },
-    { "uptime", cmd_get_uptime },
-    { "pciinfo", cmd_pciinfo },
-    { "read", cmd_read },
-    { "driveinfo", cmd_driveinfo },
-    { "dumpsector", cmd_dumpsector },
-    { "cd", cmd_cd },
-    { "ls", cmd_ls },
-    { "pwd", cmd_pwd },
-    { 0, 0 }
+Command commands[] = {
+    { "help", "", cmd_help },
+    { "history", "", cmd_history },
+    { "echo", "", cmd_echo },
+    { "clear", "", cmd_clear },
+    { "sysinfo", "", cmd_sysinfo },
+    { "reboot", "", cmd_reboot },
+    { "meminfo", "", cmd_memory_info },
+    { "uptime", "", cmd_get_uptime },
+    { "pciinfo", "", cmd_pciinfo, Argument("c", "Compact", Types::Boolean, false) },
+    { "read", "", cmd_read },
+    { "driveinfo", "", cmd_driveinfo },
+    { "dumpsector", "", cmd_dumpsector },
+    { "cd", "", cmd_cd },
+    { "ls", "", cmd_ls },
+    { "pwd", "", cmd_pwd },
+    { 0 }
 };

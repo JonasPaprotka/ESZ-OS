@@ -15,7 +15,7 @@ uint64_t vmm_malloc_pages(const uint64_t byteAmount) {
     bool success = false;
     uint64_t pageRangeBegin = vmm_bitmap.find_free_range(reqPages, success);
 
-    if (!success) return 0;
+    if (!success) return UINT64_MAX;
 
     vmm_bitmap.write_bits_in_range_from(reqPages, pageRangeBegin, true);
 
@@ -23,18 +23,17 @@ uint64_t vmm_malloc_pages(const uint64_t byteAmount) {
         uint64_t currVirtAddr = ((pageRangeBegin + i) * PAGE_SIZE) + VIRTUAL_OFFSET_VMM;
         uint64_t currPhysAddr = pmm_malloc_page();
 
-        if (currPhysAddr == PMM_MALLOC_FAILED) {
-            printInfoLine(InfoTextType::Error, "VMM malloc failed: No physical page to alloc the range");
+        if (currPhysAddr == UINT64_MAX) {
             vmm_bitmap.write_bits_in_range_from(reqPages, pageRangeBegin, false);
             // todo: fix theoretical rollback of pmm pages could be needed
             success = false;
-            return 0;
+            return UINT64_MAX;
         }
 
         if (!map_page(currVirtAddr, currPhysAddr, PAGE_FLAG_WRITE)) success = false;
     }
 
-    if (!success) return 0;
+    if (!success) return UINT64_MAX;
     return (pageRangeBegin * PAGE_SIZE) + VIRTUAL_OFFSET_VMM;
 }
 
@@ -49,7 +48,6 @@ bool vmm_free_pages(const uint64_t virtAddr, const uint64_t byteAmount) {
         PageTableEntry *pageTableEntry = page_walk(currVirtAddr);
 
         if (pageTableEntry == nullptr || !pageTableEntry->Present) {
-            printInfoLine(InfoTextType::Error, "VMM Free: Error in pageTableEntry");
             success = false;
             continue;
         }

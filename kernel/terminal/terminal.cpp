@@ -64,10 +64,19 @@ static void processLineInputBuffer() {
     add_command_to_history(lineInputBuffer);
 
     const char* args = getInputArgs(lineInputLength, lineInputBuffer);
-    if (executeCommand(lineInputBuffer, args)) {
-        reset_line_input();
-    } else {
-        displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
+    switch (executeCommand(lineInputBuffer, args)) {
+        case Return::Success:
+            reset_line_input();
+            break;
+        case Return::Error:
+            displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
+            break;
+        case Return::Warning:
+            //TODO
+            break;
+        case Return::NoReturn:
+            //TODO but should never happen
+            break;
     }
 }
 

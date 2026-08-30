@@ -38,14 +38,12 @@ const char* getInputArgs(const uint64_t inputLength, char inputBuffer[TERMINAL_B
     return args;
 }
 
-bool executeCommand(char inputBuffer[TERMINAL_BUFFER_SIZE], const char* args) {
+Return executeCommand(char inputBuffer[TERMINAL_BUFFER_SIZE], const char* args) {
     for (uint64_t i = 0; commands[i].name != 0; i++) {
         if (str_equal(inputBuffer, commands[i].name)) {
             newline();
-            commands[i].execute(args);
-            return true;
+            return commands[i].execute(commands[i]);
         }
     }
-
-    return false;
+    return Return::Error;
 }

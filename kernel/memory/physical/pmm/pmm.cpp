@@ -49,11 +49,10 @@ uint64_t pmm_malloc(const uint64_t byteAmount) {
     uint64_t pageRangeBegin = pmm_bitmap.find_free_range(reqPages, success);
 
     if (!success) {
-        printInfoLine(InfoTextType::Error, "PMM malloc failed: No free page range found");
-        return PMM_MALLOC_FAILED;
+        return UINT64_MAX;
     }
 
-    if (!pmm_malloc_page_range(pageRangeBegin, reqPages)) return PMM_MALLOC_FAILED;
+    if (!pmm_malloc_page_range(pageRangeBegin, reqPages)) return UINT64_MAX;
     return pageRangeBegin * PAGE_SIZE;
 }
 
@@ -80,7 +79,7 @@ void get_pmm_page_counts(uint64_t &freePageCounter, uint64_t &usedPageCounter) {
 
 void* pmm_malloc_addr(const uint64_t byteAmount) {
     uint64_t phys_addr = pmm_malloc(byteAmount);
-    if (phys_addr == PMM_MALLOC_FAILED) return nullptr;
+    if (phys_addr == UINT64_MAX) return nullptr;
     return (void*)(phys_addr + hhdm_offset);
 }
 

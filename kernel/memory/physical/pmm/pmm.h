@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include "bitmap.h"
 
-constexpr uint64_t PMM_MALLOC_FAILED = UINT64_MAX;
-
 extern Bitmap pmm_bitmap;
 
 extern uint64_t memoryRegionCount;

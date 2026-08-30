@@ -32,6 +32,7 @@ constexpr uint64_t FONT_SIZE = 1;
 constexpr uint64_t TERMINAL_BUFFER_SIZE = 256;
 constexpr uint64_t MAX_COMMAND_HISTORY = 100;
 constexpr uint64_t SCROLL_HISTORY_LINES = 100;
+constexpr uint64_t MAX_COMMAND_ARGS = 4;
 // -----------------------
 
 // --- MEMORY CONFIG ---
