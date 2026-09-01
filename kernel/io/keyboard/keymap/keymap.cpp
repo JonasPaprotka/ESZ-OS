@@ -12,7 +12,35 @@ const KeyboardLayout current_layout = LAYOUT_US;
 #endif // KEYBOARD_LAYOUT_US
 
 
-uint16_t scancode_to_keycode(const uint8_t scancode) {
+static uint16_t extended_scancode_to_keycode(const uint8_t scancode) {
+    switch (scancode) {
+        case 0x48: return KEY_ARROW_UP;
+        case 0x50: return KEY_ARROW_DOWN;
+        case 0x4B: return KEY_ARROW_LEFT;
+        case 0x4D: return KEY_ARROW_RIGHT;
+        case 0x47: return KEY_HOME;
+        case 0x4F: return KEY_END;
+        case 0x49: return KEY_PAGE_UP;
+        case 0x51: return KEY_PAGE_DOWN;
+        case 0x52: return KEY_INSERT;
+        case 0x53: return KEY_DELETE;
+        case 0x5B: return KEY_LGUI;
+        case 0x5C: return KEY_RGUI;
+        case 0x5D: return KEY_MENU;
+
+        // numpad
+        case 0x1C: return KEY_ENTER;
+        case 0x35: return '/';
+        case 0x1D: return KEY_RCTRL;
+        case 0x38: return KEY_RALT;
+
+        default: return KEY_UNKNOWN;
+    }
+}
+
+uint16_t scancode_to_keycode(const uint8_t scancode, const bool extended) {
+    if (extended) return extended_scancode_to_keycode(scancode);
+
     if (scancode >= 0x3A) return KEY_UNKNOWN;
     int shift_idx = shift ? 1 : 0;
 

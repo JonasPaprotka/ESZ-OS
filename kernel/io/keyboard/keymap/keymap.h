@@ -22,12 +22,25 @@ enum KeyCode : uint16_t {
     KEY_ESCAPE,
     KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12,
 
+    KEY_ARROW_UP = 300,
+    KEY_ARROW_DOWN,
+    KEY_ARROW_LEFT,
+    KEY_ARROW_RIGHT,
+    KEY_HOME,
+    KEY_END,
+    KEY_PAGE_UP,
+    KEY_PAGE_DOWN,
+    KEY_INSERT,
+    KEY_DELETE,
+    KEY_LGUI,
+    KEY_RGUI,
+    KEY_MENU,
+
     KEY_DE_AE = 500, KEY_DE_OE, KEY_DE_UE, KEY_DE_SS,
     KEY_DE_AE_CAPS, KEY_DE_OE_CAPS, KEY_DE_UE_CAPS
 };
 
-// Updated with AI / Assisted by AI
-extern uint16_t us_keymap[2][0x3A];
-extern uint16_t de_keymap[2][0x3A];
+extern uint16_t us_keymap[2][58];
+extern uint16_t de_keymap[2][58];
 
-uint16_t scancode_to_keycode(const uint8_t scancode);
+uint16_t scancode_to_keycode(const uint8_t scancode, const bool extended);

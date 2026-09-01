@@ -56,48 +56,43 @@ static void process_line_input_buffer() {
 }
 
 void shell_on_key(const uint8_t scancode) {
-    uint16_t key = scancode_to_keycode(scancode);
-
-    if (isExtendedScancode) {
-        switch(scancode) {
-            case 0x48: // ARROW UP
-                if (cmdHistCount == 0) break;
-
-                if (goThroughHistoryCount < cmdHistCount) {
-                    goThroughHistoryCount++;
-                } else break;
-
-                handle_show_history();
-                break;
-
-            case 0x50: // ARROW DOWN
-                if (goThroughHistoryCount == 0) break;
-                goThroughHistoryCount--;
-
-                if (goThroughHistoryCount == 0) {
-                    clear_input_on_screen();
-                    reset_line_input();
-                } else {
-                    handle_show_history();
-                }
-                break;
-
-            case 0x4B: // ARROW LEFT
-                cursor_move_inline(false);
-                break;
-
-            case 0x4D: // ARROW RIGHT
-                cursor_move_inline(true);
-                break;
-        }
-
-        isExtendedScancode = false;
-        return;
-    }
+    const uint16_t key = scancode_to_keycode(scancode, isExtendedScancode);
+    isExtendedScancode = false;
 
     switch(key) {
+        case KeyCode::KEY_ARROW_UP:
+            if (cmdHistCount == 0) break;
+
+            if (goThroughHistoryCount < cmdHistCount) {
+                goThroughHistoryCount++;
+            } else
+                break;
+
+            handle_show_history();
+            break;
+
+        case KeyCode::KEY_ARROW_DOWN:
+            if (goThroughHistoryCount == 0) break;
+            goThroughHistoryCount--;
+
+            if (goThroughHistoryCount == 0) {
+                clear_input_on_screen();
+                reset_line_input();
+            } else {
+                handle_show_history();
+            }
+            break;
+
+        case KeyCode::KEY_ARROW_LEFT:
+            cursor_move_inline(false);
+            break;
+
+        case KeyCode::KEY_ARROW_RIGHT:
+            cursor_move_inline(true);
+            break;
+
         case KeyCode::KEY_ENTER:
-            goThroughHistoryCount = 0; // for arrow cmd history - default: 1
+            goThroughHistoryCount = 0;
             process_line_input_buffer();
             new_line_editor_input_line();
             break;
@@ -111,7 +106,7 @@ void shell_on_key(const uint8_t scancode) {
             break;
 
         default:
-            insert_char_at_cursor(key);
+            if (key != KeyCode::KEY_UNKNOWN && key < 256) insert_char_at_cursor(key);
             break;
     }
 }
