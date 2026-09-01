@@ -1,4 +1,3 @@
-// File Updated with AI / Assisted by AI
 #pragma once
 
 #include <stdint.h>
@@ -27,6 +26,7 @@ enum KeyCode : uint16_t {
     KEY_DE_AE_CAPS, KEY_DE_OE_CAPS, KEY_DE_UE_CAPS
 };
 
+// Updated with AI / Assisted by AI
 extern uint16_t us_keymap[2][0x3A];
 extern uint16_t de_keymap[2][0x3A];
 

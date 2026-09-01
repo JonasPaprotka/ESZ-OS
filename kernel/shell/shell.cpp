@@ -10,6 +10,19 @@
 #include "autocomplete.h"
 #include "print_helper.h"
 
+void display_line_editor_error(const char* Text) {
+    newline();
+    printInfoLine(InfoTextType::Error, Text);
+    reset_line_input();
+}
+
+void new_line_editor_input_line() {
+    const char* renderPath = currentPath;
+    String linePrefix(renderPath, " >> ");
+    print_inline(linePrefix);
+    lineInputStart_X = cursorAt_X;
+}
+
 static void process_line_input_buffer() {
     if (lineInputLength == 0) {
         newline();
@@ -110,7 +123,7 @@ void shell_on_key(const uint8_t scancode) {
 
 bool shell_init() {
     printTerminalHeader();
-    if (!line_editor_init()) return false;
+    new_line_editor_input_line();
 
     return true;
 }

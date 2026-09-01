@@ -40,19 +40,6 @@ void clear_input_on_screen() {
     update_cursor_render();
 }
 
-void display_line_editor_error(const char* Text) {
-    newline();
-    printInfoLine(InfoTextType::Error, Text);
-    reset_line_input();
-}
-
-void new_line_editor_input_line() {
-    const char* renderPath = currentPath;
-    String linePrefix(renderPath, " >> ");
-    print_inline(linePrefix);
-    lineInputStart_X = cursorAt_X;
-}
-
 void insert_char_at_cursor(const char c) {
     for (uint64_t i = lineInputLength; i > lineInputCursorPos; i--) {
         lineInputBuffer[i] = lineInputBuffer[i - 1];
@@ -137,9 +124,4 @@ void handle_input_buffer_deletion() {
     isRedrawing = false;
     cursorAt_X = savedX;
     update_cursor_render();
-}
-
-bool line_editor_init() {
-    new_line_editor_input_line();
-    return true;
 }
