@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.5.0
+
+- Updated Limine Bootloader to 12.7.0
+- Shell rework
+    - Complete Shell and Terminal refactoring
+    - Commands
+        - Help has been improved
+
 ## v0.4.5
 
 - String
