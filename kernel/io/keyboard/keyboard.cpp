@@ -1,7 +1,7 @@
 #include "keyboard.h"
 #include <stdint.h>
 #include "io.h"
-#include "terminal.h"
+#include "line_editor.h"
 
 bool shift = false;
 bool isExtendedScancode = false;

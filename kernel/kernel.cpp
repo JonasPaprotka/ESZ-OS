@@ -2,7 +2,7 @@
 #include "print.h"
 #include "clear.h"
 #include "screenBuffer.h"
-#include "terminal.h"
+#include "line_editor.h"
 #include "print_helper.h"
 #include "idt.h"
 #include "pic.h"

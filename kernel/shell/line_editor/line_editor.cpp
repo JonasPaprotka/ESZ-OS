@@ -1,4 +1,4 @@
-#include "terminal.h"
+#include "line_editor.h"
 #include "print.h"
 #include "print_helper.h"
 #include "screenBuffer.h"
@@ -8,7 +8,7 @@
 #include "args.h"
 #include "filesystem.h"
 #include "string.h"
-#include "cmd_history.h"
+#include "history.h"
 #include "autocomplete.h"
 
 uint64_t lineInputLength = 0;
@@ -69,13 +69,13 @@ static void processLineInputBuffer() {
             reset_line_input();
             break;
         case Return::Error:
-            displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
+            displayTerminalError("An error occured");
             break;
         case Return::Warning:
-            //TODO
+            displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
             break;
         case Return::NoReturn:
-            //TODO but should never happen
+            displayTerminalError("Well this is akward... this command should not be able to return.");
             break;
     }
 }

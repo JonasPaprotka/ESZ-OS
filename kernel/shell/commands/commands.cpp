@@ -4,7 +4,7 @@
 #include "print_helper.h"
 #include "clear.h"
 #include "info_text.h"
-#include "cmd_history.h"
+#include "history.h"
 #include "io.h"
 #include "timer.h"
 #include "pci.h"
@@ -302,5 +302,5 @@ Command commands[] = {
     { "ls", "", cmd_ls,
         Argument("path", "", Types::String, false), },
     { "pwd", "", cmd_pwd },
-    { 0 }
+    { 0, 0, 0 }
 };

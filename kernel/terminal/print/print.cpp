@@ -7,7 +7,7 @@
 #include "font8x16.h"
 #include "clear.h"
 #include "screenBuffer.h"
-#include "terminal.h"
+#include "line_editor.h"
 #include "string.h"
 
 int cursorAt_X;

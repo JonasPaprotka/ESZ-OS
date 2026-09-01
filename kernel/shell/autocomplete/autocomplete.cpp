@@ -3,7 +3,7 @@
 #include "commands.h"
 #include "string.h"
 #include "print.h"
-#include "terminal.h"
+#include "line_editor.h"
 #include "args.h"
 
 void handleTabAutoCompletion() {

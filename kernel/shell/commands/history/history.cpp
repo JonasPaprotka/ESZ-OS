@@ -2,7 +2,7 @@
 #include "integer.h"
 #include "string.h"
 #include "print.h"
-#include "terminal.h"
+#include "line_editor.h"
 
 char commandHistory[MAX_COMMAND_HISTORY][TERMINAL_BUFFER_SIZE];
 uint64_t cmdHistCount = 0;
