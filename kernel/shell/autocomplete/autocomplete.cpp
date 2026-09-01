@@ -38,7 +38,7 @@ void handleTabAutoCompletion() {
 
     // == 1 -> autocomplete directly
     if (validTabCannidates == 1) {
-        replaceCurrentToken(currentToken, cannidateList[0].name);
+        replace_curr_token(currentToken, cannidateList[0].name);
         free(currentToken);
         return;
     };
@@ -55,7 +55,7 @@ void handleTabAutoCompletion() {
         }
 
         newline();
-        newTerminalInputLine();
+        new_line_editor_input_line();
         print_chars(lineInputBuffer, true);
         lineInputCursorPos = lineInputLength;
 

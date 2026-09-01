@@ -11,8 +11,11 @@ extern unsigned int lineInputStart_X;
 void cursor_move_inline(const bool move_right);
 void handle_input_buffer_deletion();
 void clear_input_on_screen();
-void replaceCurrentToken(const char* oldToken, const char* newToken);
-void newTerminalInputLine();
+void replace_curr_token(const char* oldToken, const char* newToken);
+void new_line_editor_input_line();
 
-void terminal_init();
-void terminal_on_key(uint8_t scancode);
+void reset_line_input();
+void display_line_editor_error(const char* Text);
+void insert_char_at_cursor(const char c);
+
+bool line_editor_init();

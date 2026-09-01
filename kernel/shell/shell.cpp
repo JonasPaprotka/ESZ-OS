@@ -1,0 +1,116 @@
+#include "line_editor.h"
+#include "print.h"
+#include "info_text.h"
+#include "keyboard.h"
+#include "keymap.h"
+#include "parser.h"
+#include "filesystem.h"
+#include "string.h"
+#include "history.h"
+#include "autocomplete.h"
+#include "print_helper.h"
+
+static void process_line_input_buffer() {
+    if (lineInputLength == 0) {
+        newline();
+        reset_line_input();
+        return;
+    }
+
+    if (lineInputLength >= TERMINAL_BUFFER_SIZE) {
+        display_line_editor_error(String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
+        return;
+    }
+
+    add_command_to_history(lineInputBuffer);
+
+    const char* args = getInputArgs(lineInputLength, lineInputBuffer);
+    switch (executeCommand(lineInputBuffer, args)) {
+        case Return::Success:
+            reset_line_input();
+            break;
+        case Return::Error:
+            display_line_editor_error("An error occured");
+            break;
+        case Return::Warning:
+            display_line_editor_error(String("Unknown Command: '", lineInputBuffer, "'"));
+            break;
+        case Return::NoReturn:
+            display_line_editor_error("Well this is akward... this command should not be able to return.");
+            break;
+    }
+}
+
+static void handle_input_buffer_insertion(const uint8_t scancode) {
+    const char c = scancode_to_keycode(scancode);
+    if (!c) return;
+    insert_char_at_cursor(c);
+}
+
+void shell_on_key(const uint8_t scancode) {
+    uint16_t key = scancode_to_keycode(scancode);
+
+    if (isExtendedScancode) {
+        switch(scancode) {
+            case 0x48: // ARROW UP
+                if (cmdHistCount == 0) break;
+
+                if (goThroughHistoryCount < cmdHistCount) {
+                    goThroughHistoryCount++;
+                } else break;
+
+                handle_show_history();
+                break;
+
+            case 0x50: // ARROW DOWN
+                if (goThroughHistoryCount == 0) break;
+                goThroughHistoryCount--;
+
+                if (goThroughHistoryCount == 0) {
+                    clear_input_on_screen();
+                    reset_line_input();
+                } else {
+                    handle_show_history();
+                }
+                break;
+
+            case 0x4B: // ARROW LEFT
+                cursor_move_inline(false);
+                break;
+
+            case 0x4D: // ARROW RIGHT
+                cursor_move_inline(true);
+                break;
+        }
+
+        isExtendedScancode = false;
+        return;
+    }
+
+    switch(key) {
+        case KeyCode::KEY_ENTER:
+            goThroughHistoryCount = 0; // for arrow cmd history - default: 1
+            process_line_input_buffer();
+            new_line_editor_input_line();
+            break;
+
+        case KeyCode::KEY_BACKSPACE:
+            handle_input_buffer_deletion();
+            break;
+
+        case KeyCode::KEY_TAB:
+            handleTabAutoCompletion();
+            break;
+
+        default:
+            handle_input_buffer_insertion(scancode);
+            break;
+    }
+}
+
+bool shell_init() {
+    printTerminalHeader();
+    if (!line_editor_init()) return false;
+
+    return true;
+}

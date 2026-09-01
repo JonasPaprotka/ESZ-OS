@@ -1,6 +1,4 @@
-#include "line_editor.h"
 #include "print.h"
-#include "print_helper.h"
 #include "screenBuffer.h"
 #include "info_text.h"
 #include "keyboard.h"
@@ -8,15 +6,14 @@
 #include "parser.h"
 #include "filesystem.h"
 #include "string.h"
-#include "history.h"
-#include "autocomplete.h"
+#include "line_editor.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];
 unsigned int lineInputCursorPos;
 unsigned int lineInputStart_X;
 
-static void reset_line_input() {
+void reset_line_input() {
     lineInputLength = 0;
     lineInputCursorPos = 0;
     lineInputBuffer[0] = 0;
@@ -43,51 +40,20 @@ void clear_input_on_screen() {
     update_cursor_render();
 }
 
-static void displayTerminalError(const char* Text) {
+void display_line_editor_error(const char* Text) {
     newline();
     printInfoLine(InfoTextType::Error, Text);
     reset_line_input();
 }
 
-static void processLineInputBuffer() {
-    if (lineInputLength == 0) {
-        newline();
-        reset_line_input();
-        return;
-    }
-
-    if (lineInputLength >= TERMINAL_BUFFER_SIZE) {
-        displayTerminalError(String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
-        return;
-    }
-
-    add_command_to_history(lineInputBuffer);
-
-    const char* args = getInputArgs(lineInputLength, lineInputBuffer);
-    switch (executeCommand(lineInputBuffer, args)) {
-        case Return::Success:
-            reset_line_input();
-            break;
-        case Return::Error:
-            displayTerminalError("An error occured");
-            break;
-        case Return::Warning:
-            displayTerminalError(String("Unknown Command: '", lineInputBuffer, "'"));
-            break;
-        case Return::NoReturn:
-            displayTerminalError("Well this is akward... this command should not be able to return.");
-            break;
-    }
-}
-
-void newTerminalInputLine() {
+void new_line_editor_input_line() {
     const char* renderPath = currentPath;
     String linePrefix(renderPath, " >> ");
     print_inline(linePrefix);
     lineInputStart_X = cursorAt_X;
 }
 
-static void insert_char_at_cursor(const char c) {
+void insert_char_at_cursor(const char c) {
     for (uint64_t i = lineInputLength; i > lineInputCursorPos; i--) {
         lineInputBuffer[i] = lineInputBuffer[i - 1];
     }
@@ -115,13 +81,7 @@ static void insert_char_at_cursor(const char c) {
     update_cursor_render();
 }
 
-static void handle_input_buffer_insertion(const uint8_t scancode) {
-    const char c = scancode_to_keycode(scancode);
-    if (!c) return;
-    insert_char_at_cursor(c);
-}
-
-void replaceCurrentToken(const char* oldToken, const char* newToken) {
+void replace_curr_token(const char* oldToken, const char* newToken) {
     while (lineInputCursorPos < lineInputLength && lineInputBuffer[lineInputCursorPos] != ' ')
         cursor_move_inline(true);
 
@@ -179,68 +139,7 @@ void handle_input_buffer_deletion() {
     update_cursor_render();
 }
 
-void terminal_on_key(const uint8_t scancode) {
-    uint16_t key = scancode_to_keycode(scancode);
-
-    if (isExtendedScancode) {
-        switch(scancode) {
-            case 0x48: // ARROW UP
-                if (cmdHistCount == 0) break;
-
-                if (goThroughHistoryCount < cmdHistCount) {
-                    goThroughHistoryCount++;
-                } else break;
-
-                handle_show_history();
-                break;
-
-            case 0x50: // ARROW DOWN
-                if (goThroughHistoryCount == 0) break;
-                goThroughHistoryCount--;
-
-                if (goThroughHistoryCount == 0) {
-                    clear_input_on_screen();
-                    reset_line_input();
-                } else {
-                    handle_show_history();
-                }
-                break;
-
-            case 0x4B: // ARROW LEFT
-                cursor_move_inline(false);
-                break;
-
-            case 0x4D: // ARROW RIGHT
-                cursor_move_inline(true);
-                break;
-        }
-
-        isExtendedScancode = false;
-        return;
-    }
-
-    switch(key) {
-        case KeyCode::KEY_ENTER:
-            goThroughHistoryCount = 0; // for arrow cmd history - default: 1
-            processLineInputBuffer();
-            newTerminalInputLine();
-            break;
-
-        case KeyCode::KEY_BACKSPACE:
-            handle_input_buffer_deletion();
-            break;
-
-        case KeyCode::KEY_TAB:
-            handleTabAutoCompletion();
-            break;
-
-        default:
-            handle_input_buffer_insertion(scancode);
-            break;
-    }
-}
-
-void terminal_init() {
-    printTerminalHeader();
-    newTerminalInputLine();
+bool line_editor_init() {
+    new_line_editor_input_line();
+    return true;
 }

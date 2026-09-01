@@ -1,7 +1,7 @@
 #include "keyboard.h"
 #include <stdint.h>
 #include "io.h"
-#include "line_editor.h"
+#include "shell.h"
 
 bool shift = false;
 bool isExtendedScancode = false;
@@ -20,5 +20,5 @@ extern "C" void keyboard_handler() {
         return;
     }
 
-    if (scancode) terminal_on_key(scancode);
+    if (scancode) shell_on_key(scancode);
 }

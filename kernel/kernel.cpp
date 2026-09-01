@@ -2,7 +2,7 @@
 #include "print.h"
 #include "clear.h"
 #include "screenBuffer.h"
-#include "line_editor.h"
+#include "shell.h"
 #include "print_helper.h"
 #include "idt.h"
 #include "pic.h"
@@ -55,7 +55,9 @@ static void init_filesystem_layer() {
 }
 
 static void init_shell() {
-    terminal_init();
+    printLoadingStart("Shell");
+    newline();
+    shell_init();
 }
 
 extern "C" void kernel_main() {
