@@ -7,6 +7,9 @@
     - Complete Shell and Terminal refactoring
     - Commands
         - Help has been improved
+- Updated default config
+    - MAX_COMMAND_HISTORY: 100 -> 128
+    - SCROLL_HISTORY_LINES: 100 -> 128
 
 ## v0.4.5
 

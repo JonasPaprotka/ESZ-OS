@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 extern uint64_t lineInputLength;
-extern char lineInputBuffer[TERMINAL_BUFFER_SIZE];
+extern char lineInputBuffer[LINE_EDITOR_BUFFER_SIZE];
 extern unsigned int lineInputCursorPos;
 extern unsigned int lineInputStart_X;
 

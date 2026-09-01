@@ -3,7 +3,7 @@
 #include "commands.h"
 #include "string.h"
 
-const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64_t inputBufferLength, const char inputBuffer[TERMINAL_BUFFER_SIZE]) {
+const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64_t inputBufferLength, const char inputBuffer[LINE_EDITOR_BUFFER_SIZE]) {
     int tokenStartsAt = 0;
 
     for (int i = inputBufferCursorAt_X; i > 0; i--) {
@@ -25,7 +25,7 @@ const char* getCurrTokenFromBuffer(const int inputBufferCursorAt_X, const uint64
     return retToken;
 }
 
-const char* getInputArgs(const uint64_t inputLength, char inputBuffer[TERMINAL_BUFFER_SIZE]) {
+const char* getInputArgs(const uint64_t inputLength, char inputBuffer[LINE_EDITOR_BUFFER_SIZE]) {
     const char* args = "";
     for (uint64_t i = 0; i < inputLength; i++) {
         if (inputBuffer[i] == ' ') {
@@ -38,7 +38,7 @@ const char* getInputArgs(const uint64_t inputLength, char inputBuffer[TERMINAL_B
     return args;
 }
 
-Return executeCommand(char inputBuffer[TERMINAL_BUFFER_SIZE], const char* args) {
+Return executeCommand(char inputBuffer[LINE_EDITOR_BUFFER_SIZE], const char* args) {
     for (uint64_t i = 0; commands[i].name != 0; i++) {
         if (str_equal(inputBuffer, commands[i].name)) {
             newline();

@@ -28,16 +28,16 @@ constexpr uint64_t FONT_SIZE = 1;
 #define OS_VERSION_PATCH 0
 // -----------------------
 
-// --- TERMINAL CONFIG ---
-constexpr uint64_t TERMINAL_BUFFER_SIZE = 256;
-constexpr uint64_t MAX_COMMAND_HISTORY = 100;
-constexpr uint64_t SCROLL_HISTORY_LINES = 100;
+// --- SHELL CONFIG ---
+constexpr uint64_t LINE_EDITOR_BUFFER_SIZE = 256;
+constexpr uint64_t MAX_COMMAND_HISTORY = 128;
+constexpr uint64_t SCROLL_HISTORY_LINES = 128;
 constexpr uint64_t MAX_COMMAND_ARGS = 4;
 // -----------------------
 
 // --- MEMORY CONFIG ---
 constexpr uint64_t PAGE_SIZE = 4096;
-constexpr uint64_t INIT_HEAP_SIZE = 4096 * 1024 * 4; // 16 MiB
+constexpr uint64_t INIT_HEAP_SIZE = 1024 * 1024 * 16; // 16 MiB
 constexpr uint64_t VIRTUAL_OFFSET_MMIO = 0xFFFFA00000000000;
 constexpr uint64_t VIRTUAL_OFFSET_VMM = 0xFFFFB00000000000;
 // ---------------------

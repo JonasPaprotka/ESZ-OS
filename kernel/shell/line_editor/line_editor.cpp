@@ -5,7 +5,7 @@
 #include "string.h"
 
 uint64_t lineInputLength = 0;
-char lineInputBuffer[TERMINAL_BUFFER_SIZE];
+char lineInputBuffer[LINE_EDITOR_BUFFER_SIZE];
 unsigned int lineInputCursorPos;
 unsigned int lineInputStart_X;
 

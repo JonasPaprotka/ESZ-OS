@@ -31,8 +31,8 @@ static void process_line_input_buffer() {
         return;
     }
 
-    if (lineInputLength >= TERMINAL_BUFFER_SIZE) {
-        display_line_editor_error(String("Command exceeds ", TERMINAL_BUFFER_SIZE, " chars"));
+    if (lineInputLength >= LINE_EDITOR_BUFFER_SIZE) {
+        display_line_editor_error(String("Command exceeds ", LINE_EDITOR_BUFFER_SIZE, " chars"));
         return;
     }
 

@@ -8,5 +8,5 @@ struct Argument {
     const char* summary = "";
     Types type = Types::Boolean;
     bool isRequired = false;
-    char value[TERMINAL_BUFFER_SIZE] = {};
+    char value[LINE_EDITOR_BUFFER_SIZE] = {};
 };
