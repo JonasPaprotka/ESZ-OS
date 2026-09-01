@@ -77,7 +77,7 @@ void str_add(char* target, const char char_value) {
 bool str_contains(const char* text, const char* searchText) {
     const uint64_t searchText_len = str_length(searchText);
     const uint64_t text_len = str_length(text);
-    if (searchText_len > text_len) return 0;
+    if (searchText_len > text_len) return false;
 
     char comparison[searchText_len + 1];
 

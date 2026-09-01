@@ -145,18 +145,43 @@ static Return cmd_help(const Command& command) {
         print_inline(commands[i].name);
 
         if (commands[i].summary[0] != 0) {
-            print_inline("  ->  ");
+            print_inline(" | ");
             print_inline(commands[i].summary);
         }
 
         if (commands[i].args[0].name != 0) {
-            print_inline(" | ");
             for (uint64_t j = 0; j < MAX_COMMAND_ARGS; j++) {
+
                 if (commands[i].args[j].name == 0) break;
 
-                print_inline("[-");
-                print_inline(commands[i].args[j].name);
-                print_inline("] ");
+                newline();
+                print_inline("   $ ");
+
+                if (commands[i].args[j].isRequired) {
+                    print_inline(String("<-", commands[i].args[j].name, ">"));
+                } else {
+                    print_inline(String("[-", commands[i].args[j].name, "]"));
+                }
+
+                switch (commands[i].args[j].type) {
+                    case Types::Boolean:
+                        print_inline(":Bool");
+                        break;
+                    case Types::Integer:
+                        print_inline(":Int");
+                        break;
+                    case Types::String:
+                        print_inline(":Str");
+                        break;
+                    default:
+                        print_inline(":?");
+                        break;
+                }
+
+                if (commands[i].args[j].summary[0] != 0) {
+                    print_inline(" | ");
+                    print_inline(commands[i].args[j].summary);
+                }
             }
         }
 
@@ -259,22 +284,23 @@ Command commands[] = {
     { "help", "", cmd_help },
     { "history", "", cmd_history },
     { "echo", "", cmd_echo,
-        Argument("text", "Text to print", Types::String, true) },
-    { "clear", "Clear the screen", cmd_clear },
+        Argument("text", "", Types::String, true) },
+    { "clear", "", cmd_clear },
     { "sysinfo", "", cmd_sysinfo },
     { "reboot", "", cmd_reboot },
     { "meminfo", "Show memory informations", cmd_memory_info },
-    { "uptime", "Time since boot", cmd_get_uptime },
+    { "uptime", "", cmd_get_uptime },
     { "pciinfo", "List detected PCI devices", cmd_pciinfo,
         Argument("c", "Compact", Types::Boolean, false) },
-    { "read", "Print the contents of a file", cmd_read,
-        Argument("file", "File to read", Types::String, true) },
-    { "driveinfo", "Show selected drive and partition information", cmd_driveinfo },
+    { "read", "", cmd_read,
+        Argument("file", "", Types::String, true) },
+    { "driveinfo", "", cmd_driveinfo },
     { "dumpsector", "Print a sector as hex", cmd_dumpsector,
         Argument("lba", "Sector to dump", Types::Integer, true) },
     { "cd", "", cmd_cd,
-        Argument("path", "Target directory, empty for root", Types::String, false) },
-    { "ls", "", cmd_ls },
+        Argument("path", "", Types::String, false), },
+    { "ls", "", cmd_ls,
+        Argument("path", "", Types::String, false), },
     { "pwd", "", cmd_pwd },
     { 0 }
 };
