@@ -1,7 +1,7 @@
+#include "limine_boot.h"
 #include <stdint.h>
 #include <stddef.h>
 #include "limine.h"
-#include "limine_boot.h"
 
 uint64_t hhdm_offset = 0;
 

@@ -1,3 +1,4 @@
+#include "shell.h"
 #include "line_editor.h"
 #include "print.h"
 #include "info_text.h"
@@ -52,12 +53,6 @@ static void process_line_input_buffer() {
             display_line_editor_error("Well this is akward... this command should not be able to return.");
             break;
     }
-}
-
-static void handle_input_buffer_insertion(const uint8_t scancode) {
-    const char c = scancode_to_keycode(scancode);
-    if (!c) return;
-    insert_char_at_cursor(c);
 }
 
 void shell_on_key(const uint8_t scancode) {
@@ -116,7 +111,7 @@ void shell_on_key(const uint8_t scancode) {
             break;
 
         default:
-            handle_input_buffer_insertion(scancode);
+            insert_char_at_cursor(key);
             break;
     }
 }

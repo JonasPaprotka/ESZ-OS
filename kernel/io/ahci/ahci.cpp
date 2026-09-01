@@ -1,7 +1,7 @@
+#include "ahci.h"
 #include "config.h"
 #include <stdint.h>
 #include "pci.h"
-#include "ahci.h"
 #include "paging.h"
 #include "timer.h"
 #include "limine_boot.h"

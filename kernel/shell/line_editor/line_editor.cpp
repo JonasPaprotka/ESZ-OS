@@ -1,12 +1,8 @@
+#include "line_editor.h"
 #include "print.h"
 #include "screenBuffer.h"
-#include "info_text.h"
-#include "keyboard.h"
-#include "keymap.h"
-#include "parser.h"
-#include "filesystem.h"
+#include "color.h"
 #include "string.h"
-#include "line_editor.h"
 
 uint64_t lineInputLength = 0;
 char lineInputBuffer[TERMINAL_BUFFER_SIZE];

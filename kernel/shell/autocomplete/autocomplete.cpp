@@ -1,3 +1,5 @@
+#include "autocomplete.h"
+#include "shell.h"
 #include "heap.h"
 #include "integer.h"
 #include "commands.h"

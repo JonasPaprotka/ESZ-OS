@@ -1,3 +1,4 @@
+#include "history.h"
 #include "config.h"
 #include "integer.h"
 #include "string.h"

@@ -1,5 +1,5 @@
-#include "config.h"
 #include "vmm.h"
+#include "config.h"
 #include "pmm.h"
 #include "pmm_bitmap.h"
 #include "bit.h"
