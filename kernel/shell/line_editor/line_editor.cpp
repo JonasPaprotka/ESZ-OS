@@ -5,7 +5,7 @@
 #include "info_text.h"
 #include "keyboard.h"
 #include "keymap.h"
-#include "args.h"
+#include "parser.h"
 #include "filesystem.h"
 #include "string.h"
 #include "history.h"

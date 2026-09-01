@@ -4,7 +4,7 @@
 #include "string.h"
 #include "print.h"
 #include "line_editor.h"
-#include "args.h"
+#include "parser.h"
 
 void handleTabAutoCompletion() {
     if (lineInputLength == 0) return;
