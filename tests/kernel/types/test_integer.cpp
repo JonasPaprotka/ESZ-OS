@@ -118,3 +118,44 @@ TEST_CASE("digit_value - round trip with to_string") {
         CHECK(digit_value(to_string(i, 36)[0]) == i);
     }
 }
+
+TEST_CASE("test is_integer char") {
+    CHECK(is_integer(' ') == false);
+    for(uint64_t i = 0; i <= 9; i++) {
+        CHECK(is_integer(to_string(i)) == true);
+    }
+    CHECK(is_integer('-') == false);
+    CHECK(is_integer('+') == false);
+}
+
+TEST_CASE("test is_integer text") {
+    CHECK(is_integer("") == false);
+    CHECK(is_integer(" ") == false);
+    CHECK(is_integer(" 1") == false);
+    CHECK(is_integer(" p") == false);
+    CHECK(is_integer(" P") == false);
+    CHECK(is_integer("P") == false);
+    CHECK(is_integer("P ") == false);
+    CHECK(is_integer("p ") == false);
+    CHECK(is_integer(" p ") == false);
+    CHECK(is_integer(" p ") == false);
+    CHECK(is_integer("this is a Test") == false);
+    CHECK(is_integer("!") == false);
+    CHECK(is_integer("&") == false);
+    CHECK(is_integer("-") == false);
+    CHECK(is_integer("+") == false);
+    CHECK(is_integer("0") == true);
+    CHECK(is_integer("010") == true);
+    CHECK(is_integer("-100") == true);
+    CHECK(is_integer("+100") == true);
+    CHECK(is_integer("p100") == false);
+    CHECK(is_integer("100p") == false);
+    CHECK(is_integer("978423") == true);
+    CHECK(is_integer(to_string(UINT64_MAX)) == true);
+    CHECK(is_integer(to_string(INT64_MAX)) == true);
+    CHECK(is_integer(to_string(INT64_MIN)) == true);
+    CHECK(is_integer(to_string(INT16_MAX)) == true);
+    CHECK(is_integer(to_string(INT16_MIN)) == true);
+    CHECK(is_integer(to_string(INT32_MAX)) == true);
+    CHECK(is_integer(to_string(INT32_MIN)) == true);
+}

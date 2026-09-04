@@ -27,7 +27,7 @@ endif
 
 ##########
 # Not addable: keymap paging args commands pci pit timer idt pic keyboard terminal filesystem storage screenBuffer print clear info_text print_helper heap pmm
-KERNEL_MODULES := string char memory math bit integer utf16 pci_class_names mbr bitmap
+KERNEL_MODULES := string char memory math bit integer utf16 pci_class_names mbr bitmap boolean
 ##########
 
 KERNEL_SRC := $(sort $(foreach m,$(KERNEL_MODULES),$(shell find $(KERNEL) -name '$(m).cpp')))

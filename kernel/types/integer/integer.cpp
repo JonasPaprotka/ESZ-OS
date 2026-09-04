@@ -36,3 +36,23 @@ int64_t to_int(const char* text, const uint64_t base) {
 int64_t to_int(const char* text) {
     return to_int(text, 10);
 }
+
+bool is_integer(const char c) {
+    return (is_digit(c));
+}
+
+bool is_integer(const char* text) {
+    const uint64_t text_len = str_length(text);
+    if (text_len == 0) return false;
+    bool found_digit = false;
+
+    for (uint64_t i = 0; i < text_len; i++) {
+        if (!is_digit(text[i])) {
+            if (!((text[i] == '-' || text[i] == '+') && i == 0)) return false;
+        } else {
+            found_digit = true;
+        }
+    }
+
+    return found_digit;
+}
