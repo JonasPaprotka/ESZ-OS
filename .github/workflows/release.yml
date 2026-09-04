@@ -79,7 +79,7 @@ jobs:
           cat SHA256SUMS
 
       - name: Create Release
-        uses: softprops/action-gh-release@v3.0.2
+        uses: softprops/action-gh-release@v3.0.3
         with:
           name: ESZ-OS ${{ github.ref_name }}
           prerelease: ${{ contains(github.ref_name, '-') }}
