@@ -2,7 +2,7 @@
 
 ## v0.5.0
 
-- Updated Limine Bootloader to 12.7.0
+- Updated Limine Bootloader to 12.8.0
 - Shell rework
     - Complete Shell and Terminal refactoring
     - Commands
