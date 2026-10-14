@@ -58,7 +58,7 @@ jobs:
         run: make CROSS=x86_64-linux-gnu-
 
       - name: Upload ISO
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: eszos-iso
           path: bin/eszos.iso
